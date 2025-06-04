@@ -16,15 +16,15 @@ https://github.com/STIWK2124-A242/class-activity-stiwk2124/blob/main/NewGroupMem
 | ---------------- | ------- | ------------- | ------------- | ----------------------------------------------------------------------- |
 | WONG ZHEN XUAN   | LEADER & Frontend Director | 292567        | 011-10890137  | <img src="https://github.com/user-attachments/assets/72aed434-0bee-40c0-9409-cb7f02b362c4" width="100"/> |
 | TAN LUCK PHANG   | MEMBER  | 293224        | 011-14438848  | <img src="https://github.com/user-attachments/assets/92f3d9cc-ef1f-4fd6-83cf-49afa12d4f12" width="100"/> |
-| Muhammad Danial Bin Mohd Faris | MEMBER | 294692 | | |
+| Muhammad Danial Bin Mohd Faris | MEMBER | 294692 | 012-451-6452 | |
 
 ### 👥 Group Members (Backend)
 | Name             | Role    | Matric Number | Phone Number  | Picture                                                                 |
 | ---------------- | ------- | ------------- | ------------- | ----------------------------------------------------------------------- |
-| Siti Alya Balqis Binti Abdul Rahmat | Backend Driector | 291345 | | |
-| Nurfatin Aleysyah Binti Abdul Razly | MEMBER | 296017 | | |
-| Nurul Husna Binti Mohd Badrulisyam | MEMBER | 291878 | | |
-| Ku Hazwan Bin Ku Izham | MEMBER  | 289889 | | |
+| Siti Alya Balqis Binti Abdul Rahmat | Backend Driector | 291345 | 012-655-2610 | |
+| Nurfatin Aleysyah Binti Abdul Razly | MEMBER | 296017 | 019-376-6461 | |
+| Nurul Husna Binti Mohd Badrulisyam | MEMBER | 291878 | 018-471-5413 | |
+| Ku Hazwan Bin Ku Izham | MEMBER  | 289889 | 019-844-2357 | |
 
 
 
