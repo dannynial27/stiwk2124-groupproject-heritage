@@ -1,0 +1,14 @@
+package my.stiwk2124.qurba;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+@SpringBootTest
+@ActiveProfiles("test")
+class QurbaApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}

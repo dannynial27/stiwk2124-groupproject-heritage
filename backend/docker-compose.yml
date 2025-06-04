@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  app:
+    ## image: bcfeszjing/qurba-backend:latest
+    ## Uncomment the above line to use a pre-built image from Docker Hub and comment the build line below.
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/qurbadb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SERVER_SERVLET_CONTEXT_PATH=/qurba
+    depends_on:
+      - mysql
+    volumes:
+      - ./QurbaProductPhoto:/app/backend/QurbaProductPhoto
+    networks:
+      - qurba-network
+      
+  mysql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=qurbadb
+    ports:
+      - "3308:3306"  # Changed from 3307 to 3308 to avoid port conflict
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - "./db/init.sql:/docker-entrypoint-initdb.d/init.sql"
+    networks:
+      - qurba-network
+      
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=root
+      - PMA_ARBITRARY=1
+    ports:
+      - "8082:80"
+    depends_on:
+      - mysql
+    networks:
+      - qurba-network
+
+networks:
+  qurba-network:
+
+volumes:
+  mysql-data:
