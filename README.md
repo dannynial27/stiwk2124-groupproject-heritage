@@ -13,9 +13,11 @@ https://github.com/STIWK2124-A242/class-activity-stiwk2124/blob/main/NewGroupMem
 
 ### 👥 Group Members
 
-| Group Member #1                             | Group Member #2                           | #3 | #4 | #5 | #6 | #7 |
-| :----------------------------------------: | :---------------------------------------: | :-:| :-:| :-:| :-:| :-:|
-| **WONG ZHEN XUAN (LEADER)**<br>Matric: 292567<br>Phone: 011-10890137<br><img src="https://github.com/user-attachments/assets/72aed434-0bee-40c0-9409-cb7f02b362c4" width="100"/> | **TAN LUCK PHANG**<br>Matric: 293224<br>Phone: 011-14438848<br><img src="https://github.com/user-attachments/assets/92f3d9cc-ef1f-4fd6-83cf-49afa12d4f12" width="100"/> |    |    |    |    |    |
+| Name               | Matric Number | Phone Number  | Picture                                                                 |
+| ------------------ | ------------- | ------------- | ----------------------------------------------------------------------- |
+| WONG ZHEN XUAN     | 292567        | 011-10890137  | <img src="https://github.com/user-attachments/assets/72aed434-0bee-40c0-9409-cb7f02b362c4" width="100"/> |
+| TAN LUCK PHANG     | 293224        | 011-14438848  | <img src="https://github.com/user-attachments/assets/92f3d9cc-ef1f-4fd6-83cf-49afa12d4f12" width="100"/> |
+
 
 
 ## Title of your application (a unique title)
