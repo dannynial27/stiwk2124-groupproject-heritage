@@ -11,6 +11,26 @@ https://github.com/STIWK2124-A242/class-activity-stiwk2124/blob/main/NewGroupMem
 1. Mention your group name for Assignment-1 and Assignment-2
 1. Other related info (if any)
 
+### 👥 Group Members
+
+<details>
+<summary><strong>WONG ZHEN XUAN (LEADER)</strong></summary>
+
+- **Matric Number:** 292567  
+- **Phone Number:** 011-10890137  
+- ![Wong Zhen Xuan](https://github.com/user-attachments/assets/72aed434-0bee-40c0-9409-cb7f02b362c4)
+
+</details>
+
+<details>
+<summary><strong>TAN LUCK PHANG</strong></summary>
+
+- **Matric Number:** 293224  
+- **Phone Number:** 011-14438848  
+- ![Tan Luck Phang](https://github.com/user-attachments/assets/92f3d9cc-ef1f-4fd6-83cf-49afa12d4f12)
+
+</details>
+
 ## Title of your application (a unique title)
 ## Abstract (in 300 words)
    1. Background
