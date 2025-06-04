@@ -14,8 +14,8 @@ https://github.com/STIWK2124-A242/class-activity-stiwk2124/blob/main/NewGroupMem
 ### 👥 Group Members (Backend)
 | Name             | Role    | Matric Number | Phone Number  | Picture                                                                 |
 | ---------------- | ------- | ------------- | ------------- | ----------------------------------------------------------------------- |
-| WONG ZHEN XUAN   | LEADER & Frontend Director | 292567        | 011-10890137  | <img src="https://github.com/user-attachments/assets/72aed434-0bee-40c0-9409-cb7f02b362c4" width="100"/> |
-| TAN LUCK PHANG   | MEMBER  | 293224        | 011-14438848  | <img src="https://github.com/user-attachments/assets/92f3d9cc-ef1f-4fd6-83cf-49afa12d4f12" width="100"/> |
+| Wong Zhen Xuan  | LEADER & Frontend Director | 292567        | 011-10890137  | <img src="https://github.com/user-attachments/assets/72aed434-0bee-40c0-9409-cb7f02b362c4" width="100"/> |
+| Tan Luck Phang  | MEMBER  | 293224        | 011-14438848  | <img src="https://github.com/user-attachments/assets/92f3d9cc-ef1f-4fd6-83cf-49afa12d4f12" width="100"/> |
 | Muhammad Danial Bin Mohd Faris | MEMBER | 294692 | 012-451-6452 | |
 
 ### 👥 Group Members (Frontend)
