@@ -13,23 +13,10 @@ https://github.com/STIWK2124-A242/class-activity-stiwk2124/blob/main/NewGroupMem
 
 ### 👥 Group Members
 
-<details>
-<summary><strong>WONG ZHEN XUAN (LEADER)</strong></summary>
+| Group Member #1                             | Group Member #2                           | #3 | #4 | #5 | #6 | #7 |
+| :----------------------------------------: | :---------------------------------------: | :-:| :-:| :-:| :-:| :-:|
+| **WONG ZHEN XUAN (LEADER)**<br>Matric: 292567<br>Phone: 011-10890137<br><img src="https://github.com/user-attachments/assets/72aed434-0bee-40c0-9409-cb7f02b362c4" width="100"/> | **TAN LUCK PHANG**<br>Matric: 293224<br>Phone: 011-14438848<br><img src="https://github.com/user-attachments/assets/92f3d9cc-ef1f-4fd6-83cf-49afa12d4f12" width="100"/> |    |    |    |    |    |
 
-- **Matric Number:** 292567  
-- **Phone Number:** 011-10890137  
-- ![Wong Zhen Xuan](https://github.com/user-attachments/assets/72aed434-0bee-40c0-9409-cb7f02b362c4)
-
-</details>
-
-<details>
-<summary><strong>TAN LUCK PHANG</strong></summary>
-
-- **Matric Number:** 293224  
-- **Phone Number:** 011-14438848  
-- ![Tan Luck Phang](https://github.com/user-attachments/assets/92f3d9cc-ef1f-4fd6-83cf-49afa12d4f12)
-
-</details>
 
 ## Title of your application (a unique title)
 ## Abstract (in 300 words)
