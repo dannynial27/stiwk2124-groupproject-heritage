@@ -4,6 +4,7 @@ import my.stiwk2124.qurba.JPAentities.Order;
 import my.stiwk2124.qurba.JPAentities.User;
 import my.stiwk2124.qurba.Security.CustomUserDetails;
 import my.stiwk2124.qurba.service.OrderService;
+import my.stiwk2124.qurba.dto.CheckoutRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,12 +34,21 @@ public class CheckoutController {
     }
 
     @PostMapping("/{userId}")
-    public ResponseEntity<Order> checkout(@PathVariable Long userId) {
+    public ResponseEntity<Order> checkout(
+            @PathVariable Long userId,
+            @RequestBody CheckoutRequest checkoutRequest) {
         // Temporarily commented out for testing
         // verifyUserId(userId);
         
         try {
-            Order order = orderService.checkout(userId);
+            Order order = orderService.checkout(
+                userId, 
+                checkoutRequest.getShippingName(),
+                checkoutRequest.getShippingAddress(),
+                checkoutRequest.getShippingCity(),
+                checkoutRequest.getShippingPostalCode(),
+                checkoutRequest.getPaymentMethod()
+            );
             return ResponseEntity.ok(order);
         } catch (Exception e) {
             e.printStackTrace();

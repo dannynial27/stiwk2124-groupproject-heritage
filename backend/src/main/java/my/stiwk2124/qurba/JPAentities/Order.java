@@ -29,6 +29,13 @@ public class Order {
     private LocalDateTime orderDate;
     private LocalDateTime updatedAt;
 
+    // New shipping and payment fields
+    private String shippingName;
+    private String shippingAddress;
+    private String shippingCity;
+    private String shippingPostalCode;
+    private String paymentMethod;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<OrderItem> orderItems;
@@ -103,5 +110,46 @@ public class Order {
 
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+    
+    // New getters and setters for shipping and payment fields
+    public String getShippingName() {
+        return shippingName;
+    }
+    
+    public void setShippingName(String shippingName) {
+        this.shippingName = shippingName;
+    }
+    
+    public String getShippingAddress() {
+        return shippingAddress;
+    }
+    
+    public void setShippingAddress(String shippingAddress) {
+        this.shippingAddress = shippingAddress;
+    }
+    
+    public String getShippingCity() {
+        return shippingCity;
+    }
+    
+    public void setShippingCity(String shippingCity) {
+        this.shippingCity = shippingCity;
+    }
+    
+    public String getShippingPostalCode() {
+        return shippingPostalCode;
+    }
+    
+    public void setShippingPostalCode(String shippingPostalCode) {
+        this.shippingPostalCode = shippingPostalCode;
+    }
+    
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+    
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }
