@@ -92,7 +92,12 @@ CREATE TABLE `orders` (
   `total_amount` decimal(10,2) NOT NULL,
   `status` enum('PENDING','CONFIRMED','SHIPPED','DELIVERED','CANCELLED') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'PENDING',
   `order_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `shipping_name` varchar(100) DEFAULT NULL,
+  `shipping_address` varchar(255) DEFAULT NULL,
+  `shipping_city` varchar(100) DEFAULT NULL,
+  `shipping_postal_code` varchar(20) DEFAULT NULL,
+  `payment_method` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

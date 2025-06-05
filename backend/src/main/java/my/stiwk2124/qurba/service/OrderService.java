@@ -68,8 +68,15 @@ public class OrderService {
         }
     }
 
+    // Legacy checkout method without shipping info (keep for backward compatibility)
     @Transactional
     public Order checkout(Long userId) {
+        return checkout(userId, null, null, null, null, null);
+    }
+
+    @Transactional
+    public Order checkout(Long userId, String shippingName, String shippingAddress, 
+                          String shippingCity, String shippingPostalCode, String paymentMethod) {
         Cart cart = cartService.getOrCreateCart(userId);
         if (cart.getItems().isEmpty()) {
             throw new IllegalStateException("Cannot checkout with empty cart");
@@ -79,6 +86,14 @@ public class OrderService {
         order.setUser(cart.getUser());
         order.setStatus(Order.Status.PENDING);
         order.setOrderDate(LocalDateTime.now());
+        
+        // Set shipping and payment information
+        order.setShippingName(shippingName);
+        order.setShippingAddress(shippingAddress);
+        order.setShippingCity(shippingCity);
+        order.setShippingPostalCode(shippingPostalCode);
+        order.setPaymentMethod(paymentMethod);
+        
         // Initialize the orderItems list
         order.setOrderItems(new ArrayList<>());
 
