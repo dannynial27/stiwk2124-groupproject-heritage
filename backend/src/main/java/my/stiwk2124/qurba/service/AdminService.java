@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 public class AdminService {
@@ -91,10 +92,67 @@ public class AdminService {
         }
     }
     
+    @Transactional(readOnly = true)
+    public List<Order> getOrdersByYearAndMonth(int year, Integer month) {
+        if (month != null) {
+            System.out.println("AdminService: Fetching orders for year " + year + ", month " + month);
+            List<Order> orders = orderRepository.findByYearAndMonth(year, month);
+            System.out.println("Found " + orders.size() + " orders for " + year + "-" + month);
+            
+            // Force loading of order items
+            loadOrderItems(orders);
+            
+            return orders;
+        } else {
+            System.out.println("AdminService: Fetching orders for year " + year);
+            List<Order> orders = orderRepository.findByYear(year);
+            System.out.println("Found " + orders.size() + " orders for year " + year);
+            
+            // Force loading of order items
+            loadOrderItems(orders);
+            
+            return orders;
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<Order> getOrdersByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        System.out.println("AdminService: Fetching orders from " + startDate + " to " + endDate);
+        List<Order> orders = orderRepository.findByDateRange(startDate, endDate);
+        System.out.println("Found " + orders.size() + " orders in date range");
+        
+        // Force loading of order items
+        for (Order order : orders) {
+            if (order.getOrderItems() != null) {
+                try {
+                    order.getOrderItems().size(); // Force initialization
+                } catch (Exception e) {
+                    System.err.println("Error loading items for order " + order.getOrderId() + ": " + e.getMessage());
+                }
+            }
+        }
+        
+        return orders;
+    }
+    
     // Helper method to get valid status values
     private String[] getValidStatusValues() {
         return Arrays.stream(Order.Status.values())
             .map(Enum::name)
             .toArray(String[]::new);
+    }
+
+    // Helper method to load order items
+    private void loadOrderItems(List<Order> orders) {
+        for (Order order : orders) {
+            if (order.getOrderItems() != null) {
+                try {
+                    int itemCount = order.getOrderItems().size(); // Force initialization
+                    System.out.println("Order " + order.getOrderId() + " has " + itemCount + " items");
+                } catch (Exception e) {
+                    System.err.println("Error loading items for order " + order.getOrderId() + ": " + e.getMessage());
+                }
+            }
+        }
     }
 }

@@ -13,11 +13,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -219,6 +222,128 @@ public class AdminController {
             error.put("error", "Failed to retrieve orders: " + e.getMessage());
             return ResponseEntity.status(500).body(error);
 
+        }
+    }
+
+    @GetMapping("/orders/by-month")
+    public ResponseEntity<?> getOrdersByMonth(
+            @RequestParam int year,
+            @RequestParam(required = false) Integer month) {
+
+        try {
+            List<Order> orders = adminService.getOrdersByYearAndMonth(year, month);
+
+            // Create simplified response objects
+            List<Map<String, Object>> simplifiedOrders = new ArrayList<>();
+
+            for (Order order : orders) {
+                Map<String, Object> orderData = new HashMap<>();
+                orderData.put("orderId", order.getOrderId());
+                orderData.put("status", order.getStatus().toString());
+                orderData.put("orderDate", order.getOrderDate());
+                orderData.put("totalAmount", order.getTotalAmount());
+
+                // Add user info
+                if (order.getUser() != null) {
+                    Map<String, Object> userData = new HashMap<>();
+                    userData.put("userId", order.getUser().getUserId());
+                    userData.put("username", order.getUser().getUsername());
+                    userData.put("email", order.getUser().getEmail());
+                    orderData.put("user", userData);
+                }
+
+                // Add order items
+                List<Map<String, Object>> items = new ArrayList<>();
+                if (order.getOrderItems() != null) {
+                    for (OrderItem item : order.getOrderItems()) {
+                        if (item != null && item.getProduct() != null) {
+                            Map<String, Object> itemData = new HashMap<>();
+                            itemData.put("orderItemId", item.getOrderItemId());
+                            itemData.put("quantity", item.getQuantity());
+                            itemData.put("unitPrice", item.getUnitPrice());
+
+                            // Add product info
+                            Map<String, Object> productData = new HashMap<>();
+                            Product product = item.getProduct();
+                            productData.put("productId", product.getProductId());
+                            productData.put("name", product.getName());
+                            productData.put("price", product.getPrice());
+
+                            itemData.put("product", productData);
+                            items.add(itemData);
+                        }
+                    }
+                }
+                orderData.put("orderItems", items);
+                simplifiedOrders.add(orderData);
+            }
+
+            return ResponseEntity.ok(simplifiedOrders);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Failed to retrieve orders: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
+        }
+    }
+
+    @GetMapping("/orders/by-date-range")
+    public ResponseEntity<?> getOrdersByDateRange(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
+
+        try {
+            List<Order> orders = adminService.getOrdersByDateRange(startDate, endDate);
+
+            // Create simplified response objects (reuse the same format as above)
+            List<Map<String, Object>> simplifiedOrders = new ArrayList<>();
+
+            for (Order order : orders) {
+                Map<String, Object> orderData = new HashMap<>();
+                orderData.put("orderId", order.getOrderId());
+                orderData.put("status", order.getStatus().toString());
+                orderData.put("orderDate", order.getOrderDate());
+                orderData.put("totalAmount", order.getTotalAmount());
+
+                // Add user info
+                if (order.getUser() != null) {
+                    Map<String, Object> userData = new HashMap<>();
+                    userData.put("userId", order.getUser().getUserId());
+                    userData.put("username", order.getUser().getUsername());
+                    userData.put("email", order.getUser().getEmail());
+                    orderData.put("user", userData);
+                }
+
+                // Add order items
+                List<Map<String, Object>> items = new ArrayList<>();
+                if (order.getOrderItems() != null) {
+                    for (OrderItem item : order.getOrderItems()) {
+                        if (item != null && item.getProduct() != null) {
+                            Map<String, Object> itemData = new HashMap<>();
+                            itemData.put("orderItemId", item.getOrderItemId());
+                            itemData.put("quantity", item.getQuantity());
+                            itemData.put("unitPrice", item.getUnitPrice());
+
+                            // Add product info
+                            Map<String, Object> productData = new HashMap<>();
+                            Product product = item.getProduct();
+                            productData.put("productId", product.getProductId());
+                            productData.put("name", product.getName());
+                            productData.put("price", product.getPrice());
+
+                            itemData.put("product", productData);
+                            items.add(itemData);
+                        }
+                    }
+                }
+                orderData.put("orderItems", items);
+                simplifiedOrders.add(orderData);
+            }
+
+            return ResponseEntity.ok(simplifiedOrders);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Failed to retrieve orders: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
         }
     }
 
