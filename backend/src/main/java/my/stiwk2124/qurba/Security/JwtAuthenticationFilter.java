@@ -7,17 +7,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -27,9 +29,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        // Add CORS headers
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        // Add CORS headers for Postman requests
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
         response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Max-Age", "3600");
@@ -42,49 +44,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String header = request.getHeader("Authorization");
         String username = null;
         String token = null;
-        Long userId = null;
 
-        logger.info("Request URI: " + request.getRequestURI());
-        logger.info("Authorization header: " + (header != null ? "present" : "missing"));
-
+        logger.info("Processing request: " + request.getRequestURI());
+        
         if (header != null && header.startsWith("Bearer ")) {
             token = header.substring(7);
             try {
                 username = jwtUtil.extractUsername(token);
-                userId = jwtUtil.extractUserId(token);
                 logger.info("Extracted username: " + username);
-                logger.info("Extracted userId: " + userId);
             } catch (Exception e) {
-                logger.error("Error extracting claims from token", e);
+                logger.error("Error processing JWT token: " + e.getMessage());
             }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (jwtUtil.validateToken(token, username)) {
-                // Create authentication details with userId as a detail
-                Map<String, Object> details = new HashMap<>();
-                if (userId != null) {
-                    details.put("userId", userId);
-                } else {
-                    // If userId is missing in token, use a default for testing
-                    userId = 8L; // Use the user ID from the console logs
-                    details.put("userId", userId);
-                    logger.warn("Using default userId: " + userId);
+            
+            try {
+                if (jwtUtil.validateToken(token, userDetails.getUsername())) {
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                    
+                    logger.info("Authentication successful for user: " + username);
+                    logger.info("User authorities: " + userDetails.getAuthorities());
                 }
-                
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                
-                WebAuthenticationDetailsSource detailsSource = new WebAuthenticationDetailsSource();
-                auth.setDetails(detailsSource.buildDetails(request));
-                
-                // Store the userId in the request attribute for controllers to access
-                request.setAttribute("userId", userId);
-                
-                SecurityContextHolder.getContext().setAuthentication(auth);
+            } catch (Exception e) {
+                logger.error("Token validation failed: " + e.getMessage());
             }
         }
+        
         chain.doFilter(request, response);
     }
 }
