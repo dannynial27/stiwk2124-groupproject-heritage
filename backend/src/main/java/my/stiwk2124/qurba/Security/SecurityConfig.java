@@ -17,7 +17,7 @@ import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Enable @PreAuthorize annotations
+@EnableMethodSecurity
 public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -28,34 +28,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Disable CSRF using lambda-based configuration
                 .csrf(csrf -> csrf.disable())
-                // Configure session management
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // Configure userDetailsService
                 .userDetailsService(userDetailsService)
-                // Authorize HTTP requests
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow OPTIONS requests
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/products", "/api/products/**").permitAll()
-                        // Allow access to image endpoints
                         .requestMatchers("/api/images/**").permitAll()
-                        // Temporarily allow cart, checkout, and orders access for testing
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/product/**").permitAll()
                         .requestMatchers("/api/cart/**").permitAll()
                         .requestMatchers("/api/checkout/**").permitAll()
                         .requestMatchers("/api/orders/**").permitAll()
-                        // Admin-only endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        // Customer-only endpoints
-                        //.requestMatchers("/api/cart/**").hasRole("CUSTOMER")
-                        //.requestMatchers("/api/checkout/**").hasRole("CUSTOMER")
-                        //.requestMatchers("/api/orders/**").hasRole("CUSTOMER")
-                        // Any other request requires authentication
+                        .requestMatchers("/api/reviews/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/wishlist/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/feedback/**").hasRole("CUSTOMER")
                         .anyRequest().authenticated()
                 )
-                // Add JWT filter before UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
