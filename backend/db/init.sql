@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: mysql:3306
--- Generation Time: Jun 05, 2025 at 04:46 AM
--- Server version: 8.0.42
--- PHP Version: 8.2.8
+-- Host: 127.0.0.1
+-- Generation Time: Jun 06, 2025 at 08:25 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,10 +28,10 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `carts` (
-  `cart_id` bigint NOT NULL,
-  `user_id` bigint NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `cart_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -49,10 +49,10 @@ INSERT INTO `carts` (`cart_id`, `user_id`, `created_at`, `updated_at`) VALUES
 --
 
 CREATE TABLE `cart_items` (
-  `cart_item_id` bigint NOT NULL,
-  `cart_id` bigint NOT NULL,
-  `product_id` bigint NOT NULL,
-  `quantity` int NOT NULL DEFAULT '1'
+  `cart_item_id` bigint(20) NOT NULL,
+  `cart_id` bigint(20) NOT NULL,
+  `product_id` bigint(20) NOT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -62,13 +62,13 @@ CREATE TABLE `cart_items` (
 --
 
 CREATE TABLE `feedbacks` (
-  `feedback_id` bigint NOT NULL,
-  `user_id` bigint NOT NULL,
-  `subject` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `status` enum('PENDING','READ','RESPONDED') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'PENDING',
-  `admin_response` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `feedback_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `status` enum('PENDING','READ','RESPONDED') NOT NULL DEFAULT 'PENDING',
+  `admin_response` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `responded_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -87,12 +87,12 @@ INSERT INTO `feedbacks` (`feedback_id`, `user_id`, `subject`, `content`, `status
 --
 
 CREATE TABLE `orders` (
-  `order_id` bigint NOT NULL,
-  `user_id` bigint NOT NULL,
+  `order_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
   `total_amount` decimal(10,2) NOT NULL,
-  `status` enum('PENDING','CONFIRMED','SHIPPED','DELIVERED','CANCELLED') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'PENDING',
-  `order_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `status` enum('PENDING','CONFIRMED','SHIPPED','DELIVERED','CANCELLED') NOT NULL DEFAULT 'PENDING',
+  `order_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `shipping_name` varchar(100) DEFAULT NULL,
   `shipping_address` varchar(255) DEFAULT NULL,
   `shipping_city` varchar(100) DEFAULT NULL,
@@ -104,8 +104,8 @@ CREATE TABLE `orders` (
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`order_id`, `user_id`, `total_amount`, `status`, `order_date`, `updated_at`) VALUES
-(1, 8, 54.00, 'CONFIRMED', '2025-06-05 02:06:19', '2025-06-05 03:32:55');
+INSERT INTO `orders` (`order_id`, `user_id`, `total_amount`, `status`, `order_date`, `updated_at`, `shipping_name`, `shipping_address`, `shipping_city`, `shipping_postal_code`, `payment_method`) VALUES
+(1, 8, 54.00, 'CONFIRMED', '2025-06-05 02:06:19', '2025-06-05 03:32:55', NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -114,10 +114,10 @@ INSERT INTO `orders` (`order_id`, `user_id`, `total_amount`, `status`, `order_da
 --
 
 CREATE TABLE `order_items` (
-  `order_item_id` bigint NOT NULL,
-  `order_id` bigint NOT NULL,
-  `product_id` bigint NOT NULL,
-  `quantity` int NOT NULL,
+  `order_item_id` bigint(20) NOT NULL,
+  `order_id` bigint(20) NOT NULL,
+  `product_id` bigint(20) NOT NULL,
+  `quantity` int(11) NOT NULL,
   `unit_price` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -135,15 +135,15 @@ INSERT INTO `order_items` (`order_item_id`, `order_id`, `product_id`, `quantity`
 --
 
 CREATE TABLE `products` (
-  `product_id` bigint NOT NULL,
-  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `product_id` bigint(20) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
-  `category` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `stock_quantity` int NOT NULL DEFAULT '0',
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `image_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
+  `category` varchar(50) NOT NULL,
+  `stock_quantity` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `image_path` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -176,12 +176,54 @@ INSERT INTO `products` (`product_id`, `name`, `description`, `price`, `category`
 -- --------------------------------------------------------
 
 --
+-- Stand-in structure for view `product_review_stats`
+-- (See below for the actual view)
+--
+CREATE TABLE `product_review_stats` (
+`product_id` bigint(20)
+,`product_name` varchar(100)
+,`review_count` bigint(21)
+,`average_rating` decimal(14,4)
+,`five_star_count` decimal(22,0)
+,`four_star_count` decimal(22,0)
+,`three_star_count` decimal(22,0)
+,`two_star_count` decimal(22,0)
+,`one_star_count` decimal(22,0)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reviews`
+--
+
+CREATE TABLE `reviews` (
+  `review_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `product_id` bigint(20) NOT NULL,
+  `rating` int(11) NOT NULL CHECK (`rating` >= 1 and `rating` <= 5),
+  `comment` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `reviews`
+--
+
+INSERT INTO `reviews` (`review_id`, `user_id`, `product_id`, `rating`, `comment`, `created_at`, `updated_at`) VALUES
+(1, 13, 1, 5, 'Amazing product! Highly recommended!', '2025-06-06 04:49:09', '2025-06-06 04:49:09'),
+(3, 13, 3, 3, 'Average product, could be better', '2025-06-06 05:13:42', '2025-06-06 05:13:42');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `roles`
 --
 
 CREATE TABLE `roles` (
-  `role_id` bigint NOT NULL,
-  `role_name` enum('ADMIN','CUSTOMER') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+  `role_id` bigint(20) NOT NULL,
+  `role_name` enum('ADMIN','CUSTOMER') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -199,14 +241,14 @@ INSERT INTO `roles` (`role_id`, `role_name`) VALUES
 --
 
 CREATE TABLE `users` (
-  `user_id` bigint NOT NULL,
-  `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `enabled` tinyint(1) NOT NULL DEFAULT '1',
-  `role_id` bigint NOT NULL DEFAULT '2'
+  `user_id` bigint(20) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `enabled` tinyint(1) NOT NULL DEFAULT 1,
+  `role_id` bigint(20) NOT NULL DEFAULT 2
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -220,7 +262,73 @@ INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `created_at`, `
 (7, 'admin123', 'admin123@example.com', '$2a$10$xgbhj5ugt8XJzOI1juKpQefNtRe.m/x9ETcmbJSkyqzPfUWSthrKq', '2025-06-05 01:59:22', '2025-06-05 01:59:22', 1, 1),
 (8, 'customer', 'customer123@example.com', '$2a$10$0xxDQdOPs2r8YUOotYvAAeM/w4SSZ31qN5vkn.8pvAlhmKwvSfkk2', '2025-06-05 02:02:29', '2025-06-05 02:02:29', 1, 2),
 (11, 'ziwen', 'ziwen1234@gmail.com', '$2a$10$hY.1pOl3itAr5MZgrb.Pg.vklStrOkxfa2r7yfPD84oCRIyc6cV8S', '2025-06-05 02:48:25', '2025-06-05 02:48:25', 1, 2),
-(12, 'wenuxTyler', 'tyler1234@gmail.com', '$2a$10$I8woOoKHn4Qrvu2s6rNz3O4HeGwkqz4/pY9oRUmGhQs3YYcAI2Bdy', '2025-06-05 02:53:49', '2025-06-05 02:53:49', 1, 1);
+(12, 'wenuxTyler', 'tyler1234@gmail.com', '$2a$10$I8woOoKHn4Qrvu2s6rNz3O4HeGwkqz4/pY9oRUmGhQs3YYcAI2Bdy', '2025-06-05 02:53:49', '2025-06-05 02:53:49', 1, 1),
+(13, 'testcustomer', 'test@example.com', '$2a$10$ELqei90KEpl5SAiFZJCwO.o5qVPpyyYets1SbHt7T5gbNxuWFwAXy', '2025-06-06 04:18:02', '2025-06-06 04:18:02', 1, 2);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `user_wishlist_summary`
+-- (See below for the actual view)
+--
+CREATE TABLE `user_wishlist_summary` (
+`user_id` bigint(20)
+,`username` varchar(50)
+,`wishlist_item_count` bigint(21)
+,`wishlist_created_at` timestamp
+,`wishlist_updated_at` timestamp
+);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `wishlists`
+--
+
+CREATE TABLE `wishlists` (
+  `wishlist_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `wishlists`
+--
+
+INSERT INTO `wishlists` (`wishlist_id`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 13, '2025-06-06 05:23:16', '2025-06-06 05:23:16');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `wishlist_items`
+--
+
+CREATE TABLE `wishlist_items` (
+  `wishlist_item_id` bigint(20) NOT NULL,
+  `wishlist_id` bigint(20) NOT NULL,
+  `product_id` bigint(20) NOT NULL,
+  `added_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `product_review_stats`
+--
+DROP TABLE IF EXISTS `product_review_stats`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `product_review_stats`  AS SELECT `p`.`product_id` AS `product_id`, `p`.`name` AS `product_name`, count(`r`.`review_id`) AS `review_count`, coalesce(avg(`r`.`rating`),0) AS `average_rating`, coalesce(sum(case when `r`.`rating` = 5 then 1 else 0 end),0) AS `five_star_count`, coalesce(sum(case when `r`.`rating` = 4 then 1 else 0 end),0) AS `four_star_count`, coalesce(sum(case when `r`.`rating` = 3 then 1 else 0 end),0) AS `three_star_count`, coalesce(sum(case when `r`.`rating` = 2 then 1 else 0 end),0) AS `two_star_count`, coalesce(sum(case when `r`.`rating` = 1 then 1 else 0 end),0) AS `one_star_count` FROM (`products` `p` left join `reviews` `r` on(`p`.`product_id` = `r`.`product_id`)) GROUP BY `p`.`product_id`, `p`.`name` ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `user_wishlist_summary`
+--
+DROP TABLE IF EXISTS `user_wishlist_summary`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `user_wishlist_summary`  AS SELECT `u`.`user_id` AS `user_id`, `u`.`username` AS `username`, count(`wi`.`wishlist_item_id`) AS `wishlist_item_count`, `w`.`created_at` AS `wishlist_created_at`, `w`.`updated_at` AS `wishlist_updated_at` FROM ((`users` `u` left join `wishlists` `w` on(`u`.`user_id` = `w`.`user_id`)) left join `wishlist_items` `wi` on(`w`.`wishlist_id` = `wi`.`wishlist_id`)) GROUP BY `u`.`user_id`, `u`.`username`, `w`.`created_at`, `w`.`updated_at` ;
 
 --
 -- Indexes for dumped tables
@@ -270,6 +378,19 @@ ALTER TABLE `products`
   ADD PRIMARY KEY (`product_id`);
 
 --
+-- Indexes for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD PRIMARY KEY (`review_id`),
+  ADD UNIQUE KEY `unique_user_product_review` (`user_id`,`product_id`),
+  ADD KEY `idx_product_reviews` (`product_id`),
+  ADD KEY `idx_user_reviews` (`user_id`),
+  ADD KEY `idx_rating` (`rating`),
+  ADD KEY `idx_created_at` (`created_at`),
+  ADD KEY `idx_reviews_product_rating` (`product_id`,`rating`),
+  ADD KEY `idx_reviews_user_created` (`user_id`,`created_at`);
+
+--
 -- Indexes for table `roles`
 --
 ALTER TABLE `roles`
@@ -286,6 +407,24 @@ ALTER TABLE `users`
   ADD KEY `users_ibfk_1` (`role_id`);
 
 --
+-- Indexes for table `wishlists`
+--
+ALTER TABLE `wishlists`
+  ADD PRIMARY KEY (`wishlist_id`),
+  ADD UNIQUE KEY `unique_user_wishlist` (`user_id`);
+
+--
+-- Indexes for table `wishlist_items`
+--
+ALTER TABLE `wishlist_items`
+  ADD PRIMARY KEY (`wishlist_item_id`),
+  ADD UNIQUE KEY `unique_wishlist_product` (`wishlist_id`,`product_id`),
+  ADD KEY `idx_wishlist_items` (`wishlist_id`),
+  ADD KEY `idx_product_wishlists` (`product_id`),
+  ADD KEY `idx_added_at` (`added_at`),
+  ADD KEY `idx_wishlist_items_product` (`product_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -293,49 +432,67 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `cart_id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `cart_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `cart_item_id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `cart_item_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `feedbacks`
 --
 ALTER TABLE `feedbacks`
-  MODIFY `feedback_id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `feedback_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `order_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `order_item_id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `order_item_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `product_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `reviews`
+--
+ALTER TABLE `reviews`
+  MODIFY `review_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `role_id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `role_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `user_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `wishlists`
+--
+ALTER TABLE `wishlists`
+  MODIFY `wishlist_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `wishlist_items`
+--
+ALTER TABLE `wishlist_items`
+  MODIFY `wishlist_item_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
@@ -374,10 +531,30 @@ ALTER TABLE `order_items`
   ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `users`
 --
 ALTER TABLE `users`
   ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`);
+
+--
+-- Constraints for table `wishlists`
+--
+ALTER TABLE `wishlists`
+  ADD CONSTRAINT `wishlists_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `wishlist_items`
+--
+ALTER TABLE `wishlist_items`
+  ADD CONSTRAINT `wishlist_items_ibfk_1` FOREIGN KEY (`wishlist_id`) REFERENCES `wishlists` (`wishlist_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `wishlist_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
