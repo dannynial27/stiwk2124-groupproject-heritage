@@ -37,7 +37,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/products", "/api/products/**").permitAll()
                         .requestMatchers("/api/images/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/reviews/product/**").permitAll()
+                        // Admin endpoints protected correctly
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // Customer endpoints protected correctly
                         .requestMatchers("/api/cart/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/checkout/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/orders/**").hasRole("CUSTOMER")
