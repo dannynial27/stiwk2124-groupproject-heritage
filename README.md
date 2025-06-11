@@ -21,7 +21,7 @@ https://github.com/STIWK2124-A242/class-activity-stiwk2124/blob/main/NewGroupMem
 ### 👥 Group Members (Frontend)
 | Name             | Role    | Matric Number | Phone Number  | Picture                                                                 |
 | ---------------- | ------- | ------------- | ------------- | ----------------------------------------------------------------------- |
-| Siti Alya Balqis Binti Abdul Rahmat | Backend Driector | 291345 | 012-655-2610 ||
+| Siti Alya Balqis Binti Abdul Rahmat | Backend Driector | 291345 | 012-655-2610 |![image](https://github.com/user-attachments/assets/65b2d941-f3ec-46fe-be23-f144fa859d39)|
 | Nurfatin Aleysyah Binti Abdul Razly | MEMBER | 296017 | 019-376-6461 | <img src="https://github.com/user-attachments/assets/a198b7ab-f8ca-49ea-ac8b-308f0edf4891" width="100"/> |
 | Nurul Husna Binti Mohd Badrulisyam | MEMBER | 291878 | 018-471-5413 | <img src="https://github.com/user-attachments/assets/c72aac99-b1c9-4036-90b0-a401a37cf01d" width="100"/> |
 | Ku Hazwan Bin Ku Izham | MEMBER  | 289889 | 019-844-2357 | <img src="https://github.com/user-attachments/assets/2e82e08a-6a98-4512-8c98-e3ee919eebbb" width="100"/> |
