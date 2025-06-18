@@ -1,64 +1,42 @@
 .navbar {
-  background-color: #F5E8D6;
+  background-color: #1E3A8A;
   padding: 1rem;
   position: fixed;
-  width: 100%;
   top: 0;
+  width: 100%;
   z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.navbar-brand {
-  color: #1E3A8A;
-  font-weight: bold;
+.navbar-brand .logo {
+  color: #fff;
   font-size: 1.5rem;
+  font-weight: bold;
 }
 
 .nav-links {
   display: flex;
-  gap: 1rem;
   align-items: center;
+  gap: 1rem;
 }
 
 .nav-link {
-  color: #1E3A8A;
+  color: #fff;
   text-decoration: none;
-  font-size: 1rem;
+  padding: 0.5rem 1rem;
 }
 
 .nav-link:hover {
-  color: #163172;
+  color: #E8D6C4;
 }
 
-.btn {
-  padding: 0.5rem 1rem;
+.logout-btn, .login-btn {
+  background-color: #fff;
+  color: #1E3A8A;
   border: none;
+  padding: 0.5rem 1rem;
   border-radius: 5px;
-  cursor: pointer;
 }
 
-.login-btn {
-  background-color: #1E3A8A;
-  color: white;
-}
-
-.login-btn:hover {
-  background-color: #163172;
-}
-
-.logout-btn {
-  background-color: #dc3545;
-  color: white;
-}
-
-.logout-btn:hover {
-  background-color: #c82333;
-}
-
-@media (max-width: 768px) {
-  .nav-links {
-    flex-direction: column;
-    align-items: flex-start;
-    margin-top: 1rem;
-  }
+.logout-btn:hover, .login-btn:hover {
+  background-color: #E8D6C4;
 }
