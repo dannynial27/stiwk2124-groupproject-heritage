@@ -51,6 +51,321 @@ https://github.com/STIWK2124-A242/class-activity-stiwk2124/blob/main/NewGroupMem
 ## Instructions on how to run Docker.
 
 ## List of all the endpoints
+## List of all the endpoints
+
+### Authentication: Customer & Admin
+| Endpoint          | Description  |
+|-------------------|----------------------|
+|POST http://localhost:8080/qurba/api/auth/register|Registration Process for Customer & admin|
+|POST http://localhost:8080/qurba/api/auth/login|Login Process for Customer & Admin|
+
+### Role: CUSTOMER
+| Endpoint          | Description          |
+|-------------------|----------------------|
+|GET http://localhost:8080/qurba/api/products|List All Products|
+|GET http://localhost:8080/qurba/api/products/sort?sortOrder=asc|Price - Sort Ascending|
+|GET http://localhost:8080/qurba/api/products/sort?sortOrder=desc|Price - Sort Descending|
+|GET http://localhost:8080/qurba/api/products/search?query=minyak|Search by Name or Description|
+|GET http://localhost:8080/qurba/api/products/filter?category=madu|Filter by Category|
+|GET http://localhost:8080/qurba/api/products/search-filter-sort?category=minuman&query=teh&sortOrder=asc|Combine - Sort, Filter, Search|
+|POST http://localhost:8080/qurba/api/cart/{userid}/add?productId=1&quantity=2|Add Product to Cart|
+|GET http://localhost:8080/qurba/api/cart/{userid}|Get User Carts|
+|PUT http://localhost:8080/qurba/api/cart/{userid}/update?productld=1&quantity=3|Update Cart Item Quantity|
+|DELETE http://localhost:8080/qurba/api/cart/{userid}/remove?productId=1|Remove Product from Cart|
+|DELETE http://localhost:8080/qurba/api/cart/{userid}/clear|Clear Cart|
+|POST http://localhost:8080/qurba/api/checkout/{userid}|Check Out Process|
+|GET http://localhost:8080/qurba/api/orders/{userid}|View Orders|
+|GET http://localhost:8080/qurba/api/orders/{orderid}/summary|View Summary|
+
+
+### Role: ADMIN
+| Endpoint          | Description          |
+|-------------------|----------------------|
+|GET  http://localhost:8080/qurba/api/admin/products|Get All Products|
+|POST http://localhost:8080/qurba/api/admin/products|Add Product|
+|PUT http://localhost:8080/qurba/api/admin/products/{productid}|Update Product|
+|DELETE http://localhost:8080/qurba/api/admin/products/{productid}|Delete Product|
+|GET http://localhost:8080/qurba/api/admin/orders|Get All Orders|
+
+## API Usage Instructions
+
+### Authentication
+
+#### ADMIN Registration
+**Endpoint:** POST http://localhost:8080/qurba/api/auth/register
+
+**Instructions:**
+1. In Postman, select Body > raw (JSON)
+2. Enter JSON object with fields:
+```
+{
+  "username": "admin121",
+  "email": "admin123@example.com",
+  "password": "Admin101!",
+  "role": "ADMIN"
+}
+```
+3. Send request to register as admin
+
+#### ADMIN Login
+**Endpoint:** POST http://localhost:8080/qurba/api/auth/login
+
+**Instructions:**
+1. In Postman, select Body > raw (JSON)
+2. Enter JSON object with fields:
+```
+{
+  "username": "admin121",
+  "password": "Admin101!"
+}
+```
+3. Send request to login
+4. Copy the token value from response:
+```
+{
+  "token": "xxxxxxx"
+}
+```
+
+#### CUSTOMER Registration
+**Endpoint:** POST http://localhost:8080/qurba/api/auth/register
+
+**Instructions:**
+1. In Postman, select Body > raw (JSON)
+2. Enter JSON object with fields:
+```
+{
+  "username": "AdamYau",
+  "email": "AdamYau@example.com",
+  "password": "password123",
+  "role": "CUSTOMER"
+}
+```
+3. Send request to register as customer
+
+#### CUSTOMER Login
+**Endpoint:** POST http://localhost:8080/qurba/api/auth/login
+
+**Instructions:**
+1. In Postman, select Body > raw (JSON)
+2. Enter JSON object with fields:
+```
+{
+  "username": "AdamYau",
+  "password": "password123"
+}
+```
+3. Send request to login
+4. Copy the token value from response:
+```
+{
+  "token": "xxxxxxx"
+}
+```
+
+### ADMIN Endpoints
+#### View All Products
+
+**Endpoint:** GET http://localhost:8080/qurba/api/admin/products
+
+**Instructions:**
+1. In Postman, select Authorization > Bearer Token
+2. Paste the admin login token
+3. Send request to view all products
+   
+#### Add Product
+**Endpoint:** POST http://localhost:8080/qurba/api/admin/products
+
+**Instructions:**
+1. In Postman, select Authorization > Bearer Token
+2. Paste the admin login token
+3. Select Body > raw (JSON)
+4. Enter product details:
+```
+{
+  "name": "Sos Premium Burger",
+  "description": "Sos that make you feels like burger",
+  "price": 20.00,
+  "category": "Sos",
+  "stockQuantity": 30
+}
+```
+5. Send request to add product
+
+#### Update Product
+**Endpoint:** PUT http://localhost:8080/qurba/api/admin/products/{productid}
+**Instructions:**
+1. Replace {productid} with the actual product ID
+2. In Postman, select Authorization > Bearer Token
+3. Paste the admin login token
+4. Select Body > raw (JSON)
+5. Enter updated product details:
+```
+{
+  "name": "Sos Premium Burger",
+  "description": "Sos that make you feels like burger",
+  "price": 60.00,
+  "category": "Sos",
+  "stockQuantity": 60
+}
+```
+6. Send request to update product
+
+#### Delete Product
+**Endpoint:** DELETE http://localhost:8080/qurba/api/admin/products/{productid}
+
+**Instructions:**
+1. Replace {productid} with the actual product ID
+2. In Postman, select Authorization > Bearer Token
+3. Paste the admin login token
+4. Send request to delete product
+
+#### View All Orders
+**Endpoint:** GET http://localhost:8080/qurba/api/admin/orders
+
+**Instructions:**
+1. In Postman, select Authorization > Bearer Token
+2. Paste the admin login token
+3. Send request to view all customer orders
+
+### CUSTOMER Endpoints
+
+#### View All Products
+**Endpoint:** GET http://localhost:8080/qurba/api/products
+
+**Instructions:**
+1. In Postman, select Authorization > Bearer Token
+2. Paste the customer login token
+3. Send request to view all products
+
+#### Sort Products by Price (Ascending)
+**Endpoint:** GET http://localhost:8080/qurba/api/products/sort?sortOrder=asc
+**Instructions:**
+1. In Postman, select Authorization > Bearer Token
+2. Paste the customer login token
+3. Send request to view products sorted by price in ascending order
+
+#### Sort Products by Price (Descending)
+**Endpoint:** GET http://localhost:8080/qurba/api/products/sort?sortOrder=desc
+
+**Instructions:**
+1. In Postman, select Authorization > Bearer Token
+2. Paste the customer login token
+3. Send request to view products sorted by price in descending order
+
+#### Search Products
+**Endpoint:** GET http://localhost:8080/qurba/api/products/search?query=minyak
+
+**Instructions:**
+1. In Postman, select Authorization > Bearer Token
+2. Paste the customer login token
+3. Modify "minyak" to your search term if needed
+4. Send request to search products by name or description
+
+#### Filter Products by Category
+**Endpoint:** GET http://localhost:8080/qurba/api/products/filter?category=Madu
+
+**Instructions:**
+1. In Postman, select Authorization > Bearer Token
+2. Paste the customer login token
+3. Modify "Madu" to your desired category if needed
+4. Send request to filter products by category
+
+#### Search, Filter, and Sort Products
+**Endpoint:** GET http://localhost:8080/qurba/api/products/search-filter-sort?category=minuman&query=teh&sortOrder=asc
+
+**Instructions:**
+1. In Postman, select Authorization > Bearer Token
+2. Paste the customer login token
+3. Modify the query parameters as needed:
+   - category=minuman
+   - query=teh
+   - sortOrder=asc
+4. Send request to search, filter, and sort products simultaneously
+
+#### Add Product to Cart
+**Endpoint:** POST http://localhost:8080/qurba/api/cart/{userid}/add?productId=1&quantity=2
+
+**Instructions:**
+1. Replace {userid} with your user ID
+2. Modify query parameters as needed:
+   - productId=1
+   - quantity=2
+3. In Postman, select Authorization > Bearer Token
+4. Paste the customer login token
+5. Send request to add product to cart
+
+#### View Cart Contents
+**Endpoint:** GET http://localhost:8080/qurba/api/cart/{userid}
+
+**Instructions:**
+1. Replace {userid} with your user ID
+2. In Postman, select Authorization > Bearer Token
+3. Paste the customer login token
+4. Send request to view your cart contents
+
+#### Update Cart Item Quantity
+**Endpoint:** PUT http://localhost:8080/qurba/api/cart/{userid}/update?productld=1&quantity=3
+
+**Instructions:**
+1. Replace {userid} with your user ID
+2. Modify query parameters as needed:
+   - productId=1
+   - quantity=3
+3. In Postman, select Authorization > Bearer Token
+4. Paste the customer login token
+5. Send request to update product quantity in cart
+
+#### Remove Product from Cart
+**Endpoint:** DELETE http://localhost:8080/qurba/api/cart/{userid}/remove?productId=1
+
+**Instructions:**
+1. Replace {userid} with your user ID
+2. Modify productId=1 as needed
+3. In Postman, select Authorization > Bearer Token
+4. Paste the customer login token
+5. Send request to remove product from cart
+
+#### Clear Cart
+**Endpoint:** DELETE http://localhost:8080/qurba/api/cart/{userid}/clear
+
+**Instructions:**
+1. Replace {userid} with your user ID
+2. In Postman, select Authorization > Bearer Token
+3. Paste the customer login token
+4. Send request to clear all items from cart
+
+#### Checkout
+**Endpoint:** POST http://localhost:8080/qurba/api/checkout/{userid}
+
+**Instructions:**
+1. Replace {userid} with your user ID
+2. In Postman, select Authorization > Bearer Token
+3. Paste the customer login token
+4. Send request to checkout and place order
+
+#### View Order History
+**Endpoint:** GET http://localhost:8080/qurba/api/orders/{userid}
+
+**Instructions:**
+1. Replace {userid} with your user ID
+2. In Postman, select Authorization > Bearer Token
+3. Paste the customer login token
+4. Send request to view your order history
+
+#### View Order Summary
+**Endpoint:** GET http://localhost:8080/qurba/api/orders/{orderid}/summary
+
+**Instructions:**
+1. Replace {orderid} with the specific order ID
+2. In Postman, select Authorization > Bearer Token
+3. Paste the customer login token
+4. Send request to view detailed order summary
+
+## link for the YouTube Presentation
+```sql
+https://youtu.be/KmkVhyES83o
+```
 
 ## Link for the YouTube Presentation
 
