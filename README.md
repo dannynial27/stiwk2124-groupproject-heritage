@@ -54,7 +54,6 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 ## Instructions on how to run Docker.
 
 ## List of all the endpoints
-## List of all the endpoints
 
 ### Authentication: Customer & Admin
 | Endpoint          | Description  |
