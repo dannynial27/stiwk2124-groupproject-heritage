@@ -252,6 +252,45 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 2. Paste the admin login token
 3. Send request to view all customer orders
 
+#### Update Order Status
+**Endpoint:** http://localhost:8080/qurba/api/admin/orders/{orderId}/status
+**Instructions:**
+1. Replace {orderid} with the actual order ID
+2. In Postman, select Authorization > Bearer Token
+3. Paste the admin login token
+4. Select Body > raw (JSON)
+5. Enter updated product details:
+```
+{
+         "status":  "CONFIRMED"
+}
+
+```
+6. Available status such as PENDING, CONFIRMED, SHIPPPED, DELIVERED, CANCELED 
+7. Send a request to update the order
+
+#### Filter Order by Status
+**Endpoint:** http://localhost:8080qurba//api/admin/orders/filter?status={orderStatus}
+**Instructions:**
+1. Replace {orderStatus} with the actual order status
+2. Available status such as PENDING, CONFIRMED, SHIPPPED, DELIVERED, CANCELED 
+3. In Postman, select Authorization > Bearer Token
+4. Paste the admin login token
+5. Send a request to viewing the filtered order by status
+
+#### Filter Order by Time
+**Endpoint (Filter by year):** http://localhost:8080/qurba/api/admin/orders/by-month?year={year}
+**Endpoint (Filter by year and month):** http://localhost:8080/qurba/api/admin/orders/by-month?year={year}&month={month}
+**Endpoint (Filter by time range):** http://localhost:8080/qurba/api/admin/orders/by-date-range?startDate={timeRange}&endDate={timeRange}
+
+**Instructions:**
+1. Replace {year} or {mont} with the actual year and month
+2. For {timeRange}, replace with format like this
+3. http://localhost:8080/qurba/api/admin/orders/by-date-range?startDate=2023-06-01T00:00:00&endDate=2023-06-30T23:59:59
+5. In Postman, select Authorization > Bearer Token
+6. Paste the admin login token
+7. Send a request to view the filtered order by time
+
 ### CUSTOMER Endpoints
 
 #### View All Products
@@ -388,7 +427,7 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 
 ## link for the YouTube Presentation
 ```sql
-https://youtu.be/KmkVhyES83o
+None
 ```
 
 ## Link for the YouTube Presentation
