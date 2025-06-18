@@ -291,6 +291,54 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 6. Paste the admin login token
 7. Send a request to view the filtered order by time
 
+
+#### View all feedback
+**Endpoint:** GET http://localhost:8080/qurba/api/admin/feedback
+**Instructions:**
+1. In Postman, select Authorization > Bearer Token
+3. Paste the admin login token
+4. Send a request to viewing the view all the feedback
+
+#### FILTER FEEDBACK by YEAR
+**Endpoint:** GET http://localhost:8080/qurba/api/admin/feedback/filter?year={year}
+**Instructions:**
+1. Replace the {year} with actual year
+2. In Postman, select Authorization > Bearer Token
+3. Paste the admin login token
+4. Send a request to view filtered feedback by year
+
+#### FILTER FEEDBACK by YEAR and MONTH
+**Endpoint:** GET http://localhost:8080/qurba/api/admin/feedback/filter?year={year}&month={month}
+**Instructions:**
+1. Replace the {year} with actual year and {month} with actual month
+2. In Postman, select Authorization > Bearer Token
+3. Paste the admin login token
+4. Send a request to view filtered feedback by year and month
+
+#### Mark Feedback as Read
+**Endpoint:** PATCH http://localhost:8080/qurba/api/admin/feedback/{feedbackId}/read
+**Instructions:**
+1. Replace the {feedbackid} with actual exisitng feedback id
+2. In Postman, select Authorization > Bearer Token
+3. Paste the admin login token
+4. Send a request to patch the feedback as read
+
+#### Response to feedback
+**Endpoint:** POST http://localhost:8080/qurba/api/admin/feedback/{feedbackId}/respond
+**Instructions:**
+1. Replace {feedbackid} with the actual order ID
+2. In Postman, select Authorization > Bearer Token
+3. Paste the admin login token
+4. Select Body > raw (JSON)
+5. Enter response details:
+```
+{
+  "response": "Thank you for your feedback. We're glad you enjoyed our products!"
+}
+```
+6. Send a request send the response
+
+
 ### CUSTOMER Endpoints
 
 #### View All Products
