@@ -76,7 +76,17 @@ https://github.com/STIWK2124-A242/class-activity-stiwk2124/blob/main/NewGroupMem
 |POST http://localhost:8080/qurba/api/checkout/{userid}|Check Out Process|
 |GET http://localhost:8080/qurba/api/orders/{userid}|View Orders|
 |GET http://localhost:8080/qurba/api/orders/{orderid}/summary|View Summary|
-
+|GET http://localhost:8080/qurba/api/reviews/product/{productId}|Fetch all reviews for a product|
+|POST http://localhost:8080/qurba/api/reviews/{userId}|Add review|
+|PUT http://localhost:8080/qurba/api/reviews/{userId}/{reviewId}|Edit review|
+|DELETE http://localhost:8080/qurba/api/reviews/{userId}/{reviewId}|Delete review|
+|GET http://localhost:8080/qurba/api/wishlist/{userId}|View wishlist|
+|POST http://localhost:8080/qurba/api/wishlist/{userId}/|Add item to wishlist|
+|DELETE http://localhost:8080/qurba/api/wishlist/{userId}/remove?productId={productId}|Remove item|
+|DELETE http://localhost:8080/qurba/api/wishlist/{userId}/clear|Clear wishlist|
+|POST http://localhost:8080/qurba/api/feedback/{userId}|Submit Feedback|
+|GET http://localhost:8080/qurba/api/feedback/{userId}|View Feedback|
+|DELETE http://localhost:8080/qurba/api/feedback/{userId}/{feedbackId}|Delete Feedback|
 
 ### Role: ADMIN
 | Endpoint          | Description          |
@@ -86,6 +96,17 @@ https://github.com/STIWK2124-A242/class-activity-stiwk2124/blob/main/NewGroupMem
 |PUT http://localhost:8080/qurba/api/admin/products/{productid}|Update Product|
 |DELETE http://localhost:8080/qurba/api/admin/products/{productid}|Delete Product|
 |GET http://localhost:8080/qurba/api/admin/orders|Get All Orders|
+|PATCH http://localhost:8080/qurba/api/admin/orders/{orderId}/status|Update Order Status|
+|GET http://localhost:8080qurba//api/admin/orders/filter?status={status}|Filter Order by status|
+|GET http://localhost:8080/qurba/api/admin/orders/by-month?year={year}|Filter Order by Year|
+|GET http://localhost:8080/qurba/api/admin/orders/by-month?year={year}&month={month}|Filter Order by Year & Month|
+|GET http://localhost:8080/qurba/api/admin/orders/by-date-range?startDate={date&Time}&endDate={date&Time}|Filter Order by Time Range |
+|GET http://localhost:8080/qurba/api/reviews/product/{productId}|Fetch all reviews for a product|
+|GET http://localhost:8080/qurba/api/admin/feedback|View All Feedback|
+|GET http://localhost:8080/qurba/api/admin/feedback/filter?year={year}|Filter feedback by year|
+|GET http://localhost:8080/qurba/api/admin/feedback/filter?year={year}&month={month}|Filter feedback by year and month|
+|PATCH http://localhost:8080/qurba/api/admin/feedback/{feedbackId}/read|Mark feedback as read|
+|POST http://localhost:8080/qurba/api/admin/feedback/{feedbackId}/respond|Response to feedback|
 
 ## API Usage Instructions
 
