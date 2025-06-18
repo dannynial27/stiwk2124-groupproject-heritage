@@ -1,0 +1,55 @@
+.container {
+  max-width: 600px;
+  padding-top: 70px;
+}
+
+.card {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-success {
+  background-color: #1E3A8A;
+  border: none;
+  border-radius: 5px;
+}
+
+.btn-success:hover {
+  background-color: #163172;
+}
+
+.btn-primary {
+  background-color: #6c757d;
+  border: none;
+  border-radius: 5px;
+}
+
+.btn-primary:hover {
+  background-color: #5a6268;
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  border: none;
+  border-radius: 5px;
+}
+
+.btn-info:hover {
+  background-color: #138496;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  border: none;
+  border-radius: 5px;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+}
+
+.container > h2 {
+  user-select: none;
+  cursor: default;
+  color: #1E3A8A;
+}
