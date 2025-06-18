@@ -584,17 +584,6 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 4. Send request to delete that particular feedback
 
 
-
-
-
-
-
-
-## link for the YouTube Presentation
-```sql
-None
-```
-
 ## Link for the YouTube Presentation
 
 ## Result/Output (Screenshot of the output)
