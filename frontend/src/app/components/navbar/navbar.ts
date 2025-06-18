@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -9,18 +9,14 @@ import { RouterModule, Router } from '@angular/router';
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css']
 })
-export class NavbarComponent implements OnInit {
-  role: string | null = null;
+export class NavbarComponent {
+  role = localStorage.getItem('role') || ''; // [Change 1: Define role property with default value]
 
-  constructor(private router: Router) {}
-
-  ngOnInit() {
-    this.role = localStorage.getItem('role');
-  }
-
-  logout() {
+  logout(): void { // [Change 2: Add logout method]
     localStorage.removeItem('role');
-    this.role = null;
-    this.router.navigate(['/login']);
+    localStorage.removeItem('token');
+    this.role = ''; // Update role after logout
+    console.log('Logged out');
+    // Navigate to login page if needed
   }
 }
