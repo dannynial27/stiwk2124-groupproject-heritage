@@ -1,56 +1,25 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { inject } from '@angular/core';
-import { FeedbackService } from '../../services/feedback.service';
-import { FooterComponent } from '../footer/footer'; // Added import
 
 @Component({
   selector: 'app-feedback-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, FooterComponent], // Added FooterComponent
+  imports: [CommonModule, FormsModule], // Required for ngModel and ngSubmit
   templateUrl: './feedback-form.html',
   styleUrls: ['./feedback-form.css']
 })
 export class FeedbackFormComponent {
-  feedback = {
-    name: '',
-    email: '',
-    message: ''
-  };
-  errorMessage: string = '';
+  feedback = { name: '', email: '', message: '' }; // [Change 1: Define the feedback object with initial properties]
+  errorMessage = ''; // [Change 2: Define errorMessage property]
 
-  private feedbackService = inject(FeedbackService);
-
-  submitFeedback() {
-    if (!this.validateForm()) return;
-    this.feedbackService.submitFeedback(this.feedback).subscribe({
-      next: () => {
-        alert('Thank you for your feedback!');
-        this.feedback = { name: '', email: '', message: '' };
-      },
-      error: (err: any) => {
-        console.error('Error submitting feedback:', err);
-        this.errorMessage = 'Failed to submit feedback. Please try again.';
-      }
-    });
-  }
-
-  validateForm(): boolean {
-    if (!this.feedback.name || !/^[a-zA-Z\s]+$/.test(this.feedback.name)) {
-      this.errorMessage = 'Name must contain only letters.';
-      return false;
+  submitFeedback(): void { // [Change 3: Add submitFeedback method]
+    if (!this.feedback.name || !this.feedback.email || !this.feedback.message) {
+      this.errorMessage = 'All fields are required.';
+      return;
     }
-    if (!this.feedback.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.feedback.email)) {
-      this.errorMessage = 'Please enter a valid email.';
-      return false;
-    }
-    if (!this.feedback.message || this.feedback.message.length < 10) {
-      this.errorMessage = 'Message must be at least 10 characters long.';
-      return false;
-    }
+    console.log('Feedback submitted:', this.feedback);
+    this.feedback = { name: '', email: '', message: '' }; // Reset form
     this.errorMessage = '';
-    return true;
   }
 }
