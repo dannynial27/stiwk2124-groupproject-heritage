@@ -1,23 +1,24 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
-import { Navbar } from './navbar';
+@Component({
+  selector: 'app-navbar',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  templateUrl: './navbar.html',
+  styleUrls: ['./navbar.css']
+})
+export class NavbarComponent {
+  role: string | null = null;
 
-describe('Navbar', () => {
-  let component: Navbar;
-  let fixture: ComponentFixture<Navbar>;
+  constructor(private authService: AuthService, private router: Router) {
+    this.role = localStorage.getItem('role');
+  }
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [Navbar]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(Navbar);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+  logout() {
+    localStorage.removeItem('role');
+    this.router.navigate(['/login']);
+  }
+}
