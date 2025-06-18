@@ -425,6 +425,124 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 3. Paste the customer login token
 4. Send request to view detailed order summary
 
+#### View Product reviews
+**Endpoint:** GET http://localhost:8080/qurba/api/reviews/product/{productId}
+**Instructions:**
+1. Replace {productId} with the specific product ID
+
+#### Submit a new review
+**Endpoint:** POST http://localhost:8080/qurba/api/reviews/{userId}
+
+**Instructions:**
+1. Replace {userID} with the actual login user ID
+2. In Postman, select Authorization > Bearer Token
+3. Paste the customer login token
+4. Select Body > raw (JSON)
+5. Enter review details:
+```sql
+{
+  "productId": 1,
+  "rating": 5,
+  "comment": "Excellent product! Highly recommended."
+}
+```
+5. Send request to post the review
+
+#### Edit review
+**Endpoint:** PUT http://localhost:8080/qurba/api/reviews/{userId}/{reviewId}
+
+**Instructions:**
+1. Replace {userID} with the actual login user ID, and {reviewID} with actual review id
+2. In Postman, select Authorization > Bearer Token
+3. Paste the customer login token
+4. Select Body > raw (JSON)
+5. Enter review details:
+```sql
+{
+  "rating": 4,
+  "comment": "Good product, but could be better after more use."
+}
+```
+5. Send request to edit the review
+
+#### View wishlist
+**Endpoint:** GET http://localhost:8080/qurba/api/wishlist/{userId}
+
+**Instructions:**
+1. Replace {userid} with the actual login userId
+2. In Postman, select Authorization > Bearer Token
+3. Paste the customer login token
+4. Send request to view wishlist
+
+#### Add item to wishlist
+**Endpoint:** POST http://localhost:8080/qurba/api/wishlist/{userId}/add?productId={productId}
+
+**Instructions:**
+1. Replace {userid} with the actual login userId and {productid} with actual product id
+2. In Postman, select Authorization > Bearer Token
+3. Paste the customer login token
+4. Send request to add that item to wishlist
+
+#### Remove specific item from wishlist 
+**Endpoint:** DELETE http://localhost:8080/qurba/api/wishlist/{userId}/remove?productId={productId}
+
+**Instructions:**
+1. Replace {userid} with the actual login userId and {productid} with actual product id
+2. In Postman, select Authorization > Bearer Token
+3. Paste the customer login token
+4. Send request to remove that specific item from wishlist
+
+#### Clear all the item from wishlist
+**Endpoint:** DELETE http://localhost:8080/qurba/api/wishlist/{userId}/clear
+
+**Instructions:**
+1. Replace {userid} with the actual login userId
+2. In Postman, select Authorization > Bearer Token
+3. Paste the customer login token
+4. Send request to clear all the item from wishlist
+
+#### Send feedback form to admin
+**Endpoint:** POST http://localhost:8080/qurba/api/feedback/{userId}
+
+**Instructions:**
+1. Replace {userID} with the actual login user ID
+2. In Postman, select Authorization > Bearer Token
+3. Paste the customer login token
+4. Select Body > raw (JSON)
+5. Enter review details:
+```sql
+{
+  "subject": "Product Quality",
+  "content": "The spices I ordered were excellent quality!"
+}
+```
+5. Send request to submit the feedback
+
+#### View feedback 
+**Endpoint:** GET http://localhost:8080/qurba/api/feedback/{userId}
+
+**Instructions:**
+1. Replace {userid} with the actual login userId
+2. In Postman, select Authorization > Bearer Token
+3. Paste the customer login token
+4. Send request to get the submitted feedback as customer
+
+#### Delete feedback 
+**Endpoint:** DELETE http://localhost:8080/qurba/api/feedback/{userId}/{feedbackId}
+
+**Instructions:**
+1. Replace {userid} with the actual login userId and the {feedbackID} with actual feedback id
+2. In Postman, select Authorization > Bearer Token
+3. Paste the customer login token
+4. Send request to delete that particular feedback
+
+
+
+
+
+
+
+
 ## link for the YouTube Presentation
 ```sql
 None
