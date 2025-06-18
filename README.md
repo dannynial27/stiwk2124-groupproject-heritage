@@ -27,6 +27,9 @@ https://github.com/STIWK2124-A242/class-activity-stiwk2124/blob/main/NewGroupMem
 | Ku Hazwan Bin Ku Izham | MEMBER  | 289889 | 019-844-2357 | <img src="https://github.com/user-attachments/assets/2e82e08a-6a98-4512-8c98-e3ee919eebbb" width="100"/> |
 
 ## Title of your application (a unique title)
+
+AmeenMarket : Bridging Tradition with Modern E-Commerce
+
 ## Abstract (in 300 words)
    1. Background
       In the rapidly evolving digital landscape, e-commerce has transformed how goods and services are bought and sold globally (Laudon & Traver, 2021). Traditional businesses like Qurba Food Industries, a manufacturer of food and beverage products under the AMEEN brand, are increasingly adopting online platforms to expand market reach and streamline sales processes. These platforms represent not just a technological shift but an opportunity to preserve and promote cultural heritage products while addressing modern market demands (Chauhan et al., 2023).
