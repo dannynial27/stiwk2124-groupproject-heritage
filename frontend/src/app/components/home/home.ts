@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
 import { FooterComponent } from '../footer/footer';
 
 @Component({
@@ -18,6 +19,7 @@ export class HomeComponent implements OnInit {
 
   private http = inject(HttpClient);
   private cartService = inject(CartService);
+  private authService = inject(AuthService);
 
   ngOnInit(): void {
     this.fetchFeaturedProducts();
@@ -37,6 +39,18 @@ export class HomeComponent implements OnInit {
   }
 
   addToCart(product: any): void {
-    this.cartService.addToCart(product);
+    const userId = this.authService.getUserId();
+    if (userId) {
+      this.cartService.addItemToCart(userId, product.productId, 1).subscribe({
+        next: () => {
+          console.log('Product added to cart successfully');
+          // Optionally, provide user feedback (e.g., a toast message)
+        },
+        error: (err) => console.error('Failed to add product to cart:', err)
+      });
+    } else {
+      console.error('User is not logged in.');
+      // Optionally, redirect to login page or show a message
+    }
   }
 }

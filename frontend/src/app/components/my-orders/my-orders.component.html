@@ -1,0 +1,35 @@
+<div class="container mt-5">
+  <h2>My Orders</h2>
+  <hr>
+  <div *ngIf="orders$ | async as orders; else loading">
+    <div *ngIf="orders.length > 0; else noOrders">
+      <div class="accordion" id="ordersAccordion">
+        <div class="accordion-item" *ngFor="let order of orders; let i = index">
+          <h2 class="accordion-header" [id]="'heading' + i">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse' + i" aria-expanded="false">
+              Order #{{ order.orderId }} - {{ order.orderDate | date:'medium' }} - Status: {{ order.status | titlecase }}
+            </button>
+          </h2>
+          <div [id]="'collapse' + i" class="accordion-collapse collapse" data-bs-parent="#ordersAccordion">
+            <div class="accordion-body">
+              <p><strong>Total:</strong> {{ order.totalAmount | currency:'MYR' }}</p>
+              <p><strong>Shipped To:</strong> {{ order.shippingName }} at {{ order.shippingAddress }}</p>
+              <h5>Items:</h5>
+              <ul>
+                <li *ngFor="let item of order.orderItems">
+                  {{ item.product.name }} (x{{ item.quantity }}) - {{ item.price | currency:'MYR' }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ng-template #noOrders>
+      <div class="alert alert-info">You have not placed any orders yet.</div>
+    </ng-template>
+  </div>
+  <ng-template #loading>
+    <p>Loading orders...</p>
+  </ng-template>
+</div><p>my-orders works!</p>
