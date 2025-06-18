@@ -1,18 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FeedbackViewerComponent } from './feedback-viewer';
+import { FeedbackService } from '../../services/feedback.service';
+import { Router } from '@angular/router';
+import { FooterComponent } from '../footer/footer';
+import { RouterModule } from '@angular/router';
 
-import { FeedbackViewer } from './feedback-viewer';
-
-describe('FeedbackViewer', () => {
-  let component: FeedbackViewer;
-  let fixture: ComponentFixture<FeedbackViewer>;
+describe('FeedbackViewerComponent', () => {
+  let component: FeedbackViewerComponent;
+  let fixture: ComponentFixture<FeedbackViewerComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FeedbackViewer]
-    })
-    .compileComponents();
+      imports: [RouterModule, FooterComponent],
+      declarations: [FeedbackViewerComponent],
+      providers: [
+        { provide: FeedbackService, useValue: { getFeedbacks: jasmine.createSpy('getFeedbacks').and.returnValue({ subscribe: () => {} }) } },
+        { provide: Router, useValue: { navigate: jasmine.createSpy('navigate') } }
+      ]
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(FeedbackViewer);
+    fixture = TestBed.createComponent(FeedbackViewerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
