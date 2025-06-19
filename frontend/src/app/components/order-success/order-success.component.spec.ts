@@ -10,7 +10,7 @@ describe('OrderSuccessComponent', () => {
     await TestBed.configureTestingModule({
       imports: [OrderSuccessComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(OrderSuccessComponent);
     component = fixture.componentInstance;

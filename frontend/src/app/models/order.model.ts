@@ -21,9 +21,9 @@ export interface Order {
 }
 
 export interface ShippingInfo {
-    shippingName: string;
-    shippingAddress: string;
-    shippingCity: string;
-    shippingPostalCode: string;
-    paymentMethod: 'CREDIT_CARD' | 'DEBIT_CARD' | 'BANK_TRANSFER' | 'E_WALLET' | 'CASH_ON_DELIVERY';
+  shippingName: string;
+  shippingAddress: string;
+  shippingCity: string;
+  shippingPostalCode: string;
+  paymentMethod: 'CREDIT_CARD' | 'DEBIT_CARD' | 'BANK_TRANSFER' | 'E_WALLET' | 'CASH_ON_DELIVERY';
 }

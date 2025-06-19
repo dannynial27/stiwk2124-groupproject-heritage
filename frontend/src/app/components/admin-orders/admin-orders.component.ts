@@ -10,7 +10,7 @@ import { Observable, of } from 'rxjs';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-orders.component.html',
-  styleUrl: './admin-orders.component.css'
+  styleUrls: ['./admin-orders.component.css']
 })
 export class AdminOrdersComponent implements OnInit {
   orders$: Observable<Order[]> = of([]);

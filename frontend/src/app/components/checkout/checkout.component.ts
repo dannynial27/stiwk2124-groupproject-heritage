@@ -11,7 +11,7 @@ import { ShippingInfo } from '../../models/order.model';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './checkout.component.html',
-  styleUrl: './checkout.component.css'
+  styleUrls: ['./checkout.component.css']
 })
 export class CheckoutComponent implements OnInit {
   checkoutForm!: FormGroup;
@@ -48,13 +48,13 @@ export class CheckoutComponent implements OnInit {
 
     this.orderService.checkout(this.userId, shippingInfo).subscribe({
       next: (order) => {
-        // Navigate to success page with the new order ID
         this.router.navigate(['/order-success', order.orderId]);
+        this.isSubmitting = false;
       },
       error: (err) => {
         console.error('Checkout failed', err);
         this.isSubmitting = false;
-        // You can add user-friendly error handling here
+        alert('Checkout failed. Please try again.');
       }
     });
   }

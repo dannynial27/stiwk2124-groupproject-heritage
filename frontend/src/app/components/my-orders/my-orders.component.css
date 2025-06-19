@@ -1,0 +1,17 @@
+.container {
+  max-width: 800px;
+  padding-top: 70px;
+}
+
+h2 {
+  color: #1E3A8A;
+}
+
+.accordion-button {
+  background-color: #fff;
+  color: #1E3A8A;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #E8D6C4;
+}

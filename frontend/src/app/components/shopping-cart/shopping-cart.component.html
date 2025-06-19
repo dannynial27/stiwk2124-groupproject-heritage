@@ -1,0 +1,26 @@
+<div class="container mt-5">
+  <h2>Shopping Cart</h2>
+  <hr>
+  <div *ngIf="cart$ | async as cart; else loading">
+    <div *ngIf="cart.cartItems.length > 0; else emptyCart">
+      <div class="card mb-3" *ngFor="let item of cart.cartItems">
+        <div class="card-body">
+          <h5 class="card-title">{{ item.product.name }}</h5>
+          <p class="card-text">Price: {{ item.product.price | currency:'MYR' }}</p>
+          <p class="card-text">Quantity:
+            <input type="number" min="1" [(ngModel)]="item.quantity" (change)="updateQuantity(item)" class="form-control d-inline-block w-auto">
+          </p>
+          <button class="btn btn-danger" (click)="removeItem(item.product.productId)">Remove</button>
+        </div>
+      </div>
+      <h4>Total: {{ cart.totalAmount | currency:'MYR' }}</h4>
+      <a routerLink="/checkout" class="btn btn-primary">Proceed to Checkout</a>
+    </div>
+    <ng-template #emptyCart>
+      <div class="alert alert-info">Your cart is empty.</div>
+    </ng-template>
+  </div>
+  <ng-template #loading>
+    <p>Loading cart...</p>
+  </ng-template>
+</div>

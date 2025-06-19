@@ -1,11 +1,6 @@
 .container {
-  max-width: 600px;
+  max-width: 800px;
   padding-top: 70px;
-}
-
-.alert-success {
-  background-color: #d4edda;
-  color: #155724;
 }
 
 .card {
@@ -22,6 +17,15 @@
   background-color: #163172;
 }
 
-h3 {
+.btn-danger {
+  background-color: #dc3545;
+  border: none;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+h2 {
   color: #1E3A8A;
 }

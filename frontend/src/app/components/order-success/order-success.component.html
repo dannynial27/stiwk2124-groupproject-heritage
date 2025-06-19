@@ -4,11 +4,9 @@
       <h4 class="alert-heading">Thank You!</h4>
       <p>Your order has been placed successfully.</p>
     </div>
-
     <h3>Order Confirmation #{{ order.orderId }}</h3>
     <p>A confirmation has been sent to your email.</p>
-
-    <div class="card mt-4 mx-auto" style="max-width: 600px;">
+    <div class="card mt-4 mx-auto">
       <div class="card-header">
         Order Summary
       </div>
@@ -18,12 +16,11 @@
         <p><strong>Shipping To:</strong> {{ order.shippingName }}, {{ order.shippingAddress }}, {{ order.shippingCity }}</p>
       </div>
     </div>
-    <a routerLink="/my-order" class="btn btn-primary mt-4">View My Orders</a>
+    <a routerLink="/my-orders" class="btn btn-primary mt-4">View My Orders</a>
   </div>
-
   <ng-template #loading>
     <div class="spinner-border" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
   </ng-template>
-</div><p>order-success works!</p>
+</div>

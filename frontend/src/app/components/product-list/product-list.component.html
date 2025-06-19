@@ -1,0 +1,39 @@
+<div class="container mt-5">
+  <h2>Manage Products</h2>
+  <hr>
+  <div *ngIf="products$ | async as products; else loading">
+    <div *ngIf="products.length > 0; else noProducts">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let product of products">
+          <td>{{ product.productId }}</td>
+          <td>{{ product.name }}</td>
+          <td>{{ product.category }}</td>
+          <td>{{ product.price | currency:'MYR' }}</td>
+          <td>{{ product.stockQuantity }}</td>
+          <td>
+            <button class="btn btn-primary me-2" (click)="editProduct(product)">Edit</button>
+            <button class="btn btn-danger" (click)="deleteProduct(product.productId)">Delete</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #noProducts>
+      <div class="alert alert-info">No products found.</div>
+    </ng-template>
+  </div>
+  <ng-template #loading>
+    <p>Loading products...</p>
+  </ng-template>
+</div>
