@@ -1,42 +1,137 @@
 <div class="home-container">
-  <div class="banner">
-    <h1>Welcome to Ameen Qurba</h1>
-    <p>Discover traditional heritage products for your modern lifestyle.</p>
+  <!-- Hero Section -->
+  <div class="hero-banner">
+    <div class="hero-content">
+      <h1>Experience Traditional Heritage</h1>
+      <p class="tagline">Authentic Malaysian flavors crafted with care and tradition</p>
+      <div class="hero-buttons">
+        <a routerLink="/products" class="btn btn-primary">Browse All Products</a>
+        <a routerLink="/about" class="btn btn-outline">Our Story</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categories Section -->
+  <div class="categories-section">
+    <h2>Shop by Category</h2>
+    <div class="category-grid">
+      <div class="category-card" *ngFor="let category of categoriesWithImages" (click)="browseCategory(category.name)">
+        <div class="category-image">
+          <img [src]="category.imagePath" [alt]="category.name" />
+        </div>
+        <h3>{{ category.name }}</h3>
+      </div>
+    </div>
   </div>
   
-  <div class="featured-products">
-    <h2>Featured Products</h2>
-    
-    <div *ngIf="isLoading" class="text-center my-5">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+  <!-- Featured Products Section -->
+  <section class="featured-section">
+    <div class="section-header">
+      <h2>Featured Products</h2>
+      <div class="section-actions">
+        <button (click)="refreshFeaturedProducts()" class="btn-refresh" title="Show different products">
+          <i class="refresh-icon"></i> Refresh
+        </button>
+        <a routerLink="/products" class="view-all">View All Products</a>
       </div>
-      <p class="mt-2">Loading products...</p>
     </div>
     
-    <div *ngIf="errorMessage && !isLoading" class="alert alert-danger">
-      {{ errorMessage }}
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Discovering exquisite products for you...</p>
     </div>
     
+    <!-- Error State -->
+    <div *ngIf="errorMessage && !isLoading" class="error-message">
+      <div class="error-icon"></div>
+      <p>{{ errorMessage }}</p>
+      <button (click)="loadFeaturedProducts()" class="btn-retry">Try Again</button>
+    </div>
+    
+    <!-- Products Display -->
     <div *ngIf="!isLoading && featuredProducts.length > 0" class="product-grid">
       <div class="product-card" *ngFor="let product of featuredProducts">
-        <img [src]="product.imagePath" alt="{{ product.name }}" 
-             onerror="this.src='/assets/default-product.png'">
-        <h3>{{ product.name }}</h3>
-        <p class="product-category">{{ product.category }}</p>
-        <p class="product-price">RM {{ product.price.toFixed(2) }}</p>
-        <button (click)="addToCart(product)" 
-                [disabled]="!product.stockQuantity" 
-                class="add-btn">
-          Add to Cart
-        </button>
+        <div class="product-badge" *ngIf="product.stockQuantity < 10 && product.stockQuantity > 0">Low Stock</div>
+        <div class="product-badge sold-out" *ngIf="product.stockQuantity === 0">Sold Out</div>
+        
+        <div class="product-image-container">
+          <img [src]="getImageUrl(product)" alt="{{ product.name }}" class="product-image">
+        </div>
+        
+        <div class="product-details">
+          <div class="product-category">{{ product.category }}</div>
+          <h3 class="product-title">{{ product.name }}</h3>
+          <div class="product-description">{{ (product.description.length > 60) ? (product.description | slice:0:60) + '...' : product.description }}</div>
+          
+          <div class="product-meta">
+            <div class="product-price">RM {{ product.price.toFixed(2) }}</div>
+            <div class="product-stock" [ngClass]="{'in-stock': product.stockQuantity > 10, 'low-stock': product.stockQuantity <= 10 && product.stockQuantity > 0, 'out-of-stock': product.stockQuantity === 0}">
+              <span *ngIf="product.stockQuantity > 0">In Stock</span>
+              <span *ngIf="product.stockQuantity === 0">Out of Stock</span>
+            </div>
+          </div>
+          
+          <div class="product-actions">
+            <button (click)="addToCart(product)" 
+                    [disabled]="!product.stockQuantity" 
+                    class="add-btn">
+              <i class="cart-icon"></i> Add to Cart
+            </button>
+            <button (click)="viewProductDetails(product)" class="view-btn">
+              <i class="view-icon"></i> Details
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     
-    <div *ngIf="!isLoading && featuredProducts.length === 0" class="text-center my-5">
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && featuredProducts.length === 0" class="empty-products">
+      <div class="empty-icon"></div>
       <p>No featured products available at this time.</p>
+      <a routerLink="/products" class="btn-browse">Browse All Products</a>
     </div>
-  </div>
-  
-  <app-footer></app-footer>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="testimonials-section">
+    <h2>What Our Customers Say</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="rating">★★★★★</div>
+        <p class="quote">"The Ameen Qurba honey is absolutely exceptional. It's pure, authentic, and has a taste that reminds me of my childhood."</p>
+        <div class="customer-info">
+          <div class="avatar"></div>
+          <p class="name">Ahmad Rahman</p>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="rating">★★★★★</div>
+        <p class="quote">"I love the traditional herbal tea blends. They're fragrant, soothing, and perfect for a relaxing evening."</p>
+        <div class="customer-info">
+          <div class="avatar"></div>
+          <p class="name">Nurul Hasan</p>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="rating">★★★★★</div>
+        <p class="quote">"The premium spices have transformed my cooking. Authentic flavors that make every dish special!"</p>
+        <div class="customer-info">
+          <div class="avatar"></div>
+          <p class="name">Mei Lin</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Heritage Story Section -->
+  <section class="heritage-section">
+    <div class="heritage-content">
+      <h2>Our Heritage Journey</h2>
+      <p>For generations, Ameen Qurba has preserved authentic Malaysian culinary traditions. Our products are crafted using time-honored recipes and techniques, bringing the rich heritage of Malaysian flavors to your kitchen.</p>
+      <a routerLink="/heritage" class="btn-heritage">Learn About Our Story</a>
+    </div>
+    <div class="heritage-image"></div>
+  </section>
 </div>

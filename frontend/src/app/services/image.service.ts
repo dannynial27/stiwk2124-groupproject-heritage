@@ -7,7 +7,8 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class ImageService {
-  private apiUrl = 'http://localhost:8080/qurba/api/images';
+  // Make apiUrl public so it can be used by components
+  public apiUrl = 'http://localhost:8080/qurba/api/images';
   
   constructor(private http: HttpClient, private authService: AuthService) { }
   
