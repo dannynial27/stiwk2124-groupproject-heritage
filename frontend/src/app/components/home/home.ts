@@ -12,10 +12,17 @@ interface CategoryWithImage {
   imagePath: string;
 }
 
+interface Testimonial {
+  name: string;
+  rating: number;
+  quote: string;
+  avatarPath: string;
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule], // Remove FooterComponent from imports
+  imports: [CommonModule, RouterModule],
   templateUrl: './home.html',
   styleUrls: ['./home.css']
 })
@@ -26,6 +33,26 @@ export class HomeComponent implements OnInit {
   categoriesWithImages: CategoryWithImage[] = [];
   isLoading: boolean = true;
   errorMessage: string = '';
+  testimonials: Testimonial[] = [
+    {
+      name: "Ahmad Rahman",
+      rating: 5,
+      quote: "The Ameen Qurba honey is absolutely exceptional. It's pure, authentic, and has a taste that reminds me of my childhood.",
+      avatarPath: "assets/customer/male1.webp" // First image
+    },
+    {
+      name: "Nurul Hasan",
+      rating: 5,
+      quote: "I love the traditional herbal tea blends. They're fragrant, soothing, and perfect for a relaxing evening.",
+      avatarPath: "assets/customer/female2.jpg" // Second image
+    },
+    {
+      name: "Nurul Aisha",
+      rating: 5, 
+      quote: "The premium spices have transformed my cooking. Authentic flavors that make every dish special!",
+      avatarPath: "assets/customer/female1.jpg" // Third image
+    }
+  ];
 
   constructor(
     private productService: ProductService,
@@ -223,5 +250,10 @@ export class HomeComponent implements OnInit {
   
   loadFeaturedProducts(): void {
     this.loadAllProducts();
+  }
+
+  // Add the rating display helper method
+  getStarRating(rating: number): string {
+    return '★'.repeat(rating) + '☆'.repeat(5 - rating);
   }
 }
