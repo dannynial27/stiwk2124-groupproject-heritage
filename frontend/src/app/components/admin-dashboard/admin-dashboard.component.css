@@ -53,3 +53,407 @@
   cursor: default;
   color: #1E3A8A;
 }
+
+.welcome-card {
+  background-color: #f8f9fa;
+  border-left: 5px solid #1E3A8A;
+  margin-bottom: 20px;
+}
+
+.dashboard-card {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.products-card {
+  border-left: 4px solid #28a745;
+}
+
+.categories-card {
+  border-left: 4px solid #17a2b8;
+}
+
+.orders-card {
+  border-left: 4px solid #ffc107;
+}
+
+.feedback-card {
+  border-left: 4px solid #6c757d;
+}
+
+.counter {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1E3A8A;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgba(30, 58, 138, 0.1);
+}
+
+.card-link {
+  color: #1E3A8A;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.card-link:hover {
+  text-decoration: underline;
+}
+
+/* Main Container */
+.admin-container {
+  max-width: 1400px;
+  padding-top: 70px;
+  padding-bottom: 2rem;
+  margin: 0 auto;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.dashboard-header h2 {
+  color: #1E3A8A;
+  font-weight: 700;
+  margin-bottom: 0;
+}
+
+.last-updated {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Welcome Card */
+.welcome-section {
+  margin: 1.5rem 0;
+}
+
+.welcome-card {
+  background-color: #f8f9fa;
+  border-left: 5px solid #1E3A8A;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.welcome-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.welcome-avatar {
+  width: 60px;
+  height: 60px;
+  background-color: rgba(30, 58, 138, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.welcome-avatar i {
+  font-size: 2rem;
+  color: #1E3A8A;
+}
+
+.welcome-content h4 {
+  margin-bottom: 0.25rem;
+  color: #1E3A8A;
+}
+
+.welcome-content p {
+  margin-bottom: 0;
+  color: #6c757d;
+}
+
+/* Dashboard Cards */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: white;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  font-weight: 600;
+  padding: 1rem 1.25rem;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.dashboard-card {
+  height: 100%;
+  overflow: hidden;
+}
+
+.products-card {
+  border-top: 4px solid #28a745;
+}
+
+.categories-card {
+  border-top: 4px solid #17a2b8;
+}
+
+.orders-card {
+  border-top: 4px solid #ffc107;
+}
+
+.feedback-card {
+  border-top: 4px solid #6c757d;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgba(30, 58, 138, 0.1);
+  color: #1E3A8A;
+  font-size: 1.2rem;
+}
+
+.counter {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1E3A8A;
+  margin: 0.5rem 0;
+  position: relative;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.card-link {
+  color: #1E3A8A;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.card-link:hover {
+  color: #152c6c;
+  text-decoration: underline;
+}
+
+.action-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(30, 58, 138, 0.1);
+  color: #1E3A8A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.action-button:hover {
+  background-color: #1E3A8A;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Quick Actions */
+.quick-actions-card {
+  height: 100%;
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.btn-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: left;
+  padding: 1rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  border: none;
+}
+
+.btn-action:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-success {
+  background-color: #1E3A8A;
+}
+
+.btn-success:hover {
+  background-color: #152c6c;
+}
+
+.btn-primary {
+  background-color: #4361ee;
+}
+
+.btn-primary:hover {
+  background-color: #3a56d4;
+}
+
+.btn-info {
+  background-color: #4cc9f0;
+  color: #343a40;
+}
+
+.btn-info:hover {
+  background-color: #3db8df;
+  color: #212529;
+}
+
+.btn-warning {
+  background-color: #f8961e;
+  color: #343a40;
+}
+
+.btn-warning:hover {
+  background-color: #e7851d;
+  color: #212529;
+}
+
+/* System Status */
+.status-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.status-item:last-child {
+  border-bottom: none;
+}
+
+.status-label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.status-value {
+  display: flex;
+  align-items: center;
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.status-indicator.online {
+  background-color: #28a745;
+}
+
+.status-indicator.offline {
+  background-color: #dc3545;
+}
+
+/* Badge Styles */
+.badge {
+  padding: 0.5rem 0.75rem;
+  border-radius: 50px;
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+.text-bg-primary {
+  background-color: #4361ee;
+  color: white;
+}
+
+.text-bg-success {
+  background-color: #28a745;
+  color: white;
+}
+
+/* Media Queries */
+@media (max-width: 992px) {
+  .welcome-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .welcome-actions {
+    width: 100%;
+  }
+  
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .welcome-content {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* Import Bootstrap Icons */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css");
+
+/* Add this to your existing CSS */
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

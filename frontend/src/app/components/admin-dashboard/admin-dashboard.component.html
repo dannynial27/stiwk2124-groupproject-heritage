@@ -1,14 +1,172 @@
-<div class="container mt-5">
-  <h2>Admin Dashboard</h2>
-  <div class="card p-4">
-    <h4>Welcome, {{ adminUsername || 'Admin' }}!</h4>
-    <p>Manage your store using the options below:</p>
-    <div class="d-flex flex-column gap-3">
-      <a routerLink="/add-product" class="btn btn-success">Add New Product</a>
-      <a routerLink="/product-list" class="btn btn-primary">View & Manage Products</a>
-      <a routerLink="/view-categories" class="btn btn-info">View Categories</a>
-      <a routerLink="/admin-orders" class="btn btn-warning">Manage Orders</a>
-      <a routerLink="/admin-feedback" class="btn btn-secondary">View Customer Feedback</a>
+<div class="container-fluid admin-container">
+  <div class="dashboard-header mb-4">
+    <h2>Admin Dashboard</h2>
+    <div class="last-updated">Last updated: {{ currentDate | date:'medium' }}</div>
+  </div>
+  
+  <div class="welcome-section mb-4">
+    <div class="welcome-card">
+      <div class="welcome-content">
+        <div class="welcome-avatar">
+          <i class="bi bi-person-circle"></i>
+        </div>
+        <div>
+          <h4>Welcome back, {{ adminUsername || 'Admin' }}!</h4>
+          <p>Here's an overview of your Ameen Qurba store's performance</p>
+        </div>
+      </div>
+      <div class="welcome-actions">
+        <button class="btn btn-outline-primary me-2" (click)="loadDashboardStats()">
+          <i class="bi bi-arrow-clockwise me-1"></i> Refresh Data
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row mb-4">
+    <!-- Products Statistics -->
+    <div class="col-md-6 col-lg-3 mb-4">
+      <div class="card dashboard-card products-card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">Products</h5>
+            <div class="card-icon">
+              <i class="bi bi-box"></i>
+            </div>
+          </div>
+          <h2 class="counter">{{ totalProducts }}</h2>
+          <p class="card-text">Total products in inventory</p>
+          <div class="card-actions">
+            <a routerLink="/product-list" class="card-link">Manage Products</a>
+            <a routerLink="/add-product" class="action-button">
+              <i class="bi bi-plus-circle"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Categories Statistics -->
+    <div class="col-md-6 col-lg-3 mb-4">
+      <div class="card dashboard-card categories-card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">Categories</h5>
+            <div class="card-icon">
+              <i class="bi bi-tag"></i>
+            </div>
+          </div>
+          <h2 class="counter">{{ totalCategories }}</h2>
+          <p class="card-text">Product categories</p>
+          <div class="card-actions">
+            <a routerLink="/view-categories" class="card-link">Manage Categories</a>
+            <a routerLink="/view-categories" class="action-button">
+              <i class="bi bi-pencil"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Orders Statistics -->
+    <div class="col-md-6 col-lg-3 mb-4">
+      <div class="card dashboard-card orders-card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">Orders</h5>
+            <div class="card-icon">
+              <i class="bi bi-bag"></i>
+            </div>
+          </div>
+          <h2 class="counter">{{ totalOrders }}</h2>
+          <p class="card-text">Total customer orders</p>
+          <div class="card-actions">
+            <a routerLink="/admin-orders" class="card-link">Manage Orders</a>
+            <a routerLink="/admin-orders" class="action-button">
+              <i class="bi bi-list-check"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Feedback Statistics -->
+    <div class="col-md-6 col-lg-3 mb-4">
+      <div class="card dashboard-card feedback-card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">Feedback</h5>
+            <div class="card-icon">
+              <i class="bi bi-chat-dots"></i>
+            </div>
+          </div>
+          <h2 class="counter">{{ totalFeedback }}</h2>
+          <p class="card-text">Customer feedback received</p>
+          <div class="card-actions">
+            <a routerLink="/admin-feedback" class="card-link">View Feedback</a>
+            <a routerLink="/admin-feedback" class="action-button">
+              <i class="bi bi-envelope-open"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Quick Actions -->
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card quick-actions-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Quick Actions</h5>
+          <span class="badge text-bg-primary">Daily Tasks</span>
+        </div>
+        <div class="card-body">
+          <div class="action-buttons">
+            <a routerLink="/add-product" class="btn btn-action btn-success">
+              <i class="bi bi-plus-circle me-2"></i> Add New Product
+            </a>
+            <a routerLink="/admin-orders" class="btn btn-action btn-warning">
+              <i class="bi bi-truck me-2"></i> Pending Orders
+            </a>
+            <a routerLink="/admin-feedback" class="btn btn-action btn-info">
+              <i class="bi bi-envelope-open me-2"></i> Unread Feedback
+            </a>
+            <a routerLink="/product-list" class="btn btn-action btn-primary">
+              <i class="bi bi-upc-scan me-2"></i> Manage Inventory
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">System Status</h5>
+          <span class="badge text-bg-success">Online</span>
+        </div>
+        <div class="card-body">
+          <div class="status-items">
+            <div class="status-item">
+              <div class="status-label">Backend API:</div>
+              <div class="status-value"><span class="status-indicator online"></span> Operational</div>
+            </div>
+            <div class="status-item">
+              <div class="status-label">Database:</div>
+              <div class="status-value"><span class="status-indicator online"></span> Connected</div>
+            </div>
+            <div class="status-item">
+              <div class="status-label">Storage:</div>
+              <div class="status-value"><span class="status-indicator online"></span> Available</div>
+            </div>
+            <div class="status-item">
+              <div class="status-label">Last Backup:</div>
+              <div class="status-value">{{ currentDate | date:'medium' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
