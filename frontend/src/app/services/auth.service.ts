@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError, of } from 'rxjs';
+import { Observable, throwError, of, BehaviorSubject } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { User } from '../models/user.model';
 
@@ -10,7 +10,32 @@ import { User } from '../models/user.model';
 export class AuthService {
   private apiUrl = 'http://localhost:8080/qurba/api/auth';
   
-  constructor(private http: HttpClient) { }
+  // Add BehaviorSubject to track authentication state
+  private authStateSubject = new BehaviorSubject<boolean>(this.hasValidToken());
+  public authState$ = this.authStateSubject.asObservable();
+  
+  // Add BehaviorSubject to track user data
+  private currentUserSubject = new BehaviorSubject<User | null>(this.getUser());
+  public currentUser$ = this.currentUserSubject.asObservable();
+  
+  constructor(private http: HttpClient) { 
+    // Check token validity on service initialization
+    this.checkTokenValidity();
+  }
+  
+  private checkTokenValidity(): void {
+    // You could add token expiration check here
+    const isLoggedIn = this.hasValidToken();
+    this.authStateSubject.next(isLoggedIn);
+    
+    if (!isLoggedIn) {
+      this.currentUserSubject.next(null);
+    }
+  }
+  
+  private hasValidToken(): boolean {
+    return !!localStorage.getItem('token');
+  }
   
   register(user: User): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, user)
@@ -23,14 +48,20 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/login`, { username, password })
       .pipe(
         map(response => {
-          // If the backend doesn't return user information directly, construct it
+          // Extract user ID and role from JWT token
+          const userId = this.extractUserIdFromToken(response.token);
+          const role = this.extractRoleFromToken(response.token);
+          
+          // Create user object with correct properties
           const userData: User = {
+            userId: userId, // Changed from id to userId
             username: username,
-            // Set default values for other required properties
             email: '',
             password: '',
-            role: response.role || this.extractRoleFromToken(response.token) || 'CUSTOMER'
+            role: role || 'CUSTOMER'
           };
+          
+          console.log('Login successful. User:', userData);
           
           return {
             token: response.token,
@@ -40,7 +71,13 @@ export class AuthService {
         tap(response => {
           localStorage.setItem('token', response.token);
           localStorage.setItem('user', JSON.stringify(response.user));
-          localStorage.setItem('role', response.user.role.toLowerCase());
+          localStorage.setItem('role', response.user.role);
+          
+          // Update auth state
+          this.authStateSubject.next(true);
+          this.currentUserSubject.next(response.user);
+          
+          console.log('Auth state updated. User is now authenticated.');
         }),
         catchError(this.handleError)
       );
@@ -48,13 +85,25 @@ export class AuthService {
   
   private extractRoleFromToken(token: string): string {
     try {
-      // Simple extraction - in real apps you'd use a proper JWT decoder
+      // JWT tokens are encoded in three parts: header.payload.signature
       const payload = token.split('.')[1];
       const decodedPayload = JSON.parse(atob(payload));
-      return decodedPayload.role || 'CUSTOMER';
-    } catch (e) {
-      console.error('Failed to extract role from token', e);
-      return 'CUSTOMER';
+      return decodedPayload.role || '';
+    } catch (error) {
+      console.error('Error extracting role from token', error);
+      return '';
+    }
+  }
+  
+  private extractUserIdFromToken(token: string): number {
+    try {
+      const payload = token.split('.')[1];
+      const decodedPayload = JSON.parse(atob(payload));
+      console.log('Token payload:', decodedPayload); // Log the payload for debugging
+      return decodedPayload.userId || 0;
+    } catch (error) {
+      console.error('Error extracting userId from token', error);
+      return 0;
     }
   }
   
@@ -81,6 +130,12 @@ export class AuthService {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('role');
+    
+    // This is critical - make sure to update the auth state
+    this.authStateSubject.next(false);
+    this.currentUserSubject.next(null);
+    
+    console.log('User logged out. Auth state updated.');
   }
   
   getUser(): User | null {
@@ -97,11 +152,11 @@ export class AuthService {
   
   getUserId(): number | null {
     const user = this.getUser();
-    return user && user.id ? user.id : null;
+    return user && user.userId ? user.userId : null; // Changed from user.id to user.userId
   }
   
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
+    return this.authStateSubject.value;
   }
   
   getToken(): string | null {
@@ -113,6 +168,20 @@ export class AuthService {
   }
   
   isAdmin(): boolean {
-    return this.getRole() === 'admin';
+    const role = this.getRole();
+    return role === 'ADMIN' || role === 'admin';
+  }
+  
+  isCustomer(): boolean {
+    const role = this.getRole();
+    return role === 'CUSTOMER' || role === 'customer';
+  }
+  
+  isAuthenticated(): boolean {
+    return this.authStateSubject.value;
+  }
+
+  getCurrentUserId(): number {
+    return this.getUserId() || 0;
   }
 }

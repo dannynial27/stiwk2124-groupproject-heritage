@@ -47,4 +47,10 @@ export class OrderService {
   updateOrderStatus(orderId: number, status: string): Observable<any> {
     return this.http.patch<any>(`${this.adminApiUrl}/orders/${orderId}/status`, { status });
   }
+
+  createOrder(orderData: any): Observable<Order> {
+    const userId = orderData.userId;
+    delete orderData.userId;
+    return this.checkout(userId, orderData);
+  }
 }

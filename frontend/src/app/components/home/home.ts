@@ -110,10 +110,10 @@ export class HomeComponent implements OnInit {
           imagePath: this.getImageUrl(product)
         });
       } else {
-        // Use a default image path if no product is found for this category
+        // Use the proper default image URL
         this.categoriesWithImages.push({
           name: category,
-          imagePath: `${this.imageService.apiUrl}/product/default`
+          imagePath: this.imageService.getDefaultImageUrl()
         });
       }
     });
@@ -137,7 +137,6 @@ export class HomeComponent implements OnInit {
         name: 'Premium Honey', 
         price: 15.00, 
         imagePath: '/api/images/product/Madu/premium-honey.png', 
-        available: true, 
         category: 'Madu', 
         description: 'Pure natural honey from Malaysian forests', 
         stockQuantity: 10
@@ -147,7 +146,6 @@ export class HomeComponent implements OnInit {
         name: 'Herbal Tea', 
         price: 10.00, 
         imagePath: '/api/images/product/Minuman/herbal-tea.png', 
-        available: true, 
         category: 'Minuman', 
         description: 'Traditional herbal tea blend with exotic herbs', 
         stockQuantity: 50 
@@ -157,7 +155,6 @@ export class HomeComponent implements OnInit {
         name: 'Special Spice Mix', 
         price: 8.50, 
         imagePath: '/api/images/product/Rempah/spice-mix.png', 
-        available: true, 
         category: 'Rempah', 
         description: 'Authentic Malaysian spice blend for traditional dishes', 
         stockQuantity: 0
@@ -167,7 +164,6 @@ export class HomeComponent implements OnInit {
         name: 'Noodle Collection', 
         price: 12.00, 
         imagePath: '/api/images/product/Mee/noodle-collection.png', 
-        available: true, 
         category: 'Mee', 
         description: 'Handcrafted traditional noodles using heritage techniques', 
         stockQuantity: 25
@@ -201,6 +197,11 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  // Add safety helper method
+  private safeProductId(product: Product): number {
+    return product?.productId || 0;
+  }
+
   addToCart(product: Product): void {
     const userId = this.authService.getUserId();
     if (!userId) {
@@ -209,13 +210,21 @@ export class HomeComponent implements OnInit {
       return;
     }
     
-    if (!product.productId) {
+    const productId = this.safeProductId(product);
+    if (productId === 0) {
       alert('Cannot add product to cart: Invalid product ID');
       return;
     }
     
-    this.cartService.addItemToCart(userId, product.productId, 1).subscribe({
-      next: () => {
+    // Ensure there's stock available
+    if (product.stockQuantity <= 0) {
+      alert('Sorry, this product is out of stock');
+      return;
+    }
+    
+    // Use the updated service method
+    this.cartService.addToCart(productId, 1).subscribe({
+      next: (cart) => {
         this.showAddedToCartNotification(product.name);
       },
       error: (err: any) => {
@@ -232,10 +241,17 @@ export class HomeComponent implements OnInit {
   }
 
   getImageUrl(product: Product): string {
-    if (!product.imagePath) {
-      return this.imageService.getSafeProductImageUrl(product.category, product.name);
+    if (!product) {
+      return this.imageService.getDefaultImageUrl();
     }
-    return product.imagePath;
+    
+    // If the product has an imagePath, use it
+    if (product.imagePath) {
+      return this.imageService.getProductImageUrl(product.imagePath);
+    }
+    
+    // Otherwise, generate a URL based on category and name
+    return this.imageService.getProductImageByName(product.category, product.name);
   }
   
   browseCategory(category: string): void {

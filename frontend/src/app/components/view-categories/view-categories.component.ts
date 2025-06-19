@@ -18,7 +18,8 @@ export class ViewCategoriesComponent implements OnInit {
   constructor(private productService: ProductService, private router: Router) {}
 
   ngOnInit(): void {
-    if (localStorage.getItem('role') !== 'admin') {
+    const role = localStorage.getItem('role');
+    if (!role || role.toLowerCase() !== 'admin') {
       alert('Only admins can access this page.');
       this.router.navigate(['/login']); // Changed from '/admin-login' to '/login'
       return;

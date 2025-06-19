@@ -101,7 +101,8 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   private checkAdmin(): boolean {
-    return localStorage.getItem('role') === 'admin';
+    const role = localStorage.getItem('role');
+    return role === 'ADMIN' || role === 'admin';
   }
   
   private getUser(): any {

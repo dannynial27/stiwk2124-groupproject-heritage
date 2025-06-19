@@ -1,6 +1,7 @@
 .container {
-  max-width: 800px;
+  max-width: 900px;
   padding-top: 70px;
+  padding-bottom: 50px;
 }
 
 h2 {
@@ -8,10 +9,74 @@ h2 {
 }
 
 .accordion-button {
-  background-color: #fff;
-  color: #1E3A8A;
+  background-color: #f8f9fa;
+  color: #333;
+  font-weight: 500;
 }
 
 .accordion-button:not(.collapsed) {
-  background-color: #E8D6C4;
+  background-color: #e9ecef;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .125);
+}
+
+.order-summary {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  padding-right: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.order-details {
+  padding: 1rem;
+}
+
+.item-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.list-group-item {
+  border: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.badge {
+  padding: 0.5em 0.75em;
+  font-size: 0.8rem;
+  color: white;
+}
+
+.status-pending {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.status-confirmed {
+  background-color: #0dcaf0;
+  color: #212529;
+}
+
+.status-shipped {
+  background-color: #0d6efd;
+}
+
+.status-delivered {
+  background-color: #198754;
+}
+
+.status-cancelled {
+  background-color: #dc3545;
+}
+
+.no-orders-message {
+  text-align: center;
+  padding: 3rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
 }

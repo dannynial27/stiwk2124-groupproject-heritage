@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
-import { Cart } from '../../models/cart.model';
+import { ImageService } from '../../services/image.service';
+import { Cart, CartItem } from '../../models/cart.model';
 import { Observable, of } from 'rxjs';
 
 @Component({
@@ -15,49 +16,54 @@ import { Observable, of } from 'rxjs';
   styleUrls: ['./shopping-cart.component.css']
 })
 export class ShoppingCartComponent implements OnInit {
-  cart$: Observable<Cart> = of({
-    cartItems: [],
-    totalAmount: 0
-  });
+  cart$: Observable<Cart> = of({ items: [], totalAmount: 0 });
 
   constructor(
     private cartService: CartService, 
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private imageService: ImageService
   ) {}
 
   ngOnInit(): void {
     const userId = this.authService.getUserId();
     if (userId) {
-      this.cart$ = this.cartService.getCart(userId);
+      // Use the cart$ observable from the service for real-time updates
+      this.cart$ = this.cartService.cart$; 
+      this.cartService.loadCart().subscribe(); // Initial load
     } else {
       this.router.navigate(['/login']);
     }
   }
 
-  updateQuantity(item: any): void {
-    if (!item || !item.product || !item.product.productId) {
-      console.error('Invalid cart item or product ID');
-      return;
+  incrementQuantity(item: CartItem): void {
+    const newQuantity = item.quantity + 1;
+    if (newQuantity <= item.product.stockQuantity) {
+      this.updateItemQuantity(item.product.productId, newQuantity);
     }
+  }
 
+  decrementQuantity(item: CartItem): void {
+    const newQuantity = item.quantity - 1;
+    this.updateItemQuantity(item.product.productId, newQuantity);
+  }
+
+  private updateItemQuantity(productId: number, quantity: number): void {
     const userId = this.authService.getUserId();
-    if (!userId) {
-      this.router.navigate(['/login']);
+    if (!userId) return;
+
+    if (quantity < 1) {
+      this.removeItem(productId);
       return;
     }
-
-    if (item.quantity > 0) {
-      this.cartService.updateItemQuantity(userId, item.product.productId, item.quantity).subscribe({
-        next: () => {
-          // Successfully updated
-        },
-        error: (err) => {
-          console.error('Failed to update quantity:', err);
-          alert('Failed to update quantity. Please try again.');
-        }
-      });
-    }
+    
+    this.cartService.updateItemQuantity(userId, productId, quantity).subscribe({
+      error: (err) => {
+        console.error('Failed to update quantity:', err);
+        alert('Failed to update quantity. Please try again.');
+        this.cartService.loadCart().subscribe(); // Revert UI on error
+      }
+    });
   }
 
   removeItem(productId: number | undefined): void {
@@ -73,14 +79,23 @@ export class ShoppingCartComponent implements OnInit {
     }
 
     this.cartService.removeItem(userId, productId).subscribe({
-      next: () => {
-        // Refresh cart after removing item
-        this.cart$ = this.cartService.getCart(userId);
-      },
       error: (err) => {
         console.error('Failed to remove item:', err);
         alert('Failed to remove item. Please try again.');
       }
     });
+  }
+
+  clearCart(): void {
+    const userId = this.authService.getUserId();
+    if (userId && confirm('Are you sure you want to clear your entire cart?')) {
+      this.cartService.clearCart(userId).subscribe({
+        error: (err) => console.error('Failed to clear cart', err)
+      });
+    }
+  }
+
+  getImageUrl(imagePath?: string): string {
+    return this.imageService.getProductImageUrl(imagePath);
   }
 }

@@ -1,44 +1,63 @@
-<nav class="navbar navbar-expand-lg fixed-top">
+<nav class="navbar" [ngClass]="{'admin-navbar': role === 'ADMIN' || role === 'admin', 'user-navbar': role !== 'ADMIN' && role !== 'admin'}">
   <div class="container-fluid">
     <a class="navbar-brand" routerLink="/">
-      <img src="assets/Logo/logo.png" alt="Ameen Qurba" class="navbar-logo">
-      <span class="brand-name">Ameen Qurba</span>
+      <img src="assets/Logo/logo.png" alt="Ameen Qurba" class="brand-logo">
+      <span>Ameen Qurba</span>
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/home" routerLinkActive="active">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/products" routerLinkActive="active">Products</a>
-        </li>
-        <li class="nav-item" *ngIf="role">
-          <a class="nav-link" routerLink="/cart" routerLinkActive="active">Cart</a>
-        </li>
-        <li class="nav-item" *ngIf="role">
-          <a class="nav-link" routerLink="/my-orders" routerLinkActive="active">My Orders</a>
-        </li>
-        <li class="nav-item" *ngIf="role">
-          <a class="nav-link" routerLink="/feedback" routerLinkActive="active">Feedback</a>
-        </li>
-        <li class="nav-item" *ngIf="role === 'admin'">
-          <a class="nav-link" routerLink="/admin-dashboard" routerLinkActive="active">Admin</a>
-        </li>
-        <li class="nav-item" *ngIf="role">
-          <a class="nav-link logout-link" (click)="logout()">Logout</a>
-        </li>
-        <li class="nav-item" *ngIf="!role">
-          <a class="nav-link" routerLink="/login" routerLinkActive="active">Login</a>
-        </li>
-        <li class="nav-item" *ngIf="!role">
-          <a class="nav-link" routerLink="/register" routerLinkActive="active">Register</a>
-        </li>
-      </ul>
+    
+    <div class="navbar-nav" [class.open]="mobileMenuOpen">
+      <div class="nav-links">
+        
+        <!-- Customer Links -->
+        <ng-container *ngIf="!role || (role.toLowerCase() !== 'admin')">
+          <a routerLink="/home" class="nav-link">Home</a>
+          <a routerLink="/products" class="nav-link">Products</a>
+          <a *ngIf="isAuthenticated" routerLink="/wishlist" class="nav-link wishlist-link">
+            <i class="bi bi-heart"></i>
+            <span class="badge" *ngIf="wishlistCount > 0">{{wishlistCount}}</span>
+          </a>
+          <a *ngIf="isAuthenticated" routerLink="/cart" class="nav-link cart-link">
+            <i class="bi bi-cart"></i>
+            <span class="badge" *ngIf="cartCount > 0">{{cartCount}}</span>
+          </a>
+          <a routerLink="/my-orders" *ngIf="isAuthenticated" class="nav-link">Orders</a>
+          <a routerLink="/feedback" *ngIf="isAuthenticated" class="nav-link">Feedback</a>
+        </ng-container>
+        
+        <!-- Admin Links -->
+        <ng-container *ngIf="role && role.toLowerCase() === 'admin'">
+            <a routerLink="/admin-dashboard" class="nav-link">Dashboard</a>
+            <a routerLink="/product-list" class="nav-link">Manage Products</a>
+            <a routerLink="/add-product" class="nav-link">Add Product</a>
+            <a routerLink="/view-categories" class="nav-link">Manage Categories</a>
+            <a routerLink="/admin-orders" class="nav-link">Manage Orders</a>
+            <a routerLink="/admin-feedback" class="nav-link">View Feedback</a>
+        </ng-container>
+        
+        <!-- Auth Dropdown -->
+        <div class="nav-dropdown" #authDropdown>
+          <button class="nav-link dropdown-toggle" (click)="toggleDropdown($event)">
+            <i class="bi bi-person-circle"></i>
+            <i class="bi bi-chevron-down"></i>
+          </button>
+          <div class="dropdown-menu">
+            <a *ngIf="!isAuthenticated" routerLink="/login" class="dropdown-item">
+              <i class="bi bi-box-arrow-in-right"></i> Login
+            </a>
+            <a *ngIf="!isAuthenticated" routerLink="/register" class="dropdown-item">
+              <i class="bi bi-person-plus"></i> Register
+            </a>
+            <button *ngIf="isAuthenticated" (click)="logout()" class="dropdown-item">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
+    
+    <!-- Mobile menu toggle -->
+    <button class="menu-toggle" (click)="toggleMobileMenu()">
+      <span class="menu-icon"></span>
+    </button>
   </div>
 </nav>
-<div class="navbar-spacer"></div>

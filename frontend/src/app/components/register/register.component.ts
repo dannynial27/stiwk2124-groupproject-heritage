@@ -2,8 +2,8 @@ import { Component, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
 import { User } from '../../models/user.model';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -27,27 +27,31 @@ export class RegisterComponent implements AfterViewInit {
   constructor(private authService: AuthService, private router: Router) {}
 
   ngAfterViewInit() {
-    // Add active class to selected role option
+    // Add active class to selected role option on initialization
     setTimeout(() => {
       this.updateSelectedRole();
     });
   }
 
   updateSelectedRole() {
-    const customerOption = document.querySelector('#customerRole')?.parentElement as HTMLElement;
-    const adminOption = document.querySelector('#adminRole')?.parentElement as HTMLElement;
+    const customerOption = document.querySelector('.role-option:nth-child(1)') as HTMLElement;
+    const adminOption = document.querySelector('.role-option:nth-child(2)') as HTMLElement;
     
     if (customerOption && adminOption) {
+      // Remove selected class from both options
+      customerOption.classList.remove('selected');
+      adminOption.classList.remove('selected');
+      
+      // Add selected class to the appropriate option
       if (this.user.role === 'CUSTOMER') {
         customerOption.classList.add('selected');
-        adminOption.classList.remove('selected');
       } else {
         adminOption.classList.add('selected');
-        customerOption.classList.remove('selected');
       }
     }
   }
 
+  // Call this whenever role radio button changes
   onRoleChange() {
     this.updateSelectedRole();
   }
@@ -76,7 +80,7 @@ export class RegisterComponent implements AfterViewInit {
     }
     
     this.isLoading = true;
-
+    
     // Convert role to uppercase to match backend expectations
     const userToRegister = {
       ...this.user,

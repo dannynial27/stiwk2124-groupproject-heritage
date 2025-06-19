@@ -18,7 +18,8 @@ export class FeedbackViewerComponent implements OnInit {
   private router = inject(Router);
 
   ngOnInit(): void {
-    if (localStorage.getItem('role') !== 'admin') {
+    const role = localStorage.getItem('role');
+    if (!role || role.toLowerCase() !== 'admin') {
       alert('Only admins can view feedback. Please login as admin.');
       this.router.navigate(['/login']); // Changed from '/admin-login' to '/login'
       return;

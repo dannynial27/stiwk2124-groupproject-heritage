@@ -1,5 +1,6 @@
 export interface User {
-  id?: number;
+  // Rename this to match backend's userId property
+  userId?: number;  // Changed from 'id' to 'userId'
   username: string;
   email: string;
   password: string;

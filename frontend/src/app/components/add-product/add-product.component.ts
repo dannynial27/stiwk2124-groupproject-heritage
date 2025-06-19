@@ -14,22 +14,22 @@ import { Product } from '../../models/product.model';
 })
 export class AddProductComponent implements OnInit {
   productForm!: FormGroup;
-  isSubmitting: boolean = false;
+  productId: number | null = null;
+  isEditMode = false;
+  isSubmitting = false;
+  errorMessage = '';
   categories: string[] = [];
-  productId?: number;
-  isEditMode: boolean = false;
-  selectedFile: File | null = null;
-  errorMessage: string = '';
-  
+
   constructor(
-    private fb: FormBuilder, 
-    private productService: ProductService, 
+    private fb: FormBuilder,
+    private productService: ProductService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    if (localStorage.getItem('role') !== 'admin') {
+    const role = localStorage.getItem('role');
+    if (!role || role.toLowerCase() !== 'admin') {
       alert('Only admins can access this page.');
       this.router.navigate(['/login']);
       return;
@@ -47,10 +47,10 @@ export class AddProductComponent implements OnInit {
 
     // Get categories
     this.productService.getCategories().subscribe({
-      next: (categories) => {
+      next: (categories: string[]) => {
         this.categories = categories;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Failed to load categories:', err);
         this.errorMessage = 'Failed to load categories. Please try again.';
       }
@@ -78,7 +78,7 @@ export class AddProductComponent implements OnInit {
         });
         this.isEditMode = true;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Failed to load product:', err);
         this.errorMessage = 'Failed to load product. Please try again.';
       }
@@ -94,6 +94,7 @@ export class AddProductComponent implements OnInit {
     this.errorMessage = '';
     this.isSubmitting = true;
     const productData: Product = {
+      productId: this.productId || 0, // Ensure productId is a number
       ...this.productForm.value
     };
 
@@ -103,7 +104,7 @@ export class AddProductComponent implements OnInit {
         next: () => {
           this.router.navigate(['/product-list']);
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Failed to update product:', err);
           this.errorMessage = 'Failed to update product. Please try again.';
           this.isSubmitting = false;
@@ -118,7 +119,7 @@ export class AddProductComponent implements OnInit {
         next: () => {
           this.router.navigate(['/product-list']);
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Failed to add product:', err);
           this.errorMessage = 'Failed to add product. Please try again.';
           this.isSubmitting = false;

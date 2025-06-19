@@ -2,15 +2,20 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImageService {
-  // Make apiUrl public so it can be used by components
-  public apiUrl = 'http://localhost:8080/qurba/api/images';
+  // Base URL for API requests
+  public apiUrl = 'http://localhost:8080/qurba/api';
   
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  constructor(
+    private http: HttpClient, 
+    private authService: AuthService,
+    private sanitizer: DomSanitizer
+  ) { }
   
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getToken();
@@ -30,60 +35,91 @@ export class ImageService {
     formData.append('replace', replace.toString());
     
     return this.http.post<{ imagePath: string }>(
-      `${this.apiUrl}/upload`,
+      `${this.apiUrl}/images/upload`,
       formData,
       { headers: this.getAuthHeaders() }
     );
   }
   
   /**
-   * Get the URL for a product image
+   * Get product image URL directly from path stored in database
+   * This handles paths in the format "assets/QurbaProductPhoto/{category}/{productName}.png"
    */
-  getProductImageUrl(category: string, productName: string): string {
-    // Normalize product name for URL (remove spaces, lowercase)
-    const normalizedName = productName.replace(/\s+/g, '-').toLowerCase();
-    return `${this.apiUrl}/product/${category}/${normalizedName}.png`;
+  getProductImageUrl(imagePath?: string): string {
+    if (!imagePath) {
+      return this.getDefaultImageUrl();
+    }
+    
+    try {
+      // If it's already an API URL, return it as is
+      if (imagePath.startsWith('http') || imagePath.startsWith('/api/')) {
+        return imagePath;
+      }
+      
+      // Convert database path format to API URL format
+      if (imagePath.includes('QurbaProductPhoto')) {
+        const parts = imagePath.split('/');
+        if (parts.length >= 3) {
+          const category = parts[parts.length - 2];
+          const filename = parts[parts.length - 1];
+          return `${this.apiUrl}/images/product/${encodeURIComponent(category)}/${encodeURIComponent(filename)}`;
+        }
+      }
+      
+      // Fallback to default if we can't parse the path
+      return this.getDefaultImageUrl();
+    } catch (error) {
+      console.error('Error processing image path:', error);
+      return this.getDefaultImageUrl();
+    }
   }
   
   /**
-   * Get a safe product image URL with fallback to default
+   * Get a safe URL for image with proper error handling
    */
-  getSafeProductImageUrl(category: string, productName: string): string {
-    try {
-      if (!category || !productName) {
-        return `${this.apiUrl}/product/default`;
-      }
-      return this.getProductImageUrl(category, productName);
-    } catch (error) {
-      console.error('Error generating image URL:', error);
-      return `${this.apiUrl}/product/default`;
+  getSafeProductImageUrl(imagePath?: string): SafeUrl {
+    const url = this.getProductImageUrl(imagePath);
+    return this.sanitizer.bypassSecurityTrustUrl(url);
+  }
+  
+  /**
+   * Get product image by category and name directly
+   */
+  getProductImageByName(category: string, productName: string): string {
+    if (!category || !productName) {
+      return this.getDefaultImageUrl();
     }
+    
+    const filename = this.ensurePngExtension(this.normalizeFilename(productName));
+    return `${this.apiUrl}/images/product/${encodeURIComponent(category)}/${encodeURIComponent(filename)}`;
+  }
+  
+  /**
+   * Get default image URL
+   */
+  getDefaultImageUrl(): string {
+    return `${this.apiUrl}/images/product/default`;
+  }
+  
+  /**
+   * Ensure filename has .png extension
+   */
+  private ensurePngExtension(filename: string): string {
+    if (!filename) return 'unknown.png';
+    return filename.toLowerCase().endsWith('.png') ? filename : `${filename}.png`;
+  }
+  
+  /**
+   * Normalize filename for URL (remove spaces, special chars)
+   */
+  private normalizeFilename(name: string): string {
+    return name.replace(/[^\w-]/g, '-').toLowerCase();
   }
   
   /**
    * Convert database image path to API URL
    */
   convertToApiUrl(dbPath: string): string {
-    if (!dbPath) {
-      return `${this.apiUrl}/product/default`;
-    }
-    
-    // Handle paths in the format "assets/QurbaProductPhoto/{category}/{productName}.png"
-    if (dbPath.startsWith('assets/QurbaProductPhoto/')) {
-      const parts = dbPath.split('/');
-      if (parts.length >= 3) {
-        const category = parts[2];
-        const filename = parts[3] || '';
-        return `${this.apiUrl}/product/${category}/${filename}`;
-      }
-    }
-    
-    // If already in API format, return as is
-    if (dbPath.startsWith(`${this.apiUrl}/product/`)) {
-      return dbPath;
-    }
-    
-    // Default fallback
-    return `${this.apiUrl}/product/default`;
+    return this.getProductImageUrl(dbPath);
   }
 }

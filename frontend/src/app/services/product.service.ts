@@ -90,4 +90,16 @@ export class ProductService {
     }
     return product;
   }
+
+  getAllProducts(): Observable<Product[]> {
+    return this.getProducts();
+  }
+
+  getProductsByCategory(category: string): Observable<Product[]> {
+    return this.filterByCategory(category);
+  }
+
+  createProduct(product: Product): Observable<Product> {
+    return this.addProduct(product);
+  }
 }

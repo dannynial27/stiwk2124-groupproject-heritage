@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { User } from '../../models/user.model';
+import { CartService } from '../../services/cart.service';
+import { WishlistService } from '../../services/wishlist.service';
 
 @Component({
   selector: 'app-login-page',
@@ -20,6 +21,8 @@ export class LoginPageComponent {
 
   constructor(
     private authService: AuthService,
+    private cartService: CartService,
+    private wishlistService: WishlistService,
     private router: Router
   ) {}
 
@@ -42,9 +45,14 @@ export class LoginPageComponent {
     
     this.authService.login(this.username, this.password).subscribe({
       next: (response) => {
-        // Navigation is handled in the auth service tap operator
+        console.log('Login successful, initializing user data...');
+        this.initializeUserServices();
+        
+        // Navigation based on role
         const role = localStorage.getItem('role');
-        if (role === 'admin') {
+        console.log(`Redirecting user with role: ${role}`);
+        
+        if (role === 'ADMIN' || role === 'admin') {
           this.router.navigate(['/admin-dashboard']);
         } else {
           this.router.navigate(['/home']);
@@ -59,5 +67,21 @@ export class LoginPageComponent {
         this.isLoading = false;
       }
     });
+  }
+  
+  initializeUserServices(): void {
+    if (this.authService.isAuthenticated()) {
+      console.log('Loading user cart data...');
+      this.cartService.loadCart().subscribe({
+        next: (data) => console.log('Cart loaded successfully:', data),
+        error: (err) => console.error('Failed to load cart:', err)
+      });
+      
+      console.log('Loading user wishlist data...');
+      this.wishlistService.getWishlist().subscribe({
+        next: (data) => console.log('Wishlist loaded successfully:', data),
+        error: (err) => console.error('Failed to load wishlist:', err)
+      });
+    }
   }
 }

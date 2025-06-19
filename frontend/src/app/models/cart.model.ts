@@ -1,11 +1,18 @@
 import { Product } from './product.model';
 
 export interface CartItem {
+  cartItemId?: number;
   product: Product;
   quantity: number;
+  subtotal?: number;
+  addedAt?: string;
 }
 
 export interface Cart {
-  cartItems: CartItem[];
-  totalAmount: number;
+  cartId?: number;
+  userId?: number;
+  items: CartItem[];
+  totalAmount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
