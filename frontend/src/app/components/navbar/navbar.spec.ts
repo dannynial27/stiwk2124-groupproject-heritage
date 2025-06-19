@@ -18,7 +18,8 @@ export class NavbarComponent {
   }
 
   logout() {
-    localStorage.removeItem('role');
+    this.authService.logout();
+    this.role = null;
     this.router.navigate(['/login']);
   }
 }

@@ -41,14 +41,10 @@ export class LoginPageComponent {
     this.isLoading = true;
     
     this.authService.login(this.username, this.password).subscribe({
-      next: (response: { token: string; user: User }) => {
-        // Store user info
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
-        localStorage.setItem('role', response.user.role.toLowerCase());
-        
-        // Navigate based on role
-        if (response.user.role.toLowerCase() === 'admin') {
+      next: (response) => {
+        // Navigation is handled in the auth service tap operator
+        const role = localStorage.getItem('role');
+        if (role === 'admin') {
           this.router.navigate(['/admin-dashboard']);
         } else {
           this.router.navigate(['/home']);
@@ -56,7 +52,7 @@ export class LoginPageComponent {
       },
       error: (err: any) => {
         console.error('Login error:', err);
-        this.errorMessage = 'Invalid username or password. Please try again.';
+        this.errorMessage = err.message || 'Invalid username or password. Please try again.';
         this.isLoading = false;
       },
       complete: () => {

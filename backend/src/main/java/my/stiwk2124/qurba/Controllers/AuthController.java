@@ -24,8 +24,9 @@ public class AuthController {
         return authService.login(request);
     }
     
-    @PostMapping("/admin/login")
-    public ResponseEntity<AuthResponse> adminLogin(@RequestBody LoginRequest request) {
-        return authService.adminLogin(request);
-    }
+    // Remove or comment out the dedicated admin login endpoint if you want to use one login endpoint for both roles
+    // @PostMapping("/admin/login")
+    // public ResponseEntity<AuthResponse> adminLogin(@RequestBody LoginRequest request) {
+    //     return authService.adminLogin(request);
+    // }
 }

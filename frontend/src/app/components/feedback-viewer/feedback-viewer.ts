@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { inject } from '@angular/core';
 import { FeedbackService } from '../../services/feedback.service';
 import { FooterComponent } from '../footer/footer';
 
@@ -21,7 +20,7 @@ export class FeedbackViewerComponent implements OnInit {
   ngOnInit(): void {
     if (localStorage.getItem('role') !== 'admin') {
       alert('Only admins can view feedback. Please login as admin.');
-      this.router.navigate(['/admin-login']);
+      this.router.navigate(['/login']); // Changed from '/admin-login' to '/login'
       return;
     }
     this.fetchFeedbacks();

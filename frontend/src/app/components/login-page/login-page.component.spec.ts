@@ -7,13 +7,14 @@ import { RouterModule, Router } from '@angular/router';
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  templateUrl: './login-page.component.html',
+  styleUrls: ['./login-page.component.css']
 })
 export class LoginComponent {
   username: string = '';
   password: string = '';
   errorMessage: string = '';
+isLoading: string|boolean;
 
   constructor(private router: Router) {}
 

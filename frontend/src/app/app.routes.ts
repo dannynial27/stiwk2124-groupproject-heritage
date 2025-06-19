@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './components/home/home';
 import { LoginPageComponent } from './components/login-page/login-page.component';
 import { RegisterComponent } from './components/register/register.component';
-import { AdminLoginComponent } from './components/admin-login/admin-login.component';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { AddProductComponent } from './components/add-product/add-product.component';
@@ -20,7 +19,6 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'login', component: LoginPageComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'admin-login', component: AdminLoginComponent },
   { path: 'admin-dashboard', component: AdminDashboardComponent },
   { path: 'product-list', component: ProductListComponent },
   { path: 'add-product', component: AddProductComponent },
@@ -33,6 +31,7 @@ export const routes: Routes = [
   { path: 'order-success/:id', component: OrderSuccessComponent },
   { path: 'my-orders', component: MyOrdersComponent },
   { path: 'admin-orders', component: AdminOrdersComponent },
+  { path: 'admin-login', redirectTo: 'login', pathMatch: 'full' },
   // Catch all route - must be last
   { path: '**', redirectTo: '/home' }
 ];

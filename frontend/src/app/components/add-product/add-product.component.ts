@@ -13,30 +13,25 @@ import { Product } from '../../models/product.model';
   styleUrls: ['./add-product.component.css']
 })
 export class AddProductComponent implements OnInit {
-  product: Product = {
-    name: '',
-    description: '',
-    price: 0,
-    category: '',
-    stockQuantity: 0,
-    available: true
-  };
-  productId: number | null = null;
   productForm!: FormGroup;
+  isSubmitting: boolean = false;
   categories: string[] = [];
+  productId?: number;
+  isEditMode: boolean = false;
+  selectedFile: File | null = null;
   errorMessage: string = '';
-
+  
   constructor(
+    private fb: FormBuilder, 
     private productService: ProductService, 
     private router: Router,
-    private route: ActivatedRoute,
-    private fb: FormBuilder
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     if (localStorage.getItem('role') !== 'admin') {
       alert('Only admins can access this page.');
-      this.router.navigate(['/admin-login']);
+      this.router.navigate(['/login']);
       return;
     }
 
@@ -57,6 +52,7 @@ export class AddProductComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to load categories:', err);
+        this.errorMessage = 'Failed to load categories. Please try again.';
       }
     });
 
@@ -72,7 +68,6 @@ export class AddProductComponent implements OnInit {
   loadProduct(id: number): void {
     this.productService.getProductById(id).subscribe({
       next: (product) => {
-        this.product = product;
         this.productForm.patchValue({
           name: product.name,
           description: product.description,
@@ -81,21 +76,24 @@ export class AddProductComponent implements OnInit {
           stockQuantity: product.stockQuantity,
           imagePath: product.imagePath
         });
+        this.isEditMode = true;
       },
       error: (err) => {
         console.error('Failed to load product:', err);
-        this.errorMessage = 'Failed to load product details.';
+        this.errorMessage = 'Failed to load product. Please try again.';
       }
     });
   }
 
   onSubmit(): void {
     if (this.productForm.invalid) {
+      this.errorMessage = 'Please fill in all required fields correctly.';
       return;
     }
 
+    this.errorMessage = '';
+    this.isSubmitting = true;
     const productData: Product = {
-      ...this.product,
       ...this.productForm.value
     };
 
@@ -108,6 +106,10 @@ export class AddProductComponent implements OnInit {
         error: (err) => {
           console.error('Failed to update product:', err);
           this.errorMessage = 'Failed to update product. Please try again.';
+          this.isSubmitting = false;
+        },
+        complete: () => {
+          this.isSubmitting = false;
         }
       });
     } else {
@@ -119,6 +121,10 @@ export class AddProductComponent implements OnInit {
         error: (err) => {
           console.error('Failed to add product:', err);
           this.errorMessage = 'Failed to add product. Please try again.';
+          this.isSubmitting = false;
+        },
+        complete: () => {
+          this.isSubmitting = false;
         }
       });
     }
