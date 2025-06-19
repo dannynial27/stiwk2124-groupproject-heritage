@@ -1,61 +1,50 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Order, ShippingInfo } from '../models/order.model';
-import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
   private apiUrl = 'http://localhost:8080/qurba/api';
+  private adminApiUrl = 'http://localhost:8080/qurba/api/admin';
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  constructor(private http: HttpClient) { }
 
-  private getAuthHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
-  }
-
-  // --- Customer Endpoints ---
+  // Customer endpoints
   checkout(userId: number, shippingInfo: ShippingInfo): Observable<Order> {
-    const url = `${this.apiUrl}/checkout/${userId}`;
-    return this.http.post<Order>(url, shippingInfo, { headers: this.getAuthHeaders() });
+    return this.http.post<Order>(`${this.apiUrl}/checkout/${userId}`, shippingInfo);
   }
 
   getUserOrders(userId: number): Observable<Order[]> {
-    const url = `${this.apiUrl}/orders/${userId}`;
-    return this.http.get<Order[]>(url, { headers: this.getAuthHeaders() });
+    return this.http.get<Order[]>(`${this.apiUrl}/orders/${userId}`);
   }
 
   getOrderSummary(orderId: number): Observable<Order> {
-    const url = `${this.apiUrl}/orders/${orderId}/summary`;
-    return this.http.get<Order>(url, { headers: this.getAuthHeaders() });
+    return this.http.get<Order>(`${this.apiUrl}/orders/${orderId}/summary`);
   }
 
-  // --- Admin Endpoints ---
+  // Admin endpoints
   getAllOrders(): Observable<Order[]> {
-    const url = `${this.apiUrl}/admin/orders`;
-    return this.http.get<Order[]>(url, { headers: this.getAuthHeaders() });
-  }
-
-  updateOrderStatus(orderId: number, status: string): Observable<Order> {
-    const url = `${this.apiUrl}/admin/orders/${orderId}/status`;
-    return this.http.patch<Order>(url, { status }, { headers: this.getAuthHeaders() });
+    return this.http.get<Order[]>(`${this.adminApiUrl}/orders`);
   }
 
   filterOrders(filters: { status?: string, year?: number, month?: number }): Observable<Order[]> {
-    let params = new HttpParams();
+    let url = `${this.adminApiUrl}/orders`;
+    
     if (filters.status) {
-      params = params.set('status', filters.status);
+      url = `${url}/filter?status=${filters.status}`;
+    } else if (filters.year && filters.month) {
+      url = `${url}/by-month?year=${filters.year}&month=${filters.month}`;
+    } else if (filters.year) {
+      url = `${url}/by-month?year=${filters.year}`;
     }
-    // Note: The backend has separate endpoints for filtering. This combines them.
-    // A more robust solution might check which filter is active and call the correct URL.
-    // For simplicity, we use the status filter here.
-    const url = `${this.apiUrl}/admin/orders/filter`;
-    return this.http.get<Order[]>(url, { headers: this.getAuthHeaders(), params });
+    
+    return this.http.get<Order[]>(url);
+  }
+
+  updateOrderStatus(orderId: number, status: string): Observable<any> {
+    return this.http.patch<any>(`${this.adminApiUrl}/orders/${orderId}/status`, { status });
   }
 }

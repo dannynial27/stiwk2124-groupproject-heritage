@@ -6,41 +6,61 @@ import { AuthService } from '../../services/auth.service';
 import { User } from '../../models/user.model';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-login-page',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  templateUrl: './login-page.component.html',
+  styleUrls: ['./login-page.component.css']
 })
-export class LoginComponent {
+export class LoginPageComponent {
   username: string = '';
   password: string = '';
   errorMessage: string = '';
+  isLoading: boolean = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   login(): void {
-    if (!this.username || !/^[a-zA-Z0-9]+$/.test(this.username)) {
-      this.errorMessage = 'Username must be a non-empty string or combination of letters and numbers.';
+    // Reset error message
+    this.errorMessage = '';
+    
+    // Validate inputs
+    if (!this.username || this.username.trim() === '') {
+      this.errorMessage = 'Username is required';
       return;
     }
-    if (!/^[A-Za-z0-9]+$/.test(this.password)) {
-      this.errorMessage = 'Password must be a non-empty string.';
+    
+    if (!this.password || this.password.trim() === '') {
+      this.errorMessage = 'Password is required';
       return;
     }
+    
+    this.isLoading = true;
+    
     this.authService.login(this.username, this.password).subscribe({
       next: (response: { token: string; user: User }) => {
+        // Store user info
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
         localStorage.setItem('role', response.user.role.toLowerCase());
+        
+        // Navigate based on role
         if (response.user.role.toLowerCase() === 'admin') {
-          this.router.navigate(['/admin-dashboard']).then(() => {}, (err: any) => console.error(err));
+          this.router.navigate(['/admin-dashboard']);
         } else {
-          this.router.navigate(['/home']).then(() => {}, (err: any) => console.error(err));
+          this.router.navigate(['/home']);
         }
       },
       error: (err: any) => {
-        this.errorMessage = 'Invalid username or password.';
+        console.error('Login error:', err);
+        this.errorMessage = 'Invalid username or password. Please try again.';
+        this.isLoading = false;
+      },
+      complete: () => {
+        this.isLoading = false;
       }
     });
   }

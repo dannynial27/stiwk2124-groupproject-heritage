@@ -6,15 +6,41 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class FeedbackService {
-  private apiUrl = '/api/feedback';
+  private apiUrl = 'http://localhost:8080/qurba/api/feedback';
+  private adminApiUrl = 'http://localhost:8080/qurba/api/admin/feedback';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  submitFeedback(feedback: any): Observable<any> {
-    return this.http.post(this.apiUrl, feedback);
+  submitFeedback(userId: number, feedback: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${userId}`, feedback);
   }
 
+  getFeedback(userId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${userId}`);
+  }
+
+  deleteFeedback(userId: number, feedbackId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${userId}/${feedbackId}`);
+  }
+
+  // Admin methods
   getFeedbacks(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+    return this.http.get<any[]>(`${this.adminApiUrl}`);
+  }
+
+  filterFeedbackByYear(year: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.adminApiUrl}/filter?year=${year}`);
+  }
+
+  filterFeedbackByYearAndMonth(year: number, month: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.adminApiUrl}/filter?year=${year}&month=${month}`);
+  }
+
+  markAsRead(feedbackId: number): Observable<any> {
+    return this.http.patch(`${this.adminApiUrl}/${feedbackId}/read`, {});
+  }
+
+  respondToFeedback(feedbackId: number, response: string): Observable<any> {
+    return this.http.post(`${this.adminApiUrl}/${feedbackId}/respond`, { response });
   }
 }

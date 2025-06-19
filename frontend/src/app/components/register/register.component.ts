@@ -14,16 +14,22 @@ import { User } from '../../models/user.model';
 })
 export class RegisterComponent {
   errorMessage: string = '';
-  user: User = { username: '', email: '', password: '', role: 'CUSTOMER', id: 0 };
+  user: User = { username: '', email: '', password: '', role: 'CUSTOMER' };
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  register(): void {
+  onSubmit(): void {
+    if (!this.user.username || !this.user.email || !this.user.password) {
+      this.errorMessage = 'All fields are required';
+      return;
+    }
+
     this.authService.register(this.user).subscribe({
       next: () => {
-        this.router.navigate(['/login']).then(() => {}, (err: any) => console.error(err));
+        this.router.navigate(['/login']);
       },
-      error: (err: any) => {
+      error: (err) => {
+        console.error('Registration failed:', err);
         this.errorMessage = 'Registration failed. Please try again.';
       }
     });

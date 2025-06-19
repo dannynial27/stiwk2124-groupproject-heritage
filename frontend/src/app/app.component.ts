@@ -7,9 +7,13 @@ import { FooterComponent } from './components/footer/footer';
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, NavbarComponent, FooterComponent],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  template: `
+    <app-navbar></app-navbar>
+    <router-outlet></router-outlet>
+    <app-footer></app-footer>
+  `,
+  styles: []
 })
 export class AppComponent {
-  title = 'temp-project';
+  title = 'Ameen Qurba';
 }

@@ -4,7 +4,8 @@ import { RouterModule, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
-import { FooterComponent } from '../footer/footer'; // Adjust path as needed
+import { ImageService } from '../../services/image.service';
+import { FooterComponent } from '../footer/footer';
 import { Product } from '../../models/product.model';
 
 @Component({
@@ -16,23 +17,58 @@ import { Product } from '../../models/product.model';
 })
 export class HomeComponent implements OnInit {
   featuredProducts: Product[] = [];
+  isLoading: boolean = true;
+  errorMessage: string = '';
 
   constructor(
     private productService: ProductService,
     private cartService: CartService,
     private authService: AuthService,
+    private imageService: ImageService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
+    this.loadFeaturedProducts();
+  }
+
+  loadFeaturedProducts(): void {
+    this.isLoading = true;
     this.productService.getProducts().subscribe({
       next: (products: Product[]) => {
-        this.featuredProducts = products.slice(0, 4); // Limit to 4 featured products
+        // Sort by price and take first 4
+        this.featuredProducts = products
+          .sort((a, b) => b.price - a.price)
+          .slice(0, 4);
+        this.isLoading = false;
       },
       error: (err: any) => {
+        console.error('Failed to load products:', err);
+        this.errorMessage = 'Failed to load products. Please try again later.';
+        this.isLoading = false;
+        
+        // Fallback products for development/demo
         this.featuredProducts = [
-          { productId: 1, name: 'Honey', price: 15.00, imagePath: 'https://via.placeholder.com/200x150?text=Honey', available: true, category: 'Honey', description: '', stockQuantity: 100 },
-          { productId: 2, name: 'Herbal Tea', price: 10.00, imagePath: 'https://via.placeholder.com/200x150?text=Herbal+Tea', available: true, category: 'Tea', description: '', stockQuantity: 50 }
+          { 
+            productId: 1, 
+            name: 'Premium Honey', 
+            price: 15.00, 
+            imagePath: '/api/images/product/Madu/premium-honey.png', 
+            available: true, 
+            category: 'Madu', 
+            description: 'Pure natural honey from Malaysian forests', 
+            stockQuantity: 100 
+          },
+          { 
+            productId: 2, 
+            name: 'Herbal Tea', 
+            price: 10.00, 
+            imagePath: '/api/images/product/Minuman/herbal-tea.png', 
+            available: true, 
+            category: 'Minuman', 
+            description: 'Traditional herbal tea blend', 
+            stockQuantity: 50 
+          }
         ];
       }
     });
@@ -40,14 +76,32 @@ export class HomeComponent implements OnInit {
 
   addToCart(product: Product): void {
     const userId = this.authService.getUserId();
-    if (userId && product.productId) {
-      this.cartService.addItemToCart(userId, product.productId, 1).subscribe({
-        next: () => alert('Product added to cart!'),
-        error: (err: any) => console.error('Failed to add product to cart:', err)
-      });
-    } else {
+    if (!userId) {
       alert('Please login to add items to cart.');
       this.router.navigate(['/login']);
+      return;
     }
+    
+    if (!product.productId) {
+      alert('Cannot add product to cart: Invalid product ID');
+      return;
+    }
+    
+    this.cartService.addItemToCart(userId, product.productId, 1).subscribe({
+      next: () => {
+        alert('Product added to cart successfully!');
+      },
+      error: (err: any) => {
+        console.error('Failed to add product to cart:', err);
+        alert('Failed to add product to cart. Please try again.');
+      }
+    });
+  }
+
+  getImageUrl(product: Product): string {
+    if (!product.imagePath) {
+      return this.imageService.getSafeProductImageUrl(product.category, product.name);
+    }
+    return product.imagePath;
   }
 }

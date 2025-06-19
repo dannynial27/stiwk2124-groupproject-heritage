@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -9,14 +10,30 @@ import { RouterModule } from '@angular/router';
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css']
 })
-export class NavbarComponent {
-  role = localStorage.getItem('role') || ''; // [Change 1: Define role property with default value]
+export class NavbarComponent implements OnInit {
+  role: string | null = null;
+  
+  constructor(private authService: AuthService, private router: Router) {}
+  
+  ngOnInit(): void {
+    this.role = this.authService.getRole();
+    // Subscribe to router events to ensure role is updated after navigation
+    this.router.events.subscribe(() => {
+      this.role = this.authService.getRole();
+    });
+  }
+  
+  logout(): void {
+    this.authService.logout();
+    this.role = null;
+    this.router.navigate(['/login']);
+  }
 
-  logout(): void { // [Change 2: Add logout method]
-    localStorage.removeItem('role');
-    localStorage.removeItem('token');
-    this.role = ''; // Update role after logout
-    console.log('Logged out');
-    // Navigate to login page if needed
+  isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
+  }
+
+  isAdmin(): boolean {
+    return this.authService.isAdmin();
   }
 }

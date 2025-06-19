@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Cart } from '../models/cart.model';
-import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,40 +9,25 @@ import { AuthService } from './auth.service';
 export class CartService {
   private apiUrl = 'http://localhost:8080/qurba/api/cart';
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
-
-  private getAuthHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
-  }
+  constructor(private http: HttpClient) { }
 
   getCart(userId: number): Observable<Cart> {
-    return this.http.get<Cart>(`${this.apiUrl}/${userId}`, { headers: this.getAuthHeaders() });
+    return this.http.get<Cart>(`${this.apiUrl}/${userId}`);
   }
 
-  addItemToCart(userId: number, productId: number, quantity: number): Observable<Cart> {
-    const headers = this.getAuthHeaders();
-    const url = `${this.apiUrl}/${userId}/add?productId=${productId}&quantity=${quantity}`;
-    return this.http.post<Cart>(url, {}, { headers });
+  addItemToCart(userId: number, productId: number, quantity: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${userId}/add?productId=${productId}&quantity=${quantity}`, {});
   }
 
   updateItemQuantity(userId: number, productId: number, quantity: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    const url = `${this.apiUrl}/${userId}/update?productId=${productId}&quantity=${quantity}`;
-    return this.http.put(url, {}, { headers });
+    return this.http.put<any>(`${this.apiUrl}/${userId}/update?productId=${productId}&quantity=${quantity}`, {});
   }
 
   removeItem(userId: number, productId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    const url = `${this.apiUrl}/${userId}/remove?productId=${productId}`;
-    return this.http.delete(url, { headers });
+    return this.http.delete<any>(`${this.apiUrl}/${userId}/remove?productId=${productId}`);
   }
 
   clearCart(userId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.delete(`${this.apiUrl}/${userId}/clear`, { headers });
+    return this.http.delete<any>(`${this.apiUrl}/${userId}/clear`);
   }
 }

@@ -1,16 +1,27 @@
 .navbar {
   background-color: #1E3A8A;
-  padding: 1rem;
+  padding: 1rem 2rem;
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .navbar-brand .logo {
   color: #fff;
   font-size: 1.5rem;
   font-weight: bold;
+}
+
+.navbar-spacer {
+  height: 70px; /* Should match navbar height */
+}
+
+.logo {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 
 .nav-links {
@@ -20,13 +31,20 @@
 }
 
 .nav-link {
-  color: #fff;
+  color: rgba(255,255,255,0.8) !important;
   text-decoration: none;
   padding: 0.5rem 1rem;
+  font-weight: 500;
+  margin: 0 0.5rem;
+  transition: color 0.3s ease;
 }
 
-.nav-link:hover {
-  color: #E8D6C4;
+.nav-link:hover, .nav-link.active {
+  color: white !important;
+}
+
+.logout-link {
+  cursor: pointer;
 }
 
 .logout-btn, .login-btn {
@@ -39,4 +57,13 @@
 
 .logout-btn:hover, .login-btn:hover {
   background-color: #E8D6C4;
+}
+
+@media (max-width: 992px) {
+  .navbar-collapse {
+    background-color: #1E3A8A;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    border-radius: 5px;
+  }
 }
