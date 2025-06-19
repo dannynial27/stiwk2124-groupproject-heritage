@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { WishlistService } from '../../services/wishlist.service';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
@@ -17,6 +17,23 @@ import { catchError } from 'rxjs/operators';
   imports: [CommonModule, RouterModule, ProductCardComponent, LoadingSpinnerComponent],
   template: `
     <div class="wishlist-container">
+      <!-- Add to Cart Notification -->
+      <div *ngIf="showAddToCartNotification && addedProduct" class="add-to-cart-notification">
+        <div class="notification-content">
+          <i class="fas fa-check-circle"></i>
+          <div class="notification-text">
+            <strong>'{{ addedProduct.name }}' moved to your cart.</strong>
+            <span>Total items in cart: {{ cartItemCount }}</span>
+          </div>
+        </div>
+        <div class="notification-actions">
+          <button class="btn btn-primary btn-sm" (click)="viewCart()">View Cart</button>
+          <button class="btn-icon" (click)="dismissNotification()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
       <div *ngIf="wishlist$ | async as wishlist; else loading">
         <div class="wishlist-header">
           <h1>My Wishlist</h1>
@@ -337,6 +354,70 @@ import { catchError } from 'rxjs/operators';
         font-size: 48px;
       }
     }
+
+    /* Add to Cart Notification Styles */
+    .add-to-cart-notification {
+      position: sticky;
+      top: 80px;
+      z-index: 1051;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #e8f4ff;
+      border-left: 4px solid #0d6efd;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .notification-content {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .notification-content .fa-check-circle {
+      color: #28a745;
+      font-size: 24px;
+    }
+
+    .notification-text strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+    
+    .notification-text span {
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .notification-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-icon {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 5px;
+      color: #666;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
   `]
 })
 export class WishlistComponent implements OnInit {
@@ -349,47 +430,72 @@ export class WishlistComponent implements OnInit {
   removingIds = new Set<number>();
   cartLoadingIds = new Set<number>();
 
+  // Notification state
+  showAddToCartNotification = false;
+  addedProduct: Product | null = null;
+  cartItemCount = 0;
+  private notificationTimer: any;
+
   constructor(
     private wishlistService: WishlistService,
     private cartService: CartService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {
     this.wishlist$ = this.wishlistService.wishlist$;
   }
 
   ngOnInit() {
     this.loadWishlist();
+    if (this.authService.isAuthenticated()) {
+      this.cartService.cartCount$.subscribe(count => {
+        this.cartItemCount = count;
+      });
+    }
   }
 
   loadWishlist() {
     this.loading = true;
     this.error = false;
-    this.wishlistService.getWishlist().pipe(
+    this.wishlist$ = this.wishlistService.getWishlist().pipe(
       catchError(err => {
         console.error('Error loading wishlist:', err);
         this.error = true;
-        return of({ items: [], totalItems: 0 });
+        return of({ items: [] } as Wishlist);
       })
-    ).subscribe(() => {
-      this.loading = false;
-    });
+    );
+    // This is just to turn off the global loading spinner
+    this.wishlist$.subscribe(() => this.loading = false);
   }
 
   onMoveToCart(product: Product) {
-    this.cartLoadingIds.add(product.productId);
-    this.cartService.addToCart(product.productId, 1).subscribe({
+    const productId = product.productId;
+    this.cartLoadingIds.add(productId);
+    
+    // 1. Add to cart
+    this.cartService.addToCart(productId, 1).subscribe({
       next: () => {
-        this.wishlistService.removeFromWishlist(product.productId).subscribe({
-          next: () => this.cartLoadingIds.delete(product.productId),
+        // 2. On success, remove from wishlist
+        this.wishlistService.removeFromWishlist(productId).subscribe({
+          next: () => {
+            // 3. Show notification and reload data
+            this.showNotification(product);
+            this.cartLoadingIds.delete(productId);
+            this.loadWishlist(); // Reload wishlist to reflect removal
+          },
           error: (err) => {
-            console.error('Error removing from wishlist:', err);
-            this.cartLoadingIds.delete(product.productId);
+            // If removing fails, we still show notification but log error
+            console.error('Failed to remove from wishlist after adding to cart:', err);
+            this.showNotification(product);
+            this.cartLoadingIds.delete(productId);
+            this.loadWishlist();
           }
         });
       },
       error: (err) => {
-        console.error('Error moving to cart:', err);
-        this.cartLoadingIds.delete(product.productId);
+        console.error('Failed to add to cart:', err);
+        this.cartLoadingIds.delete(productId);
+        // Optionally show an error notification here
       }
     });
   }
@@ -397,10 +503,13 @@ export class WishlistComponent implements OnInit {
   onRemoveFromWishlist(product: Product) {
     this.removingIds.add(product.productId);
     this.wishlistService.removeFromWishlist(product.productId).subscribe({
-      next: () => this.removingIds.delete(product.productId),
-      error: (err) => {
-        console.error('Error removing from wishlist:', err);
+      next: () => {
         this.removingIds.delete(product.productId);
+        this.loadWishlist(); // Refresh the list
+      },
+      error: () => {
+        this.removingIds.delete(product.productId);
+        // Optionally show an error
       }
     });
   }
@@ -410,18 +519,54 @@ export class WishlistComponent implements OnInit {
     if (userId && confirm('Are you sure you want to clear your entire wishlist?')) {
       this.clearingWishlist = true;
       this.wishlistService.clearWishlist().subscribe({
-        next: () => this.clearingWishlist = false,
-        error: () => this.clearingWishlist = false
+        next: () => {
+          this.clearingWishlist = false;
+          this.loadWishlist();
+        },
+        error: () => {
+          this.clearingWishlist = false;
+          // Optionally show an error
+        }
       });
     }
   }
 
   formatDate(dateString?: string): string {
-    if (!dateString) return 'Recently added';
-    try {
-      return new Date(dateString).toLocaleDateString();
-    } catch (error) {
-      return 'Recently added';
+    if (!dateString) {
+      return 'a while ago';
     }
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  }
+
+  // Notification Methods
+  showNotification(product: Product) {
+    this.addedProduct = product;
+    this.showAddToCartNotification = true;
+
+    if (this.notificationTimer) {
+      clearTimeout(this.notificationTimer);
+    }
+
+    this.notificationTimer = setTimeout(() => {
+      this.dismissNotification();
+    }, 5000); // 5-second timer
+  }
+
+  dismissNotification() {
+    this.showAddToCartNotification = false;
+    this.addedProduct = null;
+    if (this.notificationTimer) {
+      clearTimeout(this.notificationTimer);
+    }
+  }
+
+  viewCart() {
+    this.dismissNotification();
+    this.router.navigate(['/cart']);
   }
 }

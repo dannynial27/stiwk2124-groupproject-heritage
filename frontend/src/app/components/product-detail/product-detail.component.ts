@@ -12,134 +12,154 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
 import { ProductReviewsComponent } from '../product-reviews/product-reviews.component';
 import { ImageService } from '../../services/image.service';
 import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, StarRatingComponent, LoadingSpinnerComponent, ProductReviewsComponent],
   template: `
-    <div class="product-detail-container" *ngIf="!loading && product">
-      <!-- Breadcrumb -->
-      <nav class="breadcrumb">
-        <a routerLink="/home">Home</a> > 
-        <a routerLink="/products">Products</a> > 
-        <span>{{product.name}}</span>
-      </nav>
-
-      <!-- Product Main Section -->
-      <div class="product-main">
-        <div class="product-image-section">
-          <img 
-            [src]="getImageUrl(product.imagePath)" 
-            [alt]="product.name"
-            class="main-image"
-            (error)="onImageError($event)">
+    <div class="product-detail-container">
+      <!-- Add to Cart Notification -->
+      <div *ngIf="showAddToCartNotification && product" class="add-to-cart-notification">
+        <div class="notification-content">
+          <i class="fas fa-check-circle"></i>
+          <div class="notification-text">
+            <strong>'{{ product.name }}' added to your cart.</strong>
+            <span>Total items in cart: {{ cartItemCount }}</span>
+          </div>
         </div>
+        <div class="notification-actions">
+          <button class="btn btn-primary btn-sm" (click)="viewCart()">View Cart</button>
+          <button class="btn-icon" (click)="dismissNotification()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div *ngIf="!loading && product">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+          <a routerLink="/home">Home</a> > 
+          <a routerLink="/products">Products</a> > 
+          <span>{{product.name}}</span>
+        </nav>
 
-        <div class="product-info-section">
-          <h1 class="product-title">{{product.name}}</h1>
-          
-          <div class="product-rating" *ngIf="averageRating > 0">
-            <app-star-rating 
-              [rating]="averageRating" 
-              [showText]="true"
-              [reviewCount]="reviews.length">
-            </app-star-rating>
+        <!-- Product Main Section -->
+        <div class="product-main">
+          <div class="product-image-section">
+            <img 
+              [src]="getImageUrl(product.imagePath)" 
+              [alt]="product.name"
+              class="main-image"
+              (error)="onImageError($event)">
           </div>
 
-          <div class="product-price">
-            <span class="price">RM {{product.price.toFixed(2)}}</span>
-          </div>
+          <div class="product-info-section">
+            <h1 class="product-title">{{product.name}}</h1>
+            
+            <div class="product-rating" *ngIf="averageRating > 0">
+              <app-star-rating 
+                [rating]="averageRating" 
+                [showText]="true"
+                [reviewCount]="reviews.length">
+              </app-star-rating>
+            </div>
 
-          <div class="product-category">
-            <span class="category-badge">{{product.category}}</span>
-          </div>
+            <div class="product-price">
+              <span class="price">RM {{product.price.toFixed(2)}}</span>
+            </div>
 
-          <div class="stock-info">
-            <span 
-              class="stock-status"
-              [class.in-stock]="product.stockQuantity > 5"
-              [class.low-stock]="product.stockQuantity <= 5 && product.stockQuantity > 0"
-              [class.out-of-stock]="product.stockQuantity === 0">
-              {{getStockStatus()}}
-            </span>
-            <span *ngIf="product.stockQuantity > 0" class="stock-count">
-              ({{product.stockQuantity}} available)
-            </span>
-          </div>
+            <div class="product-category">
+              <span class="category-badge">{{product.category}}</span>
+            </div>
 
-          <div class="quantity-section" *ngIf="product.stockQuantity > 0">
-            <label>Quantity:</label>
-            <div class="quantity-controls">
+            <div class="stock-info">
+              <span 
+                class="stock-status"
+                [class.in-stock]="product.stockQuantity > 5"
+                [class.low-stock]="product.stockQuantity <= 5 && product.stockQuantity > 0"
+                [class.out-of-stock]="product.stockQuantity === 0">
+                {{getStockStatus()}}
+              </span>
+              <span *ngIf="product.stockQuantity > 0" class="stock-count">
+                ({{product.stockQuantity}} available)
+              </span>
+            </div>
+
+            <div class="quantity-section" *ngIf="product.stockQuantity > 0">
+              <label>Quantity:</label>
+              <div class="quantity-controls">
+                <button 
+                  class="qty-btn" 
+                  (click)="decreaseQuantity()"
+                  [disabled]="quantity <= 1">
+                  -
+                </button>
+                <input 
+                  type="number" 
+                  [(ngModel)]="quantity" 
+                  [max]="product.stockQuantity"
+                  [min]="1"
+                  class="qty-input">
+                <button 
+                  class="qty-btn" 
+                  (click)="increaseQuantity()"
+                  [disabled]="quantity >= product.stockQuantity">
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div class="action-buttons">
               <button 
-                class="qty-btn" 
-                (click)="decreaseQuantity()"
-                [disabled]="quantity <= 1">
-                -
+                class="btn btn-primary btn-large"
+                (click)="onAddToCart()"
+                [disabled]="product.stockQuantity === 0 || cartLoading">
+                <span *ngIf="!cartLoading">Add to Cart</span>
+                <span *ngIf="cartLoading">Adding...</span>
               </button>
-              <input 
-                type="number" 
-                [(ngModel)]="quantity" 
-                [max]="product.stockQuantity"
-                [min]="1"
-                class="qty-input">
+              
               <button 
-                class="qty-btn" 
-                (click)="increaseQuantity()"
-                [disabled]="quantity >= product.stockQuantity">
-                +
+                class="btn btn-outline wishlist-btn"
+                [class.in-wishlist]="isInWishlist"
+                (click)="onToggleWishlist()"
+                [disabled]="wishlistLoading">
+                <span *ngIf="!wishlistLoading">
+                  {{isInWishlist ? '❤ Remove from Wishlist' : '�� Add to Wishlist'}}
+                </span>
+                <span *ngIf="wishlistLoading">Processing...</span>
               </button>
             </div>
           </div>
-
-          <div class="action-buttons">
-            <button 
-              class="btn btn-primary btn-large"
-              (click)="onAddToCart()"
-              [disabled]="product.stockQuantity === 0 || cartLoading">
-              <span *ngIf="!cartLoading">Add to Cart</span>
-              <span *ngIf="cartLoading">Adding...</span>
-            </button>
-            
-            <button 
-              class="btn btn-outline wishlist-btn"
-              [class.in-wishlist]="isInWishlist"
-              (click)="onToggleWishlist()"
-              [disabled]="wishlistLoading">
-              <span *ngIf="!wishlistLoading">
-                {{isInWishlist ? '❤ Remove from Wishlist' : '🤍 Add to Wishlist'}}
-              </span>
-              <span *ngIf="wishlistLoading">Processing...</span>
-            </button>
-          </div>
         </div>
+
+        <!-- Product Description -->
+        <div class="product-description" *ngIf="product.description">
+          <h3>Product Description</h3>
+          <p>{{product.description}}</p>
+        </div>
+
+        <!-- Reviews Section -->
+        <app-product-reviews 
+          [productId]="product.productId"
+          [canAddReview]="true">
+        </app-product-reviews>
+
       </div>
 
-      <!-- Product Description -->
-      <div class="product-description" *ngIf="product.description">
-        <h3>Product Description</h3>
-        <p>{{product.description}}</p>
+      <app-loading-spinner 
+        *ngIf="loading" 
+        message="Loading product details...">
+      </app-loading-spinner>
+
+      <div class="error-state" *ngIf="error">
+        <h3>Product not found</h3>
+        <p>The product you're looking for doesn't exist or has been removed.</p>
+        <button class="btn btn-primary" routerLink="/products">
+          Browse Products
+        </button>
       </div>
-
-      <!-- Reviews Section -->
-      <app-product-reviews 
-        [productId]="product.productId"
-        [canAddReview]="true">
-      </app-product-reviews>
-
-    </div>
-
-    <app-loading-spinner 
-      *ngIf="loading" 
-      message="Loading product details...">
-    </app-loading-spinner>
-
-    <div class="error-state" *ngIf="error">
-      <h3>Product not found</h3>
-      <p>The product you're looking for doesn't exist or has been removed.</p>
-      <button class="btn btn-primary" routerLink="/products">
-        Browse Products
-      </button>
     </div>
   `,
   styles: [`
@@ -147,6 +167,7 @@ import { CartService } from '../../services/cart.service';
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
+      padding-top: 90px; /* Add space for sticky header */
     }
 
     .breadcrumb {
@@ -431,7 +452,7 @@ import { CartService } from '../../services/cart.service';
 
     .error-state p {
       color: #666;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
 
     @media (max-width: 768px) {
@@ -452,6 +473,70 @@ import { CartService } from '../../services/cart.service';
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       }
     }
+
+    /* Add to Cart Notification */
+    .add-to-cart-notification {
+      position: sticky;
+      top: 80px; 
+      z-index: 1051;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #e8f4ff;
+      border-left: 4px solid #0d6efd;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .notification-content {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .notification-content .fa-check-circle {
+      color: #28a745;
+      font-size: 24px;
+    }
+
+    .notification-text strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+    
+    .notification-text span {
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .notification-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-icon {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 5px;
+      color: #666;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
   `]
 })
 export class ProductDetailComponent implements OnInit {
@@ -469,6 +554,11 @@ export class ProductDetailComponent implements OnInit {
   averageRating = 0;
   userReview: Review | null = null;
   
+  // Notification state
+  showAddToCartNotification = false;
+  cartItemCount = 0;
+  private notificationTimer: any;
+  
   newReview: ReviewRequest = {
     productId: 0,
     rating: 0,
@@ -482,16 +572,23 @@ export class ProductDetailComponent implements OnInit {
     private wishlistService: WishlistService,
     private reviewService: ReviewService,
     private imageService: ImageService,
-    private cartService: CartService
+    private cartService: CartService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      const productId = +params['id'];
-      if (productId) {
-        this.loadProductDetails(productId);
+      const id = +params['id'];
+      if (id) {
+        this.loadProduct(id);
       }
     });
+
+    if (this.authService.isAuthenticated()) {
+      this.cartService.cartCount$.subscribe(count => {
+        this.cartItemCount = count;
+      });
+    }
   }
 
   loadProductDetails(productId: number) {
@@ -567,18 +664,21 @@ export class ProductDetailComponent implements OnInit {
   onAddToCart() {
     if (!this.product) return;
     
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
+
     this.cartLoading = true;
-    
     this.cartService.addToCart(this.product.productId, this.quantity).subscribe({
       next: () => {
         this.cartLoading = false;
-        console.log(`Added ${this.quantity} of ${this.product!.name} to cart`);
-        // You can show a toast notification here for better UX
+        this.showNotification();
       },
       error: (err) => {
         console.error('Error adding to cart:', err);
         this.cartLoading = false;
-        // You can show an error toast here
+        // Optionally, show an error toast/message to the user
       }
     });
   }
@@ -675,5 +775,30 @@ export class ProductDetailComponent implements OnInit {
         console.error('Error checking wishlist status:', error);
       }
     });
+  }
+
+  // Notification Methods
+  showNotification() {
+    this.showAddToCartNotification = true;
+
+    if (this.notificationTimer) {
+      clearTimeout(this.notificationTimer);
+    }
+
+    this.notificationTimer = setTimeout(() => {
+      this.dismissNotification();
+    }, 5000); // 5-second timer
+  }
+
+  dismissNotification() {
+    this.showAddToCartNotification = false;
+    if (this.notificationTimer) {
+      clearTimeout(this.notificationTimer);
+    }
+  }
+
+  viewCart() {
+    this.dismissNotification();
+    this.router.navigate(['/cart']);
   }
 }

@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { WishlistService } from '../../services/wishlist.service';
-import { CartService } from '../../services/cart.service'; // Add missing import
-import { AuthService } from '../../services/auth.service'; // Add missing import
+import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
 import { Product, ProductFilter } from '../../models/product.model';
 import { ProductCardComponent } from '../shared/product-card/product-card.component';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
@@ -16,6 +16,23 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
   imports: [CommonModule, FormsModule, RouterModule, ProductCardComponent, LoadingSpinnerComponent],
   template: `
     <div class="product-list-container">
+      <!-- Add to Cart Notification -->
+      <div *ngIf="showAddToCartNotification && addedProduct" class="add-to-cart-notification">
+        <div class="notification-content">
+          <i class="fas fa-check-circle"></i>
+          <div class="notification-text">
+            <strong>'{{ addedProduct.name }}' added to your cart.</strong>
+            <span>Total items in cart: {{ cartItemCount }}</span>
+          </div>
+        </div>
+        <div class="notification-actions">
+          <button class="btn btn-primary btn-sm" (click)="viewCart()">View Cart</button>
+          <button class="btn-icon" (click)="dismissNotification()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      
       <!-- Header Section -->
       <div class="header-section">
         <h1>Our Products</h1>
@@ -140,6 +157,7 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
+      padding-top: 90px;
     }
 
     .header-section {
@@ -273,21 +291,16 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 20px;
-      margin-top: 40px;
+      gap: 10px;
+      margin-top: 30px;
     }
 
     .page-btn {
-      padding: 10px 20px;
+      padding: 8px 16px;
       border: 1px solid #ddd;
       background: white;
       border-radius: 6px;
       cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .page-btn:hover:not(:disabled) {
-      background: #f8f9fa;
     }
 
     .page-btn:disabled {
@@ -297,27 +310,69 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
 
     .page-info {
       font-weight: 500;
-      color: #333;
     }
 
-    @media (max-width: 768px) {
-      .filter-controls {
-        flex-direction: column;
-        align-items: stretch;
-      }
+    /* Add to Cart Notification */
+    .add-to-cart-notification {
+      position: sticky;
+      top: 80px; 
+      z-index: 1051;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #e8f4ff;
+      border-left: 4px solid #0d6efd;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      animation: slideIn 0.3s ease-out;
+    }
 
-      .filter-select {
-        min-width: unset;
-      }
+    .notification-content {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
 
-      .view-toggle {
-        margin-left: 0;
-        align-self: center;
-      }
+    .notification-content .fa-check-circle {
+      color: #28a745;
+      font-size: 24px;
+    }
 
-      .products-container.grid-view {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 15px;
+    .notification-text strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+    
+    .notification-text span {
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .notification-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-icon {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 5px;
+      color: #666;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
       }
     }
   `]
@@ -337,18 +392,24 @@ export class ProductListComponent implements OnInit {
   sortOrder = '';
   viewMode: 'grid' | 'list' = 'grid';
 
-  // Pagination
   currentPage = 1;
   itemsPerPage = 12;
   totalPages = 1;
+
+  // Notification state
+  showAddToCartNotification = false;
+  addedProduct: Product | null = null;
+  cartItemCount = 0;
+  private notificationTimer: any;
 
   private searchTimeout: any;
 
   constructor(
     private productService: ProductService,
     private wishlistService: WishlistService,
-    private cartService: CartService, // Add CartService
-    private authService: AuthService  // Add AuthService
+    private cartService: CartService,
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -356,52 +417,36 @@ export class ProductListComponent implements OnInit {
     this.loadProducts();
     if (this.isAuthenticated) {
       this.loadWishlist();
+      this.cartService.cartCount$.subscribe(count => {
+        this.cartItemCount = count;
+      });
     }
   }
 
   loadProducts(): void {
     this.loading = true;
-    
-    this.productService.getAllProducts().subscribe({
-      next: (products: Product[]) => {
-        console.log('Received products:', products);
-        // Ensure we have an array
-        this.products = Array.isArray(products) ? products : [];
-        this.applyFilters();
-        this.loading = false;
-      },
-      error: (error: any) => {
-        console.error('Error loading products:', error);
-        this.products = [];
-        this.filteredProducts = [];
-        this.loading = false;
-      }
+    this.productService.getProducts().subscribe(data => {
+      this.products = data.map(p => ({...p, quantity: 1}));
+      this.applyFilters();
+      this.loading = false;
     });
   }
 
   loadWishlist() {
-    const userId = this.authService.getUserId();
-    if (!userId) {
-      return; // Don't proceed if not authenticated
-    }
-    this.wishlistService.getWishlist(userId).subscribe({
+    this.wishlistService.getWishlist().subscribe({
       next: (wishlist) => {
         this.wishlistProductIds = new Set(
-          // Add proper type annotation for item
-          wishlist.items.map((item: any) => item.product.productId)
+          wishlist.items.map(item => this.safeProductId(item.product))
         );
       },
-      error: (error) => {
-        console.error('Error loading wishlist:', error);
+      error: () => {
         this.wishlistProductIds = new Set();
       }
     });
   }
 
   onSearchChange() {
-    if (this.searchTimeout) {
-      clearTimeout(this.searchTimeout);
-    }
+    clearTimeout(this.searchTimeout);
     this.searchTimeout = setTimeout(() => {
       this.applyFilters();
     }, 300);
@@ -416,63 +461,46 @@ export class ProductListComponent implements OnInit {
   }
 
   applyFilters(): void {
-    if (!Array.isArray(this.products)) {
-      console.warn('Products is not an array:', this.products);
-      this.filteredProducts = [];
-      return;
-    }
+    let tempProducts = [...this.products];
 
-    let filtered = [...this.products];
-
-    // Apply category filter
-    if (this.selectedCategory && this.selectedCategory !== 'all') {
-      filtered = filtered.filter(product => 
-        product.category.toLowerCase() === this.selectedCategory!.toLowerCase()
-      );
-    }
-
-    // Apply search filter
+    // Search
     if (this.searchQuery) {
-      const query = this.searchQuery.toLowerCase();
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(query) ||
-        product.description.toLowerCase().includes(query)
+      tempProducts = tempProducts.filter(p =>
+        p.name.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
     }
 
-    // Apply sorting
-    if (this.sortOrder) {
-      filtered.sort((a, b) => {
-        switch (this.sortOrder) {
-          case 'asc':
-            return a.price - b.price;
-          case 'desc':
-            return b.price - a.price;
-          case 'name':
-            return a.name.localeCompare(b.name);
-          default:
-            return 0;
-        }
-      });
+    // Filter
+    if (this.selectedCategory) {
+      tempProducts = tempProducts.filter(p => p.category === this.selectedCategory);
     }
 
-    this.filteredProducts = filtered;
-    this.currentPage = 1;
+    // Sort
+    if (this.sortOrder === 'asc') {
+      tempProducts.sort((a, b) => a.price - b.price);
+    } else if (this.sortOrder === 'desc') {
+      tempProducts.sort((a, b) => b.price - a.price);
+    } else if (this.sortOrder === 'name') {
+      tempProducts.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    this.filteredProducts = tempProducts;
     this.updatePagination();
   }
-
+  
   updatePagination() {
     this.totalPages = Math.ceil(this.filteredProducts.length / this.itemsPerPage);
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.paginatedProducts = this.filteredProducts.slice(startIndex, endIndex);
+    this.goToPage(1); // Reset to first page after filtering
   }
 
   goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.updatePagination();
+    if (page < 1 || page > this.totalPages) {
+      return;
     }
+    this.currentPage = page;
+    const startIndex = (page - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedProducts = this.filteredProducts.slice(startIndex, endIndex);
   }
 
   clearFilters() {
@@ -481,58 +509,84 @@ export class ProductListComponent implements OnInit {
     this.sortOrder = '';
     this.applyFilters();
   }
-
-  // Add a safe check function
+  
   private safeProductId(product: Product): number {
-    return product?.productId || 0;
+    return product ? product.productId : 0;
   }
 
   onAddToCart(product: Product) {
-    if (!this.isAuthenticated) return;
+    if (!this.isAuthenticated) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: '/products' } });
+      return;
+    }
     const productId = this.safeProductId(product);
     this.cartLoadingIds.add(productId);
     
     this.cartService.addToCart(productId, 1).subscribe({
-      next: (cart: any) => {
+      next: () => {
+        this.showNotification(product);
         this.cartLoadingIds.delete(productId);
-        // Show success notification
       },
-      error: (err: any) => {
+      error: (error) => {
+        console.error('Error adding to cart:', error);
         this.cartLoadingIds.delete(productId);
-        console.error('Failed to add to cart:', err);
       }
     });
   }
 
   onToggleWishlist(product: Product) {
-    if (!this.isAuthenticated) return;
+    if (!this.isAuthenticated) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: '/products' } });
+      return;
+    }
     const productId = this.safeProductId(product);
     this.wishlistLoadingIds.add(productId);
-    
-    const isInWishlist = this.wishlistProductIds.has(productId);
-    
-    if (isInWishlist) {
+
+    if (this.wishlistProductIds.has(productId)) {
+      // Remove from wishlist
       this.wishlistService.removeFromWishlist(productId).subscribe({
         next: () => {
           this.wishlistProductIds.delete(productId);
           this.wishlistLoadingIds.delete(productId);
         },
-        error: (error) => {
-          console.error('Error removing from wishlist:', error);
-          this.wishlistLoadingIds.delete(productId);
-        }
+        error: () => this.wishlistLoadingIds.delete(productId)
       });
     } else {
+      // Add to wishlist
       this.wishlistService.addToWishlist(productId).subscribe({
         next: () => {
           this.wishlistProductIds.add(productId);
           this.wishlistLoadingIds.delete(productId);
         },
-        error: (error) => {
-          console.error('Error adding to wishlist:', error);
-          this.wishlistLoadingIds.delete(productId);
-        }
+        error: () => this.wishlistLoadingIds.delete(productId)
       });
     }
+  }
+
+  // Notification Methods
+  showNotification(product: Product) {
+    this.addedProduct = product;
+    this.showAddToCartNotification = true;
+
+    if (this.notificationTimer) {
+      clearTimeout(this.notificationTimer);
+    }
+
+    this.notificationTimer = setTimeout(() => {
+      this.dismissNotification();
+    }, 5000); // 5-second timer
+  }
+
+  dismissNotification() {
+    this.showAddToCartNotification = false;
+    this.addedProduct = null;
+    if (this.notificationTimer) {
+      clearTimeout(this.notificationTimer);
+    }
+  }
+
+  viewCart() {
+    this.dismissNotification();
+    this.router.navigate(['/cart']);
   }
 }
