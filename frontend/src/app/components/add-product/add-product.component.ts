@@ -18,6 +18,7 @@ export class AddProductComponent implements OnInit {
   isEditMode = false;
   isSubmitting = false;
   errorMessage = '';
+  successMessage = '';
   categories: string[] = [];
 
   constructor(
@@ -37,8 +38,8 @@ export class AddProductComponent implements OnInit {
 
     // Initialize the form
     this.productForm = this.fb.group({
-      name: ['', Validators.required],
-      description: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(50)]],
+      description: ['', [Validators.required, Validators.maxLength(200)]],
       price: [0, [Validators.required, Validators.min(0)]],
       category: ['', Validators.required],
       stockQuantity: [0, [Validators.required, Validators.min(0)]],
@@ -90,44 +91,29 @@ export class AddProductComponent implements OnInit {
       this.errorMessage = 'Please fill in all required fields correctly.';
       return;
     }
-
     this.errorMessage = '';
+    this.successMessage = '';
     this.isSubmitting = true;
     const productData: Product = {
-      productId: this.productId || 0, // Ensure productId is a number
+      productId: this.productId || 0,
       ...this.productForm.value
     };
-
-    if (this.productId) {
-      // Update existing product
-      this.productService.updateProduct(this.productId, productData).subscribe({
-        next: () => {
-          this.router.navigate(['/product-list']);
-        },
-        error: (err: any) => {
-          console.error('Failed to update product:', err);
-          this.errorMessage = 'Failed to update product. Please try again.';
-          this.isSubmitting = false;
-        },
-        complete: () => {
-          this.isSubmitting = false;
-        }
-      });
-    } else {
-      // Add new product
-      this.productService.addProduct(productData).subscribe({
-        next: () => {
-          this.router.navigate(['/product-list']);
-        },
-        error: (err: any) => {
-          console.error('Failed to add product:', err);
-          this.errorMessage = 'Failed to add product. Please try again.';
-          this.isSubmitting = false;
-        },
-        complete: () => {
-          this.isSubmitting = false;
-        }
-      });
-    }
+    const request = this.productId
+      ? this.productService.updateProduct(this.productId, productData)
+      : this.productService.addProduct(productData);
+    request.subscribe({
+      next: () => {
+        this.successMessage = this.productId ? 'Product updated successfully!' : 'Product added successfully!';
+        setTimeout(() => {
+          this.successMessage = '';
+          this.router.navigate(['/admin/products']);
+        }, 1200);
+        this.isSubmitting = false;
+      },
+      error: (err: any) => {
+        this.errorMessage = 'Failed to save product. Please check your input.';
+        this.isSubmitting = false;
+      }
+    });
   }
 }

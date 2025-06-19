@@ -19,15 +19,17 @@ export class AdminProductsComponent implements OnInit {
   products: Product[] = [];
   filteredProducts: Product[] = [];
   loading = true;
-  
+
   showAddForm = false;
   editingProduct: Product | null = null;
   currentProduct: Product = this.getEmptyProduct();
   selectedFile: File | null = null;
   imagePreviewUrl: string | ArrayBuffer | null = null;
-  
+
   searchQuery = '';
   deletingIds = new Set<number>();
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
 
   constructor(
     private productService: ProductService,
@@ -85,7 +87,6 @@ export class AdminProductsComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error deleting product:', err);
-          alert('Failed to delete product.');
           this.deletingIds.delete(product.productId);
         }
       });
@@ -106,14 +107,15 @@ export class AdminProductsComponent implements OnInit {
   }
 
   onSubmitProduct(): void {
+    console.log('onSubmitProduct called', this.currentProduct);
     this.loading = true;
-
+    this.errorMessage = null;
+    this.successMessage = null;
     const uploadObservable: Observable<string | null | undefined> = this.selectedFile
       ? this.imageService.uploadProductImage(this.selectedFile, this.currentProduct.category, this.currentProduct.name, !!this.editingProduct).pipe(
         map((response: { imagePath: string }) => response.imagePath)
       )
       : of(this.currentProduct.imagePath);
-
     uploadObservable.pipe(
       switchMap(imagePath => {
         this.currentProduct.imagePath = imagePath ?? undefined;
@@ -124,12 +126,17 @@ export class AdminProductsComponent implements OnInit {
       })
     ).subscribe({
       next: () => {
-        this.loadProducts(); // Reload all products
-        this.cancelForm();
+        this.loadProducts();
+        this.successMessage = this.editingProduct ? 'Product updated successfully!' : 'Product added successfully!';
+        setTimeout(() => {
+          this.successMessage = null;
+          this.cancelForm();
+        }, 1200);
+        this.loading = false;
       },
       error: (err: any) => {
         console.error('Error saving product:', err);
-        alert(`Failed to ${this.editingProduct ? 'update' : 'add'} product.`);
+        this.errorMessage = 'Failed to save product. Please check your input.';
         this.loading = false;
       }
     });
@@ -141,6 +148,8 @@ export class AdminProductsComponent implements OnInit {
     this.currentProduct = this.getEmptyProduct();
     this.selectedFile = null;
     this.imagePreviewUrl = null;
+    this.errorMessage = null;
+    this.successMessage = null;
   }
 
   getEmptyProduct(): Product {

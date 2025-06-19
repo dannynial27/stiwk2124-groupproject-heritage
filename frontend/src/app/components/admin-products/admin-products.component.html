@@ -1,131 +1,161 @@
 <div class="admin-products-container">
   <div class="header-section">
     <h1>Manage Products</h1>
-    <button class="btn btn-primary" (click)="showAddForm = true">
-      Add New Product
-    </button>
   </div>
 
-  <!-- Add/Edit Product Form -->
-  <div class="product-form" *ngIf="showAddForm || editingProduct">
-    <h3>{{editingProduct ? 'Edit Product' : 'Add New Product'}}</h3>
-    
-    <form (ngSubmit)="onSubmitProduct()" #productForm="ngForm">
-      <div class="form-group">
-        <label>Product Name:</label>
-        <input 
-          type="text" 
-          [(ngModel)]="currentProduct.name"
-          name="name"
-          required
-          class="form-control">
-      </div>
-
-      <div class="form-group">
-        <label>Description:</label>
-        <textarea 
-          [(ngModel)]="currentProduct.description"
-          name="description"
-          required
-          class="form-control"
-          rows="3">
-        </textarea>
-      </div>
-
-      <div class="form-row">
+  <!-- Add/Edit Product Modal -->
+  <div class="modal-backdrop" *ngIf="showAddForm || editingProduct" (click)="cancelForm()"></div>
+  <div class="product-modal" *ngIf="showAddForm || editingProduct">
+    <div class="product-form-modal" (click)="$event.stopPropagation()">
+      <h3>{{editingProduct ? 'Edit Product' : 'Add New Product'}}</h3>
+      <form (ngSubmit)="onSubmitProduct()" #productForm="ngForm" autocomplete="off">
+        <div *ngIf="successMessage" class="form-success-message">{{ successMessage }}</div>
+        <div *ngIf="errorMessage && !productForm.pristine" class="form-error-message">{{ errorMessage }}</div>
         <div class="form-group">
-          <label>Price (RM):</label>
-          <input 
-            type="number" 
-            [(ngModel)]="currentProduct.price"
-            name="price"
+          <label>Product Name:</label>
+          <input
+            type="text"
+            [(ngModel)]="currentProduct.name"
+            name="name"
             required
-            min="0"
-            step="0.01"
-            class="form-control">
-        </div>
-
-        <div class="form-group">
-          <label>Stock Quantity:</label>
-          <input 
-            type="number" 
-            [(ngModel)]="currentProduct.stockQuantity"
-            name="stockQuantity"
-            required
-            min="0"
-            class="form-control">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Category:</label>
-        <select 
-          [(ngModel)]="currentProduct.category"
-          name="category"
-          required
-          class="form-control">
-          <option value="">Select Category</option>
-          <option value="Madu">🍯 Madu</option>
-          <option value="Mee">🍜 Mee</option>
-          <option value="Minuman">☕ Minuman</option>
-          <option value="Rempah">🌶️ Rempah</option>
-          <option value="Sos">🥫 Sos</option>
-          <option value="Lain-lain">📦 Lain-lain</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Product Image:</label>
-        <div class="image-preview-container">
-          <div *ngIf="editingProduct && currentProduct.imagePath && !imagePreviewUrl" class="image-preview">
-            <img [src]="getImageUrl(currentProduct.imagePath)" alt="Current product image" class="preview-thumb">
-            <small>Current Image</small>
-          </div>
-          <div *ngIf="imagePreviewUrl" class="image-preview">
-            <img [src]="imagePreviewUrl" alt="New image preview" class="preview-thumb">
-            <small>New Image Preview</small>
+            maxlength="50"
+            class="form-control"
+            placeholder="e.g. Madu Asli"
+            #name="ngModel">
+          <div class="field-hint" *ngIf="name.invalid && (name.dirty || name.touched)">
+            <span *ngIf="name.errors?.['required']">Product name is required.</span>
+            <span *ngIf="name.errors?.['maxlength']">Maximum 50 characters.</span>
           </div>
         </div>
-        <input 
-          type="file" 
-          (change)="onFileSelected($event)"
-          accept="image/png, image/jpeg, image/gif"
-          class="form-control">
-        <small class="form-text text-muted">Upload a new image to replace the existing one. PNG format is preferred.</small>
-      </div>
-
-      <div class="form-actions">
-        <button 
-          type="submit" 
-          class="btn btn-primary"
-          [disabled]="productForm.invalid || loading">
-          {{editingProduct ? 'Update Product' : 'Add Product'}}
-        </button>
-        <button 
-          type="button" 
-          class="btn btn-secondary"
-          (click)="cancelForm()">
-          Cancel
-        </button>
-      </div>
-    </form>
+        <div class="form-group">
+          <label>Description:</label>
+          <textarea
+            [(ngModel)]="currentProduct.description"
+            name="description"
+            required
+            maxlength="200"
+            class="form-control"
+            rows="3"
+            placeholder="Describe the product..."
+            #desc="ngModel"></textarea>
+          <div class="field-hint" *ngIf="desc.invalid && (desc.dirty || desc.touched)">
+            <span *ngIf="desc.errors?.['required']">Description is required.</span>
+            <span *ngIf="desc.errors?.['maxlength']">Maximum 200 characters.</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Price (RM):</label>
+            <input
+              type="number"
+              [(ngModel)]="currentProduct.price"
+              name="price"
+              required
+              min="0.01"
+              step="0.01"
+              class="form-control"
+              placeholder="e.g. 19.90"
+              #price="ngModel">
+            <div class="field-hint" *ngIf="price.invalid && (price.dirty || price.touched)">
+              <span *ngIf="price.errors?.['required']">Price is required.</span>
+              <span *ngIf="price.errors?.['min']">Price must be greater than 0.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Stock Quantity:</label>
+            <input
+              type="number"
+              [(ngModel)]="currentProduct.stockQuantity"
+              name="stockQuantity"
+              required
+              min="0"
+              class="form-control"
+              placeholder="e.g. 10"
+              #stock="ngModel">
+            <div class="field-hint" *ngIf="stock.invalid && (stock.dirty || stock.touched)">
+              <span *ngIf="stock.errors?.['required']">Stock is required.</span>
+              <span *ngIf="stock.errors?.['min']">Stock cannot be negative.</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Category:</label>
+          <select
+            [(ngModel)]="currentProduct.category"
+            name="category"
+            required
+            class="form-control"
+            #cat="ngModel">
+            <option value="">Select Category</option>
+            <option value="Madu">🍯 Madu</option>
+            <option value="Mee">🍜 Mee</option>
+            <option value="Minuman">☕ Minuman</option>
+            <option value="Rempah">🌶️ Rempah</option>
+            <option value="Sos">🥫 Sos</option>
+            <option value="Lain-lain">📦 Lain-lain</option>
+          </select>
+          <div class="field-hint" *ngIf="cat.invalid && (cat.dirty || cat.touched)">
+            <span *ngIf="cat.errors?.['required']">Category is required.</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Product Image:</label>
+          <div class="image-preview-container">
+            <div *ngIf="editingProduct && currentProduct.imagePath && !imagePreviewUrl" class="image-preview">
+              <img [src]="getImageUrl(currentProduct.imagePath)" alt="Current product image" class="preview-thumb">
+              <small>Current Image</small>
+            </div>
+            <div *ngIf="imagePreviewUrl" class="image-preview">
+              <img [src]="imagePreviewUrl" alt="New image preview" class="preview-thumb">
+              <small>New Image Preview</small>
+            </div>
+          </div>
+          <input
+            type="file"
+            (change)="onFileSelected($event)"
+            accept="image/png, image/jpeg, image/gif"
+            class="form-control">
+          <small class="form-text text-muted">Upload a new image to replace the existing one. PNG, JPG, or GIF. Max 2MB.</small>
+        </div>
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="productForm.invalid || loading">
+            <span *ngIf="loading" class="spinner"></span>
+            {{editingProduct ? 'Update Product' : 'Add Product'}}
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="cancelForm()"
+            [disabled]="loading">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
+  <!-- End Modal -->
 
   <!-- Products Table -->
   <div class="products-table" *ngIf="!loading">
-    <div class="table-header">
-      <h3>All Products ({{products.length}})</h3>
-      <div class="search-box">
-        <input 
-          type="text" 
+    <div class="table-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <h3 style="margin: 0;">All Products ({{products.length}})</h3>
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <input
+          type="text"
           placeholder="Search products..."
           [(ngModel)]="searchQuery"
           (ngModelChange)="filterProducts()"
-          class="search-input">
+          class="search-input"
+          style="min-width: 220px; max-width: 300px;">
+        <button class="btn btn-primary" (click)="showAddForm = true" style="white-space: nowrap;">
+          Add New Product
+        </button>
       </div>
     </div>
-
-    <div class="table-container">
+    <div class="table-container" style="overflow-x: auto;">
       <table class="products-table-content">
         <thead>
           <tr>
@@ -140,7 +170,7 @@
         <tbody>
           <tr *ngFor="let product of filteredProducts">
             <td>
-              <img 
+              <img
                 [src]="getImageUrl(product.imagePath ?? null)"
                 [alt]="product.name"
                 class="product-thumb"
@@ -152,7 +182,7 @@
             </td>
             <td class="price">RM {{product.price.toFixed(2)}}</td>
             <td>
-              <span 
+              <span
                 class="stock-badge"
                 [class.low-stock]="product.stockQuantity <= 5 && product.stockQuantity > 0"
                 [class.out-of-stock]="product.stockQuantity === 0">
@@ -160,12 +190,12 @@
               </span>
             </td>
             <td class="actions">
-              <button 
+              <button
                 class="btn btn-sm btn-outline"
                 (click)="editProduct(product)">
                 Edit
               </button>
-              <button 
+              <button
                 class="btn btn-sm btn-danger"
                 (click)="deleteProduct(product)"
                 [disabled]="deletingIds.has(product.productId)">
@@ -183,8 +213,8 @@
     </div>
   </div>
 
-  <app-loading-spinner 
-    *ngIf="loading" 
+  <app-loading-spinner
+    *ngIf="loading"
     message="Loading products...">
   </app-loading-spinner>
 </div>

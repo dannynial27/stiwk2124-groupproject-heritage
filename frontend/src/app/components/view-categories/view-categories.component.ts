@@ -14,6 +14,9 @@ import { ProductService } from '../../services/product.service';
 export class ViewCategoriesComponent implements OnInit {
   categories: string[] = [];
   newCategory: string = '';
+  successMessage: string | null = null;
+  errorMessage: string | null = null;
+  loading = false;
 
   constructor(private productService: ProductService, private router: Router) {}
 
@@ -34,18 +37,48 @@ export class ViewCategoriesComponent implements OnInit {
   }
 
   addCategory(): void {
-    if (this.newCategory && !this.categories.includes(this.newCategory)) {
-      this.productService.addCategory(this.newCategory).subscribe(() => {
-        this.categories.push(this.newCategory);
-        this.newCategory = '';
-      });
+    this.successMessage = null;
+    this.errorMessage = null;
+    if (!this.newCategory.trim()) {
+      this.errorMessage = 'Category name cannot be empty.';
+      return;
     }
+    if (this.categories.includes(this.newCategory.trim())) {
+      this.errorMessage = 'Category already exists.';
+      return;
+    }
+    this.loading = true;
+    this.productService.addCategory(this.newCategory.trim()).subscribe({
+      next: () => {
+        this.categories.push(this.newCategory.trim());
+        this.successMessage = 'Category added successfully!';
+        this.newCategory = '';
+        this.loading = false;
+        setTimeout(() => this.successMessage = null, 1200);
+      },
+      error: () => {
+        this.errorMessage = 'Failed to add category. Please try again.';
+        this.loading = false;
+      }
+    });
   }
 
   deleteCategory(category: string): void {
+    this.successMessage = null;
+    this.errorMessage = null;
     if (confirm(`Are you sure you want to delete ${category}?`)) {
-      this.productService.deleteCategory(category).subscribe(() => {
-        this.categories = this.categories.filter(c => c !== category);
+      this.loading = true;
+      this.productService.deleteCategory(category).subscribe({
+        next: () => {
+          this.categories = this.categories.filter(c => c !== category);
+          this.successMessage = 'Category deleted successfully!';
+          this.loading = false;
+          setTimeout(() => this.successMessage = null, 1200);
+        },
+        error: () => {
+          this.errorMessage = 'Failed to delete category. Please try again.';
+          this.loading = false;
+        }
       });
     }
   }

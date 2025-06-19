@@ -1,34 +1,58 @@
 <div class="container mt-5">
   <h2>{{ productId ? 'Edit Product' : 'Add New Product' }}</h2>
   <hr>
-  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" autocomplete="off">
     <div class="mb-3">
       <label for="name" class="form-label">Product Name</label>
-      <input type="text" id="name" formControlName="name" class="form-control">
+      <input type="text" id="name" formControlName="name" class="form-control" placeholder="e.g. Madu Asli">
+      <div class="field-hint" *ngIf="productForm.get('name')?.invalid && (productForm.get('name')?.dirty || productForm.get('name')?.touched)">
+        <span *ngIf="productForm.get('name')?.errors?.['required']">Product name is required.</span>
+        <span *ngIf="productForm.get('name')?.errors?.['maxlength']">Maximum 50 characters.</span>
+      </div>
     </div>
     <div class="mb-3">
       <label for="description" class="form-label">Description</label>
-      <textarea id="description" formControlName="description" class="form-control"></textarea>
+      <textarea id="description" formControlName="description" class="form-control" placeholder="Describe the product..."></textarea>
+      <div class="field-hint" *ngIf="productForm.get('description')?.invalid && (productForm.get('description')?.dirty || productForm.get('description')?.touched)">
+        <span *ngIf="productForm.get('description')?.errors?.['required']">Description is required.</span>
+        <span *ngIf="productForm.get('description')?.errors?.['maxlength']">Maximum 200 characters.</span>
+      </div>
     </div>
     <div class="mb-3">
       <label for="price" class="form-label">Price (MYR)</label>
-      <input type="number" id="price" formControlName="price" class="form-control">
+      <input type="number" id="price" formControlName="price" class="form-control" placeholder="e.g. 19.90">
+      <div class="field-hint" *ngIf="productForm.get('price')?.invalid && (productForm.get('price')?.dirty || productForm.get('price')?.touched)">
+        <span *ngIf="productForm.get('price')?.errors?.['required']">Price is required.</span>
+        <span *ngIf="productForm.get('price')?.errors?.['min']">Price must be greater than 0.</span>
+      </div>
     </div>
     <div class="mb-3">
       <label for="category" class="form-label">Category</label>
       <select id="category" formControlName="category" class="form-control">
+        <option value="">Select Category</option>
         <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
       </select>
+      <div class="field-hint" *ngIf="productForm.get('category')?.invalid && (productForm.get('category')?.dirty || productForm.get('category')?.touched)">
+        <span *ngIf="productForm.get('category')?.errors?.['required']">Category is required.</span>
+      </div>
     </div>
     <div class="mb-3">
       <label for="stockQuantity" class="form-label">Stock Quantity</label>
-      <input type="number" id="stockQuantity" formControlName="stockQuantity" class="form-control">
+      <input type="number" id="stockQuantity" formControlName="stockQuantity" class="form-control" placeholder="e.g. 10">
+      <div class="field-hint" *ngIf="productForm.get('stockQuantity')?.invalid && (productForm.get('stockQuantity')?.dirty || productForm.get('stockQuantity')?.touched)">
+        <span *ngIf="productForm.get('stockQuantity')?.errors?.['required']">Stock is required.</span>
+        <span *ngIf="productForm.get('stockQuantity')?.errors?.['min']">Stock cannot be negative.</span>
+      </div>
     </div>
     <div class="mb-3">
       <label for="imagePath" class="form-label">Image URL</label>
-      <input type="text" id="imagePath" formControlName="imagePath" class="form-control">
+      <input type="text" id="imagePath" formControlName="imagePath" class="form-control" placeholder="Paste image URL or leave blank for default">
     </div>
-    <button type="submit" class="btn btn-primary w-100" [disabled]="productForm.invalid">Save Product</button>
-    <div *ngIf="errorMessage" class="error mt-3">{{ errorMessage }}</div>
+    <button type="submit" class="btn btn-primary w-100" [disabled]="productForm.invalid || isSubmitting">
+      <span *ngIf="isSubmitting" class="spinner"></span>
+      {{ productId ? 'Update Product' : 'Add Product' }}
+    </button>
+    <div *ngIf="successMessage" class="form-success-message mt-3">{{ successMessage }}</div>
+    <div *ngIf="errorMessage && productForm.dirty" class="form-error-message mt-3">{{ errorMessage }}</div>
   </form>
 </div>
