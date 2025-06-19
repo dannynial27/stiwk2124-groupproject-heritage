@@ -54,6 +54,12 @@ import { ImageService } from '../../../services/image.service';
             </a>
           </div>
         </div>
+        
+        <div class="login-prompt" *ngIf="!isAuthenticated">
+          <a routerLink="/login" (click)="$event.stopPropagation()" class="login-link">
+            Login for more details
+          </a>
+        </div>
       </div>
     </div>
   `,
@@ -177,6 +183,31 @@ import { ImageService } from '../../../services/image.service';
       padding: 8px;
       width: auto;
       min-width: 40px;
+    }
+
+    .login-prompt {
+      padding: 10px;
+      text-align: center;
+    }
+
+    .login-link {
+      font-size: 14px;
+      color: #007bff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login-link:hover {
+      text-decoration: underline;
+    }
+
+    .compare-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
     }
   `]
 })
