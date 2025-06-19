@@ -21,3 +21,17 @@
 h2 {
   color: #1E3A8A;
 }
+
+th {
+  cursor: pointer;
+  position: relative;
+}
+
+th .sort-icon {
+  margin-left: 5px;
+  color: #999;
+}
+
+th:hover .sort-icon {
+  color: #333;
+}

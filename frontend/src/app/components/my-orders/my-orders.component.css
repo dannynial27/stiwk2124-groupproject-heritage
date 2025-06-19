@@ -4,6 +4,12 @@
   padding-bottom: 50px;
 }
 
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 h2 {
   color: #1E3A8A;
 }
@@ -79,4 +85,9 @@ h2 {
   padding: 3rem;
   background-color: #f8f9fa;
   border-radius: 8px;
+}
+
+.accordion-collapse {
+  overflow: hidden;
+  transition: height 0.35s ease-in-out;
 }

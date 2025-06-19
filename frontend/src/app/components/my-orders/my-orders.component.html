@@ -1,12 +1,23 @@
 <div class="container mt-5">
-  <h2>My Orders</h2>
+  <div class="page-header">
+    <h2>My Orders</h2>
+    <button class="btn btn-outline-secondary btn-sm" (click)="toggleSortDirection()">
+      Sort by Date 
+      <i class="bi" [ngClass]="{'bi-arrow-down': sortDirection === 'desc', 'bi-arrow-up': sortDirection === 'asc'}"></i>
+    </button>
+  </div>
   <hr>
-  <div *ngIf="orders$ | async as orders; else loading">
+  <div *ngIf="!isLoading; else loading">
     <div *ngIf="orders.length > 0; else noOrders">
       <div class="accordion" id="ordersAccordion">
         <div class="accordion-item" *ngFor="let order of orders; let i = index">
           <h2 class="accordion-header" [id]="'heading' + i">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse' + i" [attr.aria-expanded]="i === 0" [attr.aria-controls]="'collapse' + i">
+            <button 
+              class="accordion-button" 
+              [class.collapsed]="activeOrderIndex !== i"
+              type="button" 
+              (click)="toggleAccordion(i)"
+              [attr.aria-expanded]="activeOrderIndex === i">
               <div class="order-summary">
                 <span><strong>Order #{{ order.orderId }}</strong></span>
                 <span>{{ order.orderDate | date:'longDate' }}</span>
@@ -15,7 +26,11 @@
               </div>
             </button>
           </h2>
-          <div [id]="'collapse' + i" class="accordion-collapse collapse" [class.show]="i === 0" [attr.aria-labelledby]="'heading' + i" data-bs-parent="#ordersAccordion">
+          <div 
+            #accordionBody
+            [id]="'collapse' + i" 
+            class="accordion-collapse"
+            [class.show]="activeOrderIndex === i">
             <div class="accordion-body">
               <div class="order-details">
                 <p><strong>Shipped To:</strong> {{ order.shippingName }} at {{ order.shippingAddress }}, {{ order.shippingCity }}</p>

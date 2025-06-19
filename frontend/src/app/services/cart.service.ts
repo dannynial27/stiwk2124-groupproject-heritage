@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { Cart } from '../models/cart.model';
+import { Cart, CartItem } from '../models/cart.model';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -13,9 +13,11 @@ export class CartService {
   // State management for cart
   private cartSubject = new BehaviorSubject<Cart>({ items: [] });
   private cartCountSubject = new BehaviorSubject<number>(0);
+  private itemsForCheckoutSubject = new BehaviorSubject<CartItem[]>([]);
   
   public cart$ = this.cartSubject.asObservable();
   public cartCount$ = this.cartCountSubject.asObservable();
+  public itemsForCheckout$ = this.itemsForCheckoutSubject.asObservable();
 
   constructor(private http: HttpClient, private authService: AuthService) {
     this.loadInitialCartData();
@@ -137,6 +139,10 @@ export class CartService {
   calculateCartTotal(): number {
     const cart = this.cartSubject.value;
     return cart.items.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+  }
+
+  setItemsForCheckout(items: CartItem[]): void {
+    this.itemsForCheckoutSubject.next(items);
   }
 
   private updateCartCount(cart: Cart): void {

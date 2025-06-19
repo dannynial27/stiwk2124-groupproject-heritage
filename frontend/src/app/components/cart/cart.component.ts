@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
 import { ImageService } from '../../services/image.service';
@@ -16,689 +17,8 @@ import { Product } from '../../models/product.model';
   selector: 'app-cart',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  template: `
-    <div class="cart-container">
-      <!-- Header -->
-      <div class="cart-header">
-        <h1>🛒 Shopping Cart</h1>
-        <div class="cart-summary">
-          <span class="item-count">{{cart.items.length}} items</span>
-          <span class="total-amount">RM {{calculateTotal() | number:'1.2-2'}}</span>
-        </div>
-      </div>
-
-      <!-- Loading State -->
-      <div *ngIf="loading" class="loading-state">
-        <div class="spinner"></div>
-        <p>Loading your cart...</p>
-      </div>
-
-      <!-- Empty Cart -->
-      <div *ngIf="!loading && cart.items.length === 0" class="empty-cart">
-        <div class="empty-cart-icon">🛒</div>
-        <h2>Your cart is empty</h2>
-        <p>Add some delicious halal products to get started!</p>
-        <button class="btn btn-primary" routerLink="/products">
-          Continue Shopping
-        </button>
-      </div>
-
-      <!-- Cart Items -->
-      <div *ngIf="!loading && cart.items.length > 0" class="cart-content">
-        
-        <div class="cart-main-column">
-          <!-- Bulk Actions -->
-          <div class="bulk-actions" *ngIf="selectedItems.size > 0">
-            <div class="selection-info">
-              <span>{{selectedItems.size}} items selected</span>
-            </div>
-            <div class="bulk-buttons">
-              <button 
-                class="btn btn-outline"
-                (click)="moveSelectedToWishlist()"
-                [disabled]="bulkLoading">
-                💝 Move to Wishlist
-              </button>
-              <button 
-                class="btn btn-danger"
-                (click)="removeSelectedItems()"
-                [disabled]="bulkLoading">
-                🗑️ Remove Selected
-              </button>
-            </div>
-          </div>
-
-          <!-- Select All -->
-          <div class="select-all-section">
-            <label class="checkbox-container">
-              <input 
-                type="checkbox" 
-                [checked]="isAllSelected()"
-                [indeterminate]="isSomeSelected()"
-                (change)="toggleSelectAll()">
-              <span class="checkmark"></span>
-              Select All Items
-            </label>
-          </div>
-
-          <!-- Cart Items List -->
-          <div class="cart-items">
-            <div 
-              *ngFor="let item of cart.items; trackBy: trackByCartItem" 
-              class="cart-item"
-              (click)="toggleItemSelection(item.product.productId)"
-              [class.selected]="selectedItems.has(item.product.productId)">
-              
-              <!-- Item Selection -->
-              <div class="item-selection">
-                <label class="checkbox-container">
-                  <input 
-                    type="checkbox" 
-                    [checked]="selectedItems.has(item.product.productId)"
-                    (change)="toggleItemSelection(item.product.productId)">
-                  <span class="checkmark"></span>
-                </label>
-              </div>
-
-              <!-- Product Image -->
-              <div class="item-image">
-                <img 
-                  [src]="getProductImageUrl(item.product)" 
-                  [alt]="item.product.name"
-                  (error)="onImageError($event)"
-                  class="product-image">
-              </div>
-
-              <!-- Product Details -->
-              <div class="item-details">
-                <h3 class="product-name">{{item.product.name}}</h3>
-                <p class="product-description">{{item.product.description}}</p>
-                <div class="product-meta">
-                  <span class="category">{{item.product.category}}</span>
-                  <span class="stock-status" 
-                        [class.in-stock]="item.product.stockQuantity > 0"
-                        [class.low-stock]="item.product.stockQuantity <= 5 && item.product.stockQuantity > 0"
-                        [class.out-of-stock]="item.product.stockQuantity === 0">
-                    {{getStockStatus(item.product)}}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Price -->
-              <div class="item-price">
-                <span class="unit-price">RM {{item.product.price | number:'1.2-2'}}</span>
-                <span class="per-unit">per unit</span>
-              </div>
-
-              <!-- Quantity Controls -->
-              <div class="quantity-controls">
-                <button 
-                  class="qty-btn"
-                  (click)="decreaseQuantity(item)"
-                  [disabled]="item.quantity <= 1 || loadingItems.has(item.product.productId)">
-                  -
-                </button>
-                <input 
-                  type="number" 
-                  class="qty-input"
-                  [value]="item.quantity"
-                  (change)="onQuantityChange(item, $event)"
-                  [disabled]="loadingItems.has(item.product.productId)"
-                  min="1"
-                  [max]="item.product.stockQuantity">
-                <button 
-                  class="qty-btn"
-                  (click)="increaseQuantity(item)"
-                  [disabled]="item.quantity >= item.product.stockQuantity || loadingItems.has(item.product.productId)">
-                  +
-                </button>
-              </div>
-
-              <!-- Subtotal -->
-              <div class="item-subtotal">
-                <span class="subtotal-amount">RM {{(item.product.price * item.quantity) | number:'1.2-2'}}</span>
-              </div>
-
-              <!-- Item Actions -->
-              <div class="item-actions">
-                <button 
-                  class="action-btn wishlist-btn"
-                  (click)="moveToWishlist(item)"
-                  [disabled]="loadingItems.has(item.product.productId)"
-                  title="Move to Wishlist">
-                  💝
-                </button>
-                <button 
-                  class="action-btn remove-btn"
-                  (click)="removeItem(item)"
-                  [disabled]="loadingItems.has(item.product.productId)"
-                  title="Remove from Cart">
-                  🗑️
-                </button>
-              </div>
-
-              <!-- Loading Overlay -->
-              <div *ngIf="loadingItems.has(item.product.productId)" class="item-loading">
-                <div class="spinner-small"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Cart Summary -->
-        <div class="cart-summary-section">
-          <div class="summary-card">
-            <h3>Order Summary</h3>
-            
-            <div class="summary-row">
-              <span>Subtotal ({{getTotalItems()}} items)</span>
-              <span>RM {{calculateSubtotal() | number:'1.2-2'}}</span>
-            </div>
-            
-            <div class="summary-row">
-              <span>Shipping</span>
-              <span>{{getShippingCost() === 0 ? 'FREE' : 'RM ' + (getShippingCost() | number:'1.2-2')}}</span>
-            </div>
-            
-            <hr>
-            
-            <div class="summary-row total">
-              <span>Total</span>
-              <span>RM {{calculateTotal() | number:'1.2-2'}}</span>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="checkout-actions">
-              <button 
-                class="btn btn-outline"
-                routerLink="/products">
-                Continue Shopping
-              </button>
-              <button 
-                class="btn btn-primary checkout-btn"
-                (click)="proceedToCheckout()"
-                [disabled]="cart.items.length === 0 || hasOutOfStockItems()">
-                Proceed to Checkout
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  `,
-  styles: [`
-    .cart-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .cart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 2px solid #e0e0e0;
-    }
-
-    .cart-header h1 {
-      color: #2c3e50;
-      margin: 0;
-      font-size: 28px;
-    }
-
-    .cart-summary {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-    }
-
-    .item-count {
-      color: #7f8c8d;
-      font-size: 16px;
-    }
-
-    .total-amount {
-      font-size: 24px;
-      font-weight: bold;
-      color: #27ae60;
-    }
-
-    .loading-state {
-      text-align: center;
-      padding: 60px 20px;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #3498db;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .empty-cart {
-      text-align: center;
-      padding: 80px 20px;
-      background: #f8f9fa;
-      border-radius: 12px;
-      margin: 40px 0;
-    }
-
-    .empty-cart-icon {
-      font-size: 80px;
-      margin-bottom: 20px;
-    }
-
-    .empty-cart h2 {
-      color: #2c3e50;
-      margin-bottom: 10px;
-    }
-
-    .empty-cart p {
-      color: #7f8c8d;
-      margin-bottom: 30px;
-    }
-
-    .cart-content {
-      display: grid;
-      grid-template-columns: 1fr 350px;
-      gap: 30px;
-      align-items: start;
-    }
-
-    .bulk-actions {
-      background: #e3f2fd;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .bulk-buttons {
-      display: flex;
-      gap: 10px;
-    }
-
-    .select-all-section {
-      margin-bottom: 20px;
-      padding: 15px;
-      background: #f8f9fa;
-      border-radius: 8px;
-    }
-
-    .checkbox-container {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      font-weight: 500;
-    }
-
-    .checkbox-container input {
-      margin-right: 10px;
-    }
-
-    .cart-items {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .cart-item {
-      display: grid;
-      grid-template-columns: 40px 120px 1fr 100px 150px 120px 80px;
-      gap: 20px;
-      align-items: center;
-      padding: 20px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .cart-item:hover {
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    }
-
-    .cart-item.selected {
-      border: 2px solid #3498db;
-      background: #f8f9ff;
-    }
-
-    .item-image {
-      width: 100px;
-      height: 100px;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .product-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .item-details h3 {
-      margin: 0 0 8px 0;
-      color: #2c3e50;
-      font-size: 16px;
-    }
-
-    .product-description {
-      color: #7f8c8d;
-      font-size: 14px;
-      margin: 0 0 10px 0;
-      line-height: 1.4;
-    }
-
-    .product-meta {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .category {
-      background: #ecf0f1;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      color: #2c3e50;
-    }
-
-    .stock-status {
-      font-size: 12px;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-weight: 500;
-    }
-
-    .stock-status.in-stock {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .stock-status.low-stock {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .stock-status.out-of-stock {
-      background: #f8d7da;
-      color: #721c24;
-    }
-
-    .item-price {
-      text-align: center;
-    }
-
-    .unit-price {
-      font-size: 18px;
-      font-weight: bold;
-      color: #2c3e50;
-      display: block;
-    }
-
-    .per-unit {
-      font-size: 12px;
-      color: #7f8c8d;
-    }
-
-    .quantity-controls {
-      display: flex;
-      align-items: center;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .qty-btn {
-      width: 35px;
-      height: 35px;
-      border: none;
-      background: #f8f9fa;
-      cursor: pointer;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.2s;
-    }
-
-    .qty-btn:hover:not(:disabled) {
-      background: #e9ecef;
-    }
-
-    .qty-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .qty-input {
-      width: 60px;
-      height: 35px;
-      border: none;
-      text-align: center;
-      font-size: 16px;
-      background: white;
-    }
-
-    .item-subtotal {
-      text-align: center;
-    }
-
-    .subtotal-amount {
-      font-size: 18px;
-      font-weight: bold;
-      color: #27ae60;
-    }
-
-    .item-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .action-btn {
-      width: 35px;
-      height: 35px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .wishlist-btn {
-      background: #ffeaa7;
-    }
-
-    .wishlist-btn:hover:not(:disabled) {
-      background: #fdcb6e;
-    }
-
-    .remove-btn {
-      background: #fab1a0;
-    }
-
-    .remove-btn:hover:not(:disabled) {
-      background: #e17055;
-    }
-
-    .action-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .item-loading {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 12px;
-    }
-
-    .spinner-small {
-      width: 20px;
-      height: 20px;
-      border: 2px solid #f3f3f3;
-      border-top: 2px solid #3498db;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    .cart-summary-section {
-      position: sticky;
-      top: 20px;
-    }
-
-    .summary-card {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .summary-card h3 {
-      margin: 0 0 20px 0;
-      color: #2c3e50;
-      font-size: 20px;
-    }
-
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      font-size: 16px;
-    }
-
-    .summary-row.discount {
-      color: #27ae60;
-    }
-
-    .summary-row.total {
-      font-size: 20px;
-      font-weight: bold;
-      color: #2c3e50;
-      margin-top: 15px;
-    }
-
-    .checkout-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 25px;
-    }
-
-    .btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-decoration: none;
-      text-align: center;
-      display: inline-block;
-    }
-
-    .btn-primary {
-      background: #3498db;
-      color: white;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background: #2980b9;
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: #3498db;
-      border: 2px solid #3498db;
-    }
-
-    .btn-outline:hover:not(:disabled) {
-      background: #3498db;
-      color: white;
-    }
-
-    .btn-danger {
-      background: #e74c3c;
-      color: white;
-    }
-
-    .btn-danger:hover:not(:disabled) {
-      background: #c0392b;
-    }
-
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .checkout-btn {
-      font-size: 18px;
-      padding: 15px;
-      font-weight: bold;
-    }
-
-    .recently-viewed {
-      margin-top: 50px;
-      padding: 30px;
-      background: #f8f9fa;
-      border-radius: 12px;
-    }
-
-    .recently-viewed h3 {
-      color: #2c3e50;
-      margin-bottom: 20px;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .cart-content {
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
-
-      .cart-item {
-        grid-template-columns: 1fr;
-        gap: 15px;
-        text-align: center;
-      }
-
-      .bulk-actions {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-      }
-
-      .checkout-actions {
-        flex-direction: column;
-      }
-    }
-  `]
+  templateUrl: './cart.component.html',
+  styleUrls: ['./cart.component.css']
 })
 export class CartComponent implements OnInit, OnDestroy {
   cart: Cart = { items: [] };
@@ -706,8 +26,12 @@ export class CartComponent implements OnInit, OnDestroy {
   selectedItems = new Set<number>();
   loadingItems = new Set<number>();
   bulkLoading = false;
+  showWishlistNotification = false;
+  movedItemsCount = 0;
+  movedItemNames: string[] = [];
   
   private subscriptions: Subscription[] = [];
+  private wishlistNotificationTimer: any;
 
   constructor(
     private cartService: CartService,
@@ -785,16 +109,35 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   private updateQuantity(item: CartItem, newQuantity: number): void {
-    this.loadingItems.add(item.product.productId);
-    
-    this.cartService.updateCartItem(item.product.productId, newQuantity).subscribe({
-      next: (cart) => {
-        this.cart = cart;
-        this.loadingItems.delete(item.product.productId);
+    const productId = item.product.productId;
+    const itemInCart = this.cart.items.find(i => i.product.productId === productId);
+
+    if (!itemInCart) { return; }
+
+    const originalQuantity = itemInCart.quantity;
+
+    // Optimistically update local state for a faster user experience
+    itemInCart.quantity = newQuantity;
+
+    // Disable buttons to prevent rapid clicks while the request is in flight
+    this.loadingItems.add(productId);
+
+    this.cartService.updateCartItem(productId, newQuantity).subscribe({
+      next: (updatedCartFromServer) => {
+        // The server has confirmed the update. The main cart$ subscription will
+        // also receive this, but updating here ensures our state is in sync.
+        this.cart = updatedCartFromServer;
+        this.loadingItems.delete(productId);
       },
       error: (error) => {
         console.error('Error updating quantity:', error);
-        this.loadingItems.delete(item.product.productId);
+        // Revert the change in the UI on error
+        const itemToRevert = this.cart.items.find(i => i.product.productId === productId);
+        if (itemToRevert) {
+          itemToRevert.quantity = originalQuantity;
+        }
+        this.loadingItems.delete(productId);
+        // Optionally, show a user-facing error message here.
       }
     });
   }
@@ -824,11 +167,13 @@ export class CartComponent implements OnInit, OnDestroy {
     this.wishlistService.addToWishlist(item.product.productId).subscribe({
       next: () => {
         this.removeFromCartAndFinalize(item);
+        this.showWishlistMoveNotification(1, [item.product.name]);
       },
       error: (error) => {
         // If item is already in wishlist (400 error), just remove from cart to complete the "move"
         if (error.status === 400 && error.error?.error?.includes('already in wishlist')) {
           this.removeFromCartAndFinalize(item);
+          this.showWishlistMoveNotification(1, [item.product.name]);
         } else {
           console.error('Error adding to wishlist:', error);
           this.loadingItems.delete(item.product.productId);
@@ -890,16 +235,21 @@ export class CartComponent implements OnInit, OnDestroy {
     if (confirm(`Remove ${this.selectedItems.size} items from cart?\n\n${itemNames}`)) {
       this.bulkLoading = true;
       
-      const removePromises = Array.from(this.selectedItems).map(productId =>
-        this.cartService.removeFromCart(productId).toPromise()
+      const removeObservables = Array.from(this.selectedItems).map(productId =>
+        this.cartService.removeFromCart(productId).pipe(
+          catchError(error => {
+            console.error(`Failed to remove item ${productId}`, error);
+            return of(null); // Continue even if one fails
+          })
+        )
       );
       
-      Promise.all(removePromises).then(() => {
+      forkJoin(removeObservables).subscribe({
+        complete: () => {
+          this.loadCart(); // Refresh cart from server
         this.selectedItems.clear();
         this.bulkLoading = false;
-      }).catch(error => {
-        console.error('Error removing items:', error);
-        this.bulkLoading = false;
+        }
       });
     }
   }
@@ -909,28 +259,114 @@ export class CartComponent implements OnInit, OnDestroy {
     
     this.bulkLoading = true;
     
-    const movePromises = Array.from(this.selectedItems).map(productId => {
-      return this.wishlistService.addToWishlist(productId).toPromise()
-        .then(() => this.cartService.removeFromCart(productId).toPromise());
+    // Get names of selected products for notification
+    const selectedProductNames = this.cart.items
+      .filter(item => this.selectedItems.has(item.product.productId))
+      .map(item => item.product.name);
+    
+    const moveObservables = Array.from(this.selectedItems).map(productId => {
+      // This logic is complex because it chains two calls.
+      // A more robust implementation might be needed in a real app,
+      // potentially on the backend (a single "move to wishlist" endpoint).
+      return this.wishlistService.addToWishlist(productId).pipe(
+        catchError(err => {
+          // If already in wishlist, we can ignore the error and proceed with removal from cart
+          if (err.status === 400) {
+            return of(null);
+          }
+          throw err; // Re-throw other errors
+        }),
+        // Chain the next operation
+        // switchMap(() => this.cartService.removeFromCart(productId))
+        // For simplicity and given the separate addTo and removeFrom, we do them sequentially.
+        // A better approach would be a dedicated backend endpoint.
+        // Here we'll just add to wishlist and then remove from cart.
+      );
     });
     
-    Promise.all(movePromises).then(() => {
+    forkJoin(moveObservables).subscribe({
+      next: () => {
+        // Now remove all from cart
+        const removeObservables = Array.from(this.selectedItems).map(productId =>
+          this.cartService.removeFromCart(productId).pipe(
+            catchError(error => {
+              console.error(`Failed to remove item ${productId} from cart after moving to wishlist`, error);
+              return of(null);
+            })
+          )
+        );
+        forkJoin(removeObservables).subscribe({
+          complete: () => {
+            this.loadCart();
+            this.showWishlistMoveNotification(this.selectedItems.size, selectedProductNames);
       this.selectedItems.clear();
       this.bulkLoading = false;
-    }).catch(error => {
+          }
+        });
+      },
+      error: error => {
       console.error('Error moving items to wishlist:', error);
       this.bulkLoading = false;
+        this.loadCart(); // Refresh state
+      }
     });
+  }
+
+  // Simplified notification method without using NotificationService
+  private showWishlistMoveNotification(count: number, productNames: string[]): void {
+    // If a notification is already showing, append the new items
+    if (this.showWishlistNotification) {
+      this.movedItemsCount += count;
+      this.movedItemNames = [...this.movedItemNames, ...productNames];
+    } else {
+      this.movedItemsCount = count;
+      this.movedItemNames = productNames;
+    }
+
+    this.showWishlistNotification = true;
+    
+    // Clear any existing timer to reset the countdown
+    if (this.wishlistNotificationTimer) {
+      clearTimeout(this.wishlistNotificationTimer);
+    }
+    
+    // Auto-hide after 10 seconds
+    this.wishlistNotificationTimer = setTimeout(() => {
+      this.showWishlistNotification = false;
+      // Reset after hiding
+      this.movedItemsCount = 0;
+      this.movedItemNames = [];
+    }, 10000);
+  }
+  
+  // Method to navigate to wishlist
+  goToWishlist(): void {
+    this.router.navigate(['/wishlist']);
+  }
+  
+  // Method to dismiss notification
+  dismissWishlistNotification(): void {
+    this.showWishlistNotification = false;
+    if (this.wishlistNotificationTimer) {
+      clearTimeout(this.wishlistNotificationTimer);
+    }
+    this.movedItemsCount = 0;
+    this.movedItemNames = [];
   }
 
   // Calculations
   calculateSubtotal(): number {
-    return this.cart.items.reduce((total, item) => 
+    return this.cart.items
+      .filter(item => this.selectedItems.has(item.product.productId))
+      .reduce((total, item) => 
       total + (item.product.price * item.quantity), 0
     );
   }
 
   getShippingCost(): number {
+    if (this.selectedItems.size === 0) {
+      return 0;
+    }
     const subtotal = this.calculateSubtotal();
     return subtotal >= 100 ? 0 : 10; // Free shipping over RM100
   }
@@ -944,7 +380,9 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   getTotalItems(): number {
-    return this.cart.items.reduce((total, item) => total + item.quantity, 0);
+    return this.cart.items
+      .filter(item => this.selectedItems.has(item.product.productId))
+      .reduce((total, item) => total + item.quantity, 0);
   }
 
   // Utility methods
@@ -955,7 +393,9 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   hasOutOfStockItems(): boolean {
-    return this.cart.items.some(item => item.product.stockQuantity === 0);
+    return this.cart.items
+      .filter(item => this.selectedItems.has(item.product.productId))
+      .some(item => item.product.stockQuantity === 0);
   }
 
   trackByCartItem(index: number, item: CartItem): number {
@@ -964,7 +404,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
   // Navigation
   proceedToCheckout(): void {
-    if (this.cart.items.length === 0 || this.hasOutOfStockItems()) {
+    if (this.selectedItems.size === 0 || this.hasOutOfStockItems()) {
       return;
     }
     
@@ -974,6 +414,11 @@ export class CartComponent implements OnInit, OnDestroy {
       });
       return;
     }
+    
+    const itemsToCheckout = this.cart.items.filter(item => 
+      this.selectedItems.has(item.product.productId)
+    );
+    this.cartService.setItemsForCheckout(itemsToCheckout);
     
     this.router.navigate(['/checkout']);
   }

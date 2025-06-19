@@ -20,7 +20,10 @@
             <i class="bi bi-cart"></i>
             <span class="badge" *ngIf="cartCount > 0">{{cartCount}}</span>
           </a>
-          <a routerLink="/my-orders" *ngIf="isAuthenticated" class="nav-link">Orders</a>
+          <a routerLink="/my-orders" *ngIf="isAuthenticated" class="nav-link order-link">
+            <i class="bi bi-box-seam"></i>
+            <span class="badge" *ngIf="orderCount > 0">{{orderCount}}</span>
+          </a>
           <a routerLink="/my-feedback" *ngIf="isAuthenticated" class="nav-link">My Feedback</a>
           <a routerLink="/feedback" *ngIf="isAuthenticated" class="nav-link">Submit Feedback</a>
         </ng-container>

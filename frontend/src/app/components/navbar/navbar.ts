@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { WishlistService } from '../../services/wishlist.service';
 import { CartService } from '../../services/cart.service';
+import { OrderService } from '../../services/order.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -17,6 +18,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   role: string | null = null;
   wishlistCount: number = 0;
   cartCount: number = 0;
+  orderCount: number = 0;
   mobileMenuOpen: boolean = false;
   isAuthenticated: boolean = false; // Add this missing property
   
@@ -27,6 +29,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private router: Router,
     private wishlistService: WishlistService,
     private cartService: CartService,
+    private orderService: OrderService,
     private authService: AuthService
   ) {}
 
@@ -45,6 +48,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
           // Reset counts if not authenticated
           this.wishlistCount = 0;
           this.cartCount = 0;
+          this.orderCount = 0;
         }
       })
     );
@@ -109,9 +113,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
       })
     );
 
+    // Subscribe to order count changes
+    this.subscriptions.add(
+      this.orderService.orderCount$.subscribe(count => {
+        console.log('Order count updated:', count);
+        this.orderCount = count;
+      })
+    );
+
     // Initialize data
     this.loadWishlistData();
     this.loadCartData();
+    this.loadOrderData();
   }
 
   loadWishlistData() {
@@ -132,6 +145,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
   }
 
+  loadOrderData() {
+    if (this.isAuthenticated) {
+      const userId = this.authService.getUserId();
+      if (userId) {
+        this.orderService.getUserOrders(userId).subscribe({
+          next: () => console.log('Orders loaded successfully in navbar'),
+          error: (err) => console.error('Error loading orders in navbar:', err)
+        });
+      }
+    }
+  }
+
   logout() {
     localStorage.removeItem('role');
     localStorage.removeItem('token');
@@ -139,6 +164,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.role = null;
     this.cartCount = 0;
     this.wishlistCount = 0;
+    this.orderCount = 0;
     this.isAuthenticated = false; // Update the isAuthenticated state
     this.router.navigate(['/login']);
     this.mobileMenuOpen = false;

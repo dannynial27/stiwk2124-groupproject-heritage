@@ -1,26 +1,52 @@
-<div class="container mt-5 text-center">
-  <div *ngIf="order$ | async as order; else loading">
-    <div class="alert alert-success">
-      <h4 class="alert-heading">Thank You!</h4>
-      <p>Your order has been placed successfully.</p>
+<div class="success-container">
+  <div class="success-card" *ngIf="order$ | async as order; else loading">
+    
+    <!-- Success Icon -->
+    <div class="success-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+      </svg>
     </div>
-    <h3>Order Confirmation #{{ order.orderId }}</h3>
-    <p>A confirmation has been sent to your email.</p>
-    <div class="card mt-4 mx-auto">
-      <div class="card-header">
-        Order Summary
-      </div>
-      <div class="card-body text-start">
-        <p><strong>Total Amount:</strong> {{ order.totalAmount | currency:'MYR' }}</p>
-        <p><strong>Status:</strong> {{ order.status | titlecase }}</p>
-        <p><strong>Shipping To:</strong> {{ order.shippingName }}, {{ order.shippingAddress }}, {{ order.shippingCity }}</p>
+
+    <!-- Content -->
+    <h1 class="success-title">Payment Successful!</h1>
+    <p class="success-message">Thank you! Your order has been placed successfully.</p>
+    
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <h2 class="summary-title">Order #{{ order.orderId }}</h2>
+      <div class="summary-details">
+        <div class="summary-item">
+          <span class="label">Total Amount:</span>
+          <span class="value">{{ order.totalAmount | currency:'MYR' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Status:</span>
+          <span class="value status" [ngClass]="order.status.toLowerCase()">{{ order.status | titlecase }}</span>
+        </div>
+        <div class="summary-item address">
+          <span class="label">Shipping To:</span>
+          <span class="value">{{ order.shippingName }}, {{ order.shippingAddress }}, {{ order.shippingCity }}</span>
+        </div>
       </div>
     </div>
-    <a routerLink="/my-orders" class="btn btn-primary mt-4">View My Orders</a>
+    <p class="email-notice">A confirmation has been sent to your email.</p>
+    
+    <!-- Action Buttons -->
+    <div class="actions">
+      <a routerLink="/my-orders" class="btn btn-primary">
+        <i class="fas fa-receipt"></i> View My Orders
+      </a>
+      <a routerLink="/products" class="btn btn-secondary">
+        Continue Shopping
+      </a>
+    </div>
+
   </div>
+
+  <!-- Loading State -->
   <ng-template #loading>
-    <div class="spinner-border" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
+    <div class="loading-spinner"></div>
+    <p>Loading order details...</p>
   </ng-template>
 </div>

@@ -1,0 +1,235 @@
+    <div class="cart-container">
+      <!-- Wishlist Notification -->
+      <div *ngIf="showWishlistNotification" class="wishlist-notification">
+        <div class="notification-content">
+          <i class="bi bi-heart-fill"></i>
+          <div class="notification-text">
+            <strong>{{ movedItemsCount === 1 ? 'Item' : movedItemsCount + ' items' }} moved to your wishlist</strong>
+            <span *ngIf="movedItemsCount === 1">
+              "{{ movedItemNames[0] }}"
+            </span>
+            <span *ngIf="movedItemsCount > 1 && movedItemsCount <= 3">
+              {{ movedItemNames.join(', ') }}
+            </span>
+            <span *ngIf="movedItemsCount > 3">
+              {{ movedItemNames.slice(0, 2).join(', ') }} and {{ movedItemsCount - 2 }} more
+            </span>
+          </div>
+        </div>
+        <div class="notification-actions">
+          <button class="btn btn-sm btn-outline" (click)="goToWishlist()">
+            View Wishlist
+          </button>
+          <button class="btn btn-sm btn-icon" (click)="dismissWishlistNotification()">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <div class="cart-header">
+        <h1>🛒 Shopping Cart</h1>
+        <div class="cart-summary">
+          <span class="item-count">{{cart.items.length}} items</span>
+          <span class="total-amount">RM {{calculateTotal() | number:'1.2-2'}}</span>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading your cart...</p>
+      </div>
+
+      <!-- Empty Cart -->
+      <div *ngIf="!loading && cart.items.length === 0" class="empty-cart">
+        <div class="empty-cart-icon">🛒</div>
+        <h2>Your cart is empty</h2>
+        <p>Add some delicious halal products to get started!</p>
+        <button class="btn btn-primary" routerLink="/products">
+          Continue Shopping
+        </button>
+      </div>
+
+      <!-- Cart Items -->
+      <div *ngIf="!loading && cart.items.length > 0" class="cart-content">
+        
+        <div class="cart-main-column">
+          <!-- Bulk Actions -->
+          <div class="bulk-actions" *ngIf="selectedItems.size > 0">
+            <div class="selection-info">
+              <span>{{selectedItems.size}} items selected</span>
+            </div>
+            <div class="bulk-buttons">
+              <button 
+                class="btn btn-outline"
+                (click)="moveSelectedToWishlist()"
+                [disabled]="bulkLoading">
+                💝 Move to Wishlist
+              </button>
+              <button 
+                class="btn btn-danger"
+                (click)="removeSelectedItems()"
+                [disabled]="bulkLoading">
+                🗑️ Remove Selected
+              </button>
+            </div>
+          </div>
+
+          <!-- Select All -->
+          <div class="select-all-section">
+            <label class="checkbox-container">
+              <input 
+                type="checkbox" 
+                [checked]="isAllSelected()"
+                [indeterminate]="isSomeSelected()"
+                (change)="toggleSelectAll()">
+              <span class="checkmark"></span>
+              Select All Items
+            </label>
+          </div>
+
+          <!-- Cart Items List -->
+          <div class="cart-items">
+            <div 
+              *ngFor="let item of cart.items; trackBy: trackByCartItem" 
+              class="cart-item"
+              (click)="toggleItemSelection(item.product.productId)"
+              [class.selected]="selectedItems.has(item.product.productId)">
+              
+              <!-- Item Selection -->
+              <div class="item-selection" (click)="$event.stopPropagation()">
+                <label class="checkbox-container">
+                  <input 
+                    type="checkbox" 
+                    [checked]="selectedItems.has(item.product.productId)"
+                    (change)="toggleItemSelection(item.product.productId)">
+                  <span class="checkmark"></span>
+                </label>
+              </div>
+
+              <!-- Product Image -->
+              <div class="item-image">
+                <img 
+                  [src]="getProductImageUrl(item.product)" 
+                  [alt]="item.product.name"
+                  (error)="onImageError($event)"
+                  class="product-image">
+              </div>
+
+              <!-- Product Details -->
+              <div class="item-details">
+                <h3 class="product-name">{{item.product.name}}</h3>
+                <p class="product-description">{{item.product.description}}</p>
+                <div class="product-meta">
+                  <span class="category">{{item.product.category}}</span>
+                  <span class="stock-status" 
+                        [class.in-stock]="item.product.stockQuantity > 0"
+                        [class.low-stock]="item.product.stockQuantity <= 5 && item.product.stockQuantity > 0"
+                        [class.out-of-stock]="item.product.stockQuantity === 0">
+                    {{getStockStatus(item.product)}}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Price -->
+              <div class="item-price">
+                <span class="unit-price">RM {{item.product.price | number:'1.2-2'}}</span>
+                <span class="per-unit">per unit</span>
+              </div>
+
+              <!-- Quantity Controls -->
+              <div class="quantity-controls" (click)="$event.stopPropagation()">
+                <button 
+                  class="qty-btn"
+                  (click)="decreaseQuantity(item)"
+                  [disabled]="item.quantity <= 1 || loadingItems.has(item.product.productId)">
+                  -
+                </button>
+                <input 
+                  type="number" 
+                  class="qty-input"
+                  [value]="item.quantity"
+                  (change)="onQuantityChange(item, $event)"
+                  [disabled]="loadingItems.has(item.product.productId)"
+                  min="1"
+                  [max]="item.product.stockQuantity">
+                <button 
+                  class="qty-btn"
+                  (click)="increaseQuantity(item)"
+                  [disabled]="item.quantity >= item.product.stockQuantity || loadingItems.has(item.product.productId)">
+                  +
+                </button>
+              </div>
+
+              <!-- Subtotal -->
+              <div class="item-subtotal">
+                <span class="subtotal-amount">RM {{(item.product.price * item.quantity) | number:'1.2-2'}}</span>
+              </div>
+
+              <!-- Item Actions -->
+              <div class="item-actions" (click)="$event.stopPropagation()">
+                <button 
+                  class="action-btn wishlist-btn"
+                  (click)="moveToWishlist(item)"
+                  [disabled]="loadingItems.has(item.product.productId)"
+                  title="Move to Wishlist">
+                  💝
+                </button>
+                <button 
+                  class="action-btn remove-btn"
+                  (click)="removeItem(item)"
+                  [disabled]="loadingItems.has(item.product.productId)"
+                  title="Remove from Cart">
+                  🗑️
+                </button>
+              </div>
+
+              <!-- Loading Overlay has been removed for faster perceived updates -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="cart-summary-section">
+          <div class="summary-card">
+            <h3>Order Summary</h3>
+            
+            <div class="summary-row">
+              <span>Subtotal ({{getTotalItems()}} items)</span>
+              <span>RM {{calculateSubtotal() | number:'1.2-2'}}</span>
+            </div>
+            
+            <div class="summary-row">
+              <span>Shipping</span>
+              <span>{{selectedItems.size === 0 ? 'RM 0.00' : (getShippingCost() === 0 ? 'FREE' : 'RM ' + (getShippingCost() | number:'1.2-2'))}}</span>
+            </div>
+            
+            <hr>
+            
+            <div class="summary-row total">
+              <span>Total</span>
+              <span>RM {{calculateTotal() | number:'1.2-2'}}</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="checkout-actions">
+              <button 
+                class="btn btn-outline"
+                routerLink="/products">
+                Continue Shopping
+              </button>
+              <button 
+                class="btn btn-primary checkout-btn"
+                (click)="proceedToCheckout()"
+                [disabled]="cart.items.length === 0 || hasOutOfStockItems() || selectedItems.size === 0"
+                [class.disabled]="cart.items.length === 0 || hasOutOfStockItems() || selectedItems.size === 0">
+                Proceed to Checkout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  

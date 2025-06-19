@@ -13,10 +13,22 @@ import { WishlistService } from './services/wishlist.service';
   imports: [RouterOutlet, NavbarComponent, FooterComponent],
   template: `
     <app-navbar></app-navbar>
-    <router-outlet></router-outlet>
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
     <app-footer></app-footer>
   `,
-  styles: []
+  styles: [`
+    :host {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .content {
+      flex: 1;
+    }
+  `]
 })
 export class AppComponent implements OnInit {
   title = 'Ameen Qurba';
