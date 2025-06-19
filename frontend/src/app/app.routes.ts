@@ -26,6 +26,7 @@ import { FeedbackFormComponent } from './components/feedback-form/feedback-form'
 import { CheckoutComponent } from './components/checkout/checkout.component';
 import { OrderSuccessComponent } from './components/order-success/order-success.component';
 import { MyOrdersComponent } from './components/my-orders/my-orders.component';
+import { MyFeedbackComponent } from './components/my-feedback/my-feedback.component';
 
 export const routes: Routes = [
   // Default route
@@ -45,8 +46,9 @@ export const routes: Routes = [
   
   // User account routes
   { path: 'wishlist', component: WishlistComponent },
-  { path: 'cart', component: ShoppingCartComponent },
+  { path: 'cart', component: CartComponent },
   { path: 'my-orders', component: MyOrdersComponent },
+  { path: 'my-feedback', component: MyFeedbackComponent },
   
   // Shopping flow routes
   { path: 'checkout', component: CheckoutComponent },

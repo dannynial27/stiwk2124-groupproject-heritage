@@ -10,13 +10,13 @@ import { Review, ReviewRequest } from '../../models/review.model';
 import { StarRatingComponent } from '../shared/star-rating/star-rating.component';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
 import { ProductReviewsComponent } from '../product-reviews/product-reviews.component';
-import { ProductCardComponent } from '../shared/product-card/product-card.component';
 import { ImageService } from '../../services/image.service';
+import { CartService } from '../../services/cart.service';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, StarRatingComponent, LoadingSpinnerComponent, ProductCardComponent, ProductReviewsComponent],
+  imports: [CommonModule, FormsModule, RouterModule, StarRatingComponent, LoadingSpinnerComponent, ProductReviewsComponent],
   template: `
     <div class="product-detail-container" *ngIf="!loading && product">
       <!-- Breadcrumb -->
@@ -127,18 +127,6 @@ import { ImageService } from '../../services/image.service';
         [canAddReview]="true">
       </app-product-reviews>
 
-      <!-- Related Products -->
-      <div class="related-products" *ngIf="relatedProducts.length > 0">
-        <h3>Related Products</h3>
-        <div class="related-products-grid">
-          <app-product-card
-            *ngFor="let relatedProduct of relatedProducts"
-            [product]="relatedProduct"
-            (addToCart)="onAddToCart()"
-            (toggleWishlist)="onToggleWishlist()">
-          </app-product-card>
-        </div>
-      </div>
     </div>
 
     <app-loading-spinner 
@@ -469,7 +457,6 @@ import { ImageService } from '../../services/image.service';
 export class ProductDetailComponent implements OnInit {
   product: Product | null = null;
   reviews: Review[] = [];
-  relatedProducts: Product[] = [];
   
   loading = false;
   error = false;
@@ -494,7 +481,8 @@ export class ProductDetailComponent implements OnInit {
     private productService: ProductService,
     private wishlistService: WishlistService,
     private reviewService: ReviewService,
-    private imageService: ImageService
+    private imageService: ImageService,
+    private cartService: CartService
   ) {}
 
   ngOnInit() {
@@ -515,8 +503,7 @@ export class ProductDetailComponent implements OnInit {
       next: (product) => {
         this.product = product;
         this.loadReviews(productId);
-        this.loadRelatedProducts(product.category);
-        this.checkWishlistStatus(productId);
+        this.checkWishlistStatus();
         this.loading = false;
       },
       error: (error) => {
@@ -535,30 +522,6 @@ export class ProductDetailComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading reviews:', error);
-      }
-    });
-  }
-
-  loadRelatedProducts(category: string) {
-    this.productService.getProductsByCategory(category).subscribe({
-      next: (products) => {
-        this.relatedProducts = products
-          .filter(p => p.productId !== this.product?.productId)
-          .slice(0, 4);
-      },
-      error: (error) => {
-        console.error('Error loading related products:', error);
-      }
-    });
-  }
-
-  checkWishlistStatus(productId: number) {
-    this.wishlistService.isInWishlist(productId).subscribe({
-      next: (isInWishlist: boolean) => {
-        this.isInWishlist = isInWishlist;
-      },
-      error: (error: any) => {
-        console.error('Error checking wishlist status:', error);
       }
     });
   }
@@ -606,12 +569,18 @@ export class ProductDetailComponent implements OnInit {
     
     this.cartLoading = true;
     
-    // Simulate API call
-    setTimeout(() => {
-      this.cartLoading = false;
-      console.log(`Added ${this.quantity} of ${this.product!.name} to cart`);
-      // You can show a toast notification here
-    }, 1000);
+    this.cartService.addToCart(this.product.productId, this.quantity).subscribe({
+      next: () => {
+        this.cartLoading = false;
+        console.log(`Added ${this.quantity} of ${this.product!.name} to cart`);
+        // You can show a toast notification here for better UX
+      },
+      error: (err) => {
+        console.error('Error adding to cart:', err);
+        this.cartLoading = false;
+        // You can show an error toast here
+      }
+    });
   }
 
   onToggleWishlist() {
@@ -676,5 +645,35 @@ export class ProductDetailComponent implements OnInit {
 
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString();
+  }
+
+  loadProduct(id: number) {
+    this.loading = true;
+    this.error = false;
+    this.productService.getProductById(id).subscribe({
+      next: (product) => {
+        this.product = product;
+        this.loading = false;
+        this.checkWishlistStatus();
+      },
+      error: (err) => {
+        console.error('Error loading product:', err);
+        this.loading = false;
+        this.error = true;
+      }
+    });
+  }
+
+  checkWishlistStatus() {
+    if (!this.product) return;
+    
+    this.wishlistService.isInWishlist(this.product.productId).subscribe({
+      next: (isInWishlist: boolean) => {
+        this.isInWishlist = isInWishlist;
+      },
+      error: (error: any) => {
+        console.error('Error checking wishlist status:', error);
+      }
+    });
   }
 }

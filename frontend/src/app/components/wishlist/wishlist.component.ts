@@ -3,9 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { WishlistService } from '../../services/wishlist.service';
 import { CartService } from '../../services/cart.service';
-import { Wishlist, WishlistItem } from '../../models/wishlist.model';
+import { AuthService } from '../../services/auth.service';
+import { Wishlist } from '../../models/wishlist.model';
+import { Product } from '../../models/product.model';
 import { ProductCardComponent } from '../shared/product-card/product-card.component';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-wishlist',
@@ -13,136 +17,126 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
   imports: [CommonModule, RouterModule, ProductCardComponent, LoadingSpinnerComponent],
   template: `
     <div class="wishlist-container">
-      <div class="header-section">
-        <h1>My Wishlist</h1>
-        <p *ngIf="!loading && wishlist">{{wishlist.items.length}} items in your wishlist</p>
-      </div>
-
-      <app-loading-spinner 
-        *ngIf="loading" 
-        message="Loading wishlist...">
-      </app-loading-spinner>
-
-      <!-- Wishlist Items -->
-      <div class="wishlist-content" *ngIf="!loading && wishlist">
-        <!-- Action Bar -->
-        <div class="action-bar" *ngIf="wishlist.items.length > 0">
-          <div class="bulk-actions">
-            <button 
-              class="btn btn-primary"
-              (click)="onMoveAllToCart()"
-              [disabled]="moveAllLoading">
-              <span *ngIf="!moveAllLoading">🛒 Move All to Cart</span>
-              <span *ngIf="moveAllLoading">Moving...</span>
-            </button>
-            
-            <button 
-              class="btn btn-secondary"
-              (click)="onShareWishlist()"
-              [disabled]="shareLoading">
-              <span *ngIf="!shareLoading">📤 Share Wishlist</span>
-              <span *ngIf="shareLoading">Generating...</span>
-            </button>
-            
-            <button 
-              class="btn btn-outline"
-              (click)="onClearWishlist()"
-              [disabled]="clearingWishlist">
+      <div *ngIf="wishlist$ | async as wishlist; else loading">
+        <div class="wishlist-header">
+          <h1>My Wishlist</h1>
+          <div class="header-actions">
+            <button class="btn btn-danger" (click)="clearWishlist()" [disabled]="clearingWishlist || wishlist.items.length === 0">
+              <i class="bi bi-trash"></i> 
               <span *ngIf="!clearingWishlist">Clear All</span>
               <span *ngIf="clearingWishlist">Clearing...</span>
             </button>
           </div>
-          
-          <div class="view-toggle">
-            <button 
-              class="view-btn"
-              [class.active]="viewMode === 'grid'"
-              (click)="viewMode = 'grid'">
-              Grid
-            </button>
-            <button 
-              class="view-btn"
-              [class.active]="viewMode === 'list'"
-              (click)="viewMode = 'list'">
-              List
-            </button>
-          </div>
         </div>
 
-        <!-- Products Grid/List -->
-        <div 
-          class="products-container"
-          [class.grid-view]="viewMode === 'grid'"
-          [class.list-view]="viewMode === 'list'"
-          *ngIf="wishlist.items.length > 0">
-          
-          <div class="wishlist-item" *ngFor="let item of wishlist.items">
-            <app-product-card
-              [product]="item.product"
-              [isInWishlist]="true"
-              [wishlistLoading]="removingIds.has(item.product.productId)"
-              [cartLoading]="cartLoadingIds.has(item.product.productId)"
-              (addToCart)="onAddToCart($event)"
-              (toggleWishlist)="onRemoveFromWishlist($event)">
-            </app-product-card>
+        <div class="header-section">
+          <p>{{wishlist.items.length}} items in your wishlist</p>
+        </div>
+
+        <!-- Wishlist Items -->
+        <div class="wishlist-content">
+          <!-- Action Bar -->
+          <div class="action-bar" *ngIf="wishlist.items.length > 0">
+            <div class="bulk-actions">
+            </div>
             
-            <div class="item-actions">
-              <p class="added-date">Added {{formatDate(item.addedAt)}}</p>
+            <div class="view-toggle">
               <button 
-                class="btn btn-small btn-primary move-to-cart-btn"
-                (click)="onMoveToCart(item.product)"
-                [disabled]="item.product.stockQuantity === 0 || cartLoadingIds.has(item.product.productId)">
-                <span *ngIf="!cartLoadingIds.has(item.product.productId)">Move to Cart</span>
-                <span *ngIf="cartLoadingIds.has(item.product.productId)">Moving...</span>
+                class="view-btn"
+                [class.active]="viewMode === 'grid'"
+                (click)="viewMode = 'grid'">
+                Grid
+              </button>
+              <button 
+                class="view-btn"
+                [class.active]="viewMode === 'list'"
+                (click)="viewMode = 'list'">
+                List
               </button>
             </div>
           </div>
+
+          <!-- Products Grid/List -->
+          <div 
+            class="products-container"
+            [class.grid-view]="viewMode === 'grid'"
+            [class.list-view]="viewMode === 'list'"
+            *ngIf="wishlist.items.length > 0">
+            
+            <div class="wishlist-item" *ngFor="let item of wishlist.items">
+              <app-product-card
+                [product]="item.product"
+                [isAuthenticated]="true"
+                [isInWishlist]="true"
+                [wishlistLoading]="removingIds.has(item.product.productId)"
+                [cartLoading]="cartLoadingIds.has(item.product.productId)"
+                (toggleWishlist)="onRemoveFromWishlist($event)">
+              </app-product-card>
+              
+              <div class="item-actions">
+                <p class="added-date">Added {{formatDate(item.addedAt)}}</p>
+                <button 
+                  class="btn btn-small btn-primary move-to-cart-btn"
+                  (click)="onMoveToCart(item.product)"
+                  [disabled]="item.product.stockQuantity === 0 || cartLoadingIds.has(item.product.productId)">
+                  <span *ngIf="!cartLoadingIds.has(item.product.productId)">Move to Cart</span>
+                  <span *ngIf="cartLoadingIds.has(item.product.productId)">Moving...</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-wishlist" *ngIf="wishlist.items.length === 0">
+            <div class="empty-icon">❤️</div>
+            <h3>Your wishlist is empty</h3>
+            <p>Save items you love to your wishlist and never lose track of them!</p>
+            <button class="btn btn-primary" routerLink="/products">
+              Start Shopping
+            </button>
+          </div>
         </div>
 
-        <!-- Empty State -->
-        <div class="empty-wishlist" *ngIf="wishlist.items.length === 0">
-          <div class="empty-icon">❤️</div>
-          <h3>Your wishlist is empty</h3>
-          <p>Save items you love to your wishlist and never lose track of them!</p>
-          <button class="btn btn-primary" routerLink="/products">
-            Start Shopping
+        <!-- Error State -->
+        <div class="error-state" *ngIf="error">
+          <h3>Unable to load wishlist</h3>
+          <p>Please try again later or contact support if the problem persists.</p>
+          <button class="btn btn-primary" (click)="loadWishlist()">
+            Try Again
           </button>
         </div>
       </div>
 
-      <!-- Error State -->
-      <div class="error-state" *ngIf="error">
-        <h3>Unable to load wishlist</h3>
-        <p>Please try again later or contact support if the problem persists.</p>
-        <button class="btn btn-primary" (click)="loadWishlist()">
-          Try Again
-        </button>
-      </div>
+      <ng-template #loading>
+        <app-loading-spinner 
+          message="Loading wishlist...">
+        </app-loading-spinner>
+      </ng-template>
     </div>
   `,
   styles: [`
     .wishlist-container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 20px;
-      min-height: 60vh;
+      padding: 90px 1rem 2rem; /* Added top padding to prevent navbar overlap */
     }
 
-    .header-section {
-      text-align: center;
-      margin-bottom: 40px;
+    .wishlist-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
     }
 
-    .header-section h1 {
+    .wishlist-header h1 {
       font-size: 36px;
       color: #333;
-      margin: 0 0 10px 0;
+      margin: 0;
     }
 
-    .header-section p {
-      font-size: 16px;
-      color: #666;
-      margin: 0;
+    .header-actions {
+      display: flex;
+      gap: 15px;
     }
 
     .action-bar {
@@ -202,6 +196,9 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
       overflow: hidden;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
 
     .wishlist-item:hover {
@@ -273,7 +270,9 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
       cursor: pointer;
       transition: all 0.3s ease;
       text-align: center;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .btn-small {
@@ -290,14 +289,23 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
       background: #218838;
     }
 
+    .btn-danger {
+      background-color: #dc3545;
+      color: white;
+    }
+    
+    .btn-danger:hover:not(:disabled) {
+      background-color: #c82333;
+    }
+
     .btn-outline {
       background: white;
-      border: 2px solid #dc3545;
-      color: #dc3545;
+      border: 2px solid #6c757d;
+      color: #6c757d;
     }
 
     .btn-outline:hover:not(:disabled) {
-      background: #dc3545;
+      background: #6c757d;
       color: white;
     }
 
@@ -332,21 +340,22 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
   `]
 })
 export class WishlistComponent implements OnInit {
-  wishlist: Wishlist | null = null;
-  loading = false;
+  wishlist$: Observable<Wishlist>;
+  loading = true;
   error = false;
   clearingWishlist = false;
   viewMode: 'grid' | 'list' = 'grid';
   
   removingIds = new Set<number>();
   cartLoadingIds = new Set<number>();
-  moveAllLoading = false;
-  shareLoading = false;
 
   constructor(
     private wishlistService: WishlistService,
-    private cartService: CartService
-  ) {}
+    private cartService: CartService,
+    private authService: AuthService
+  ) {
+    this.wishlist$ = this.wishlistService.wishlist$;
+  }
 
   ngOnInit() {
     this.loadWishlist();
@@ -355,172 +364,62 @@ export class WishlistComponent implements OnInit {
   loadWishlist() {
     this.loading = true;
     this.error = false;
-
-    this.wishlistService.getWishlist().subscribe({
-      next: (wishlist) => {
-        this.wishlist = wishlist;
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading wishlist:', error);
+    this.wishlistService.getWishlist().pipe(
+      catchError(err => {
+        console.error('Error loading wishlist:', err);
         this.error = true;
-        this.loading = false;
-      }
+        return of({ items: [], totalItems: 0 });
+      })
+    ).subscribe(() => {
+      this.loading = false;
     });
   }
 
-  onAddToCart(product: any) {
+  onMoveToCart(product: Product) {
     this.cartLoadingIds.add(product.productId);
-    
     this.cartService.addToCart(product.productId, 1).subscribe({
       next: () => {
-        this.cartLoadingIds.delete(product.productId);
-        console.log('Added to cart:', product.name);
-      },
-      error: (error) => {
-        console.error('Error adding to cart:', error);
-        this.cartLoadingIds.delete(product.productId);
-      }
-    });
-  }
-
-  onMoveToCart(product: any) {
-    this.cartLoadingIds.add(product.productId);
-    
-    // Add to cart first, then remove from wishlist
-    this.cartService.addToCart(product.productId, 1).subscribe({
-      next: () => {
-        // Now remove from wishlist
         this.wishlistService.removeFromWishlist(product.productId).subscribe({
-          next: (updatedWishlist) => {
-            this.wishlist = updatedWishlist;
-            this.cartLoadingIds.delete(product.productId);
-            console.log('Moved to cart:', product.name);
-          },
-          error: (error) => {
-            console.error('Error removing from wishlist:', error);
+          next: () => this.cartLoadingIds.delete(product.productId),
+          error: (err) => {
+            console.error('Error removing from wishlist:', err);
             this.cartLoadingIds.delete(product.productId);
           }
         });
       },
-      error: (error) => {
-        console.error('Error adding to cart:', error);
+      error: (err) => {
+        console.error('Error moving to cart:', err);
         this.cartLoadingIds.delete(product.productId);
       }
     });
   }
 
-  onRemoveFromWishlist(product: any) {
+  onRemoveFromWishlist(product: Product) {
     this.removingIds.add(product.productId);
-
     this.wishlistService.removeFromWishlist(product.productId).subscribe({
-      next: (updatedWishlist) => {
-        // Update with the returned wishlist
-        this.wishlist = updatedWishlist;
-        this.removingIds.delete(product.productId);
-        console.log('Removed from wishlist:', product.name);
-      },
-      error: (error) => {
-        console.error('Error removing from wishlist:', error);
+      next: () => this.removingIds.delete(product.productId),
+      error: (err) => {
+        console.error('Error removing from wishlist:', err);
         this.removingIds.delete(product.productId);
       }
     });
   }
 
-  onMoveAllToCart() {
-    if (!this.wishlist || this.wishlist.items.length === 0) {
-      return;
-    }
-
-    if (confirm(`Move all ${this.wishlist.items.length} items to cart?`)) {
-      this.moveAllLoading = true;
-      
-      this.wishlistService.moveAllToCart().subscribe({
-        next: (response: any) => {
-          console.log('All items moved to cart:', response);
-          this.loadWishlist(); // Refresh wishlist
-          this.moveAllLoading = false;
-          // Show success message
-          alert('All items moved to cart successfully!');
-        },
-        error: (error: any) => {
-          console.error('Error moving all to cart:', error);
-          this.moveAllLoading = false;
-          alert('Failed to move items to cart. Please try again.');
-        }
+  clearWishlist(): void {
+    const userId = this.authService.getUserId();
+    if (userId && confirm('Are you sure you want to clear your entire wishlist?')) {
+      this.clearingWishlist = true;
+      this.wishlistService.clearWishlist().subscribe({
+        next: () => this.clearingWishlist = false,
+        error: () => this.clearingWishlist = false
       });
     }
   }
 
-  onShareWishlist() {
-    if (!this.wishlist || this.wishlist.items.length === 0) {
-      alert('Cannot share an empty wishlist');
-      return;
-    }
-
-    this.shareLoading = true;
-    
-    this.wishlistService.generateShareableLink().subscribe({
-      next: (response: any) => {
-        this.shareLoading = false;
-        
-        // Create a share modal or copy to clipboard
-        const shareUrl = response.shareUrl;
-        
-        if (navigator.share) {
-          // Use native share API if available
-          navigator.share({
-            title: 'My Wishlist',
-            text: `Check out my wishlist with ${this.wishlist!.items.length} amazing products!`,
-            url: shareUrl
-          }).catch(console.error);
-        } else {
-          // Fallback: copy to clipboard
-          navigator.clipboard.writeText(shareUrl).then(() => {
-            alert('Wishlist link copied to clipboard!');
-          }).catch(() => {
-            // Show the link in a prompt as fallback
-            prompt('Copy this link to share your wishlist:', shareUrl);
-          });
-        }
-      },
-      error: (error: any) => {
-        console.error('Error generating shareable link:', error);
-        this.shareLoading = false;
-        alert('Failed to generate shareable link. Please try again.');
-      }
-    });
-  }
-
-  onClearWishlist() {
-    if (!confirm('Are you sure you want to clear your entire wishlist?')) {
-      return;
-    }
-
-    this.clearingWishlist = true;
-
-    this.wishlistService.clearWishlist().subscribe({
-      next: (updatedWishlist) => {
-        this.wishlist = updatedWishlist;
-        this.clearingWishlist = false;
-        console.log('Wishlist cleared');
-      },
-      error: (error) => {
-        console.error('Error clearing wishlist:', error);
-        this.clearingWishlist = false;
-      }
-    });
-  }
-
-  // Handle potential undefined date in formatDate
   formatDate(dateString?: string): string {
-    if (!dateString) {
-      return 'Recently added';
-    }
-    
+    if (!dateString) return 'Recently added';
     try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString();
+      return new Date(dateString).toLocaleDateString();
     } catch (error) {
       return 'Recently added';
     }

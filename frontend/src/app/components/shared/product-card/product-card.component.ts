@@ -1,91 +1,57 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { Product } from '../../../models/product.model';
-import { StarRatingComponent } from '../star-rating/star-rating.component';
-import { WishlistService } from '../../../services/wishlist.service';
-import { CartService } from '../../../services/cart.service';
 import { ImageService } from '../../../services/image.service';
 
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [CommonModule, RouterModule, StarRatingComponent],
+  imports: [CommonModule, RouterModule],
   template: `
-    <div class="product-card">
-      <div class="product-image-container">
-        <img 
-          [src]="getImageUrl()" 
-          [alt]="product.name"
-          class="product-image"
-          (error)="onImageError($event)">
-        
-        <div class="product-badges">
-          <span class="category-badge">{{product.category}}</span>
-          <span *ngIf="product.stockQuantity <= 5 && product.stockQuantity > 0" 
-                class="stock-badge low-stock">
-            Low Stock
-          </span>
-          <span *ngIf="product.stockQuantity === 0" class="stock-badge out-of-stock">
-            Out of Stock
-          </span>
-        </div>
-        
+    <div class="product-card" [class.compact]="compact" (click)="onCardClick()">
+      <div class="card-header">
+        <span class="category-badge">{{getCategoryEmoji()}} {{product.category}}</span>
         <button 
-          class="wishlist-btn"
+          *ngIf="isAuthenticated"
+          class="btn btn-icon wishlist-btn"
           [class.in-wishlist]="isInWishlist"
-          (click)="onWishlistToggle()"
-          [disabled]="wishlistLoading">
-          ❤
+          (click)="onToggleWishlist(); $event.stopPropagation()"
+          [disabled]="wishlistLoading"
+          title="{{isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}}">
+          <span *ngIf="!wishlistLoading">{{isInWishlist ? '❤️' : '🤍'}}</span>
+          <span *ngIf="wishlistLoading" class="spinner-small"></span>
         </button>
       </div>
       
-      <div class="product-info">
-        <h3 class="product-name" [routerLink]="['/products', product.productId]">
-          {{product.name}}
-        </h3>
-        
-        <p class="product-description">
-          {{truncateText(product.description, 80)}}
-        </p>
-        
-        <div class="product-rating" *ngIf="averageRating > 0">
-          <app-star-rating 
-            [rating]="averageRating" 
-            [showText]="true"
-            [reviewCount]="reviewCount">
-          </app-star-rating>
+      <div class="card-body">
+        <div class="product-image">
+          <img [src]="getImageUrl()" [alt]="product.name" (error)="onImageError($event)">
+        </div>
+        <h4 class="product-name">{{product.name}}</h4>
+      </div>
+      
+      <div class="card-footer">
+        <div class="price-and-stock">
+          <span class="price">RM {{product.price.toFixed(2)}}</span>
         </div>
         
-        <div class="product-footer">
-          <div class="price-section">
-            <span class="price">RM {{product.price.toFixed(2)}}</span>
-          </div>
+        <div class="action-buttons" *ngIf="isAuthenticated">
+          <button 
+            class="btn btn-primary add-to-cart-btn"
+            (click)="onAddToCart(); $event.stopPropagation()"
+            [disabled]="product.stockQuantity === 0 || cartLoading">
+            <span *ngIf="!cartLoading">🛒 Add to Cart</span>
+            <span *ngIf="cartLoading">Adding...</span>
+          </button>
           
-          <div class="action-buttons">
-            <button 
-              class="btn btn-primary add-to-cart-btn"
-              (click)="onAddToCart()"
-              [disabled]="product.stockQuantity === 0 || cartLoading">
-              <span *ngIf="!cartLoading">🛒 Add to Cart</span>
-              <span *ngIf="cartLoading">Adding...</span>
-            </button>
-            
-            <div class="secondary-actions">
-              <button 
-                class="btn btn-outline quick-view-btn"
-                (click)="onQuickView(); $event.stopPropagation()"
-                title="Quick View">
-                ⚡
-              </button>
-              
-              <button 
-                class="btn btn-outline compare-btn"
-                (click)="onCompare(); $event.stopPropagation()"
-                title="Add to Compare">
-                ⚖️
-              </button>
-            </div>
+          <div class="secondary-actions">
+            <a [routerLink]="['/products', product.productId]"
+               (click)="$event.stopPropagation()"
+               class="btn btn-outline"
+               title="View product details">
+              View Details
+            </a>
           </div>
         </div>
       </div>
@@ -107,33 +73,15 @@ import { ImageService } from '../../../services/image.service';
       box-shadow: 0 8px 25px rgba(0,0,0,0.1);
       transform: translateY(-2px);
     }
-    
-    .product-image-container {
-      position: relative;
-      height: 200px;
-      overflow: hidden;
-    }
-    
-    .product-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-    
-    .product-card:hover .product-image {
-      transform: scale(1.05);
-    }
-    
-    .product-badges {
-      position: absolute;
-      top: 8px;
-      left: 8px;
+
+    .card-header {
       display: flex;
-      flex-direction: column;
-      gap: 4px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      border-bottom: 1px solid #f0f0f0;
     }
-    
+
     .category-badge {
       background: #28a745;
       color: white;
@@ -142,125 +90,84 @@ import { ImageService } from '../../../services/image.service';
       font-size: 12px;
       font-weight: 500;
     }
-    
-    .stock-badge {
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-    
-    .low-stock {
-      background: #ffc107;
-      color: #856404;
-    }
-    
-    .out-of-stock {
-      background: #dc3545;
-      color: white;
-    }
-    
+
     .wishlist-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 36px;
-      height: 36px;
+      background: none;
       border: none;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.9);
-      font-size: 16px;
+      font-size: 24px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      padding: 0;
+      line-height: 1;
     }
-    
-    .wishlist-btn:hover {
-      background: white;
-      transform: scale(1.1);
-    }
-    
+
     .wishlist-btn.in-wishlist {
       color: #dc3545;
-      background: rgba(220, 53, 69, 0.1);
     }
-    
-    .product-info {
+
+    .card-body {
       padding: 16px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+      text-align: center;
     }
-    
+
+    .product-image {
+      height: 150px;
+      margin-bottom: 16px;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
     .product-name {
       font-size: 16px;
       font-weight: 600;
-      margin: 0 0 8px 0;
+      margin: 0;
       color: #333;
-      cursor: pointer;
-      transition: color 0.3s ease;
     }
-    
-    .product-name:hover {
-      color: #28a745;
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      margin-top: auto; /* Pushes footer to the bottom */
+      border-top: 1px solid #f0f0f0;
+      min-height: 95px; /* Ensures consistent height */
     }
-    
-    .product-description {
-      font-size: 14px;
-      color: #666;
-      margin: 0 0 12px 0;
-      line-height: 1.4;
-    }
-    
-    .product-rating {
-      margin-bottom: 12px;
-    }
-    
-    .product-footer {
-      margin-top: auto;
-    }
-    
-    .price-section {
-      margin-bottom: 12px;
-    }
-    
-    .price {
-      font-size: 20px;
+
+    .price-and-stock .price {
+      font-size: 1.25rem;
       font-weight: 700;
       color: #28a745;
     }
+
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.5rem;
+    }
     
     .btn {
-      padding: 10px 16px;
-      border: none;
       border-radius: 6px;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.3s ease;
-      width: 100%;
     }
-    
-    .btn-primary {
+
+    .add-to-cart-btn {
       background: #28a745;
       color: white;
-    }
-    
-    .btn-primary:hover:not(:disabled) {
-      background: #218838;
-    }
-    
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+      border: none;
+      padding: 10px 16px;
     }
 
     .secondary-actions {
       display: flex;
       gap: 8px;
-      margin-top: 8px;
     }
 
     .btn-outline {
@@ -270,78 +177,67 @@ import { ImageService } from '../../../services/image.service';
       padding: 8px;
       width: auto;
       min-width: 40px;
-      flex: 1;
-    }
-
-    .btn-outline:hover:not(:disabled) {
-      background: #f8f9fa;
-      border-color: #28a745;
-      color: #28a745;
-    }
-
-    .quick-view-btn:hover:not(:disabled) {
-      border-color: #007bff;
-      color: #007bff;
-    }
-
-    .compare-btn:hover:not(:disabled) {
-      border-color: #ffc107;
-      color: #ffc107;
     }
   `]
 })
-export class ProductCardComponent implements OnInit {
+export class ProductCardComponent {
   @Input() product!: Product;
+  @Input() isAuthenticated: boolean = false;
   @Input() isInWishlist: boolean = false;
-  @Input() averageRating: number = 0;
-  @Input() reviewCount: number = 0;
   @Input() cartLoading: boolean = false;
   @Input() wishlistLoading: boolean = false;
-  
+  @Input() compact = false;
+
   @Output() addToCart = new EventEmitter<Product>();
   @Output() toggleWishlist = new EventEmitter<Product>();
-  @Output() quickView = new EventEmitter<Product>();
   @Output() compare = new EventEmitter<Product>();
+  @Output() cardClick = new EventEmitter<Product>();
 
-  constructor(
-    private wishlistService: WishlistService,
-    private cartService: CartService,
-    private router: Router,
-    private imageService: ImageService
-  ) {}
+  showQuickActions = false;
 
-  ngOnInit() {}
+  constructor(private imageService: ImageService) {}
 
   getImageUrl(): string {
-    if (!this.product) {
-      return this.imageService.getDefaultImageUrl();
-    }
-    
-    return this.imageService.getProductImageUrl(this.product.imagePath);
+    return this.imageService.getProductImageUrl(this.product?.imagePath);
   }
 
   onImageError(event: any) {
-    event.target.src = this.imageService.getDefaultImageUrl();
+    event.target.src = this.imageService.getProductImageUrl(undefined);
   }
 
   onAddToCart() {
     this.addToCart.emit(this.product);
   }
 
-  onWishlistToggle() {
+  onToggleWishlist() {
     this.toggleWishlist.emit(this.product);
-  }
-
-  onQuickView() {
-    this.quickView.emit(this.product);
   }
 
   onCompare() {
     this.compare.emit(this.product);
   }
 
+  onCardClick() {
+    this.cardClick.emit(this.product);
+  }
+
   truncateText(text: string, maxLength: number): string {
     if (!text) return '';
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  }
+
+  getCategoryEmoji(): string {
+    const categoryEmojis: { [key: string]: string } = {
+      'Electronics': '📱',
+      'Fashion': '👗',
+      'Home': '🏠',
+      'Beauty': '💄',
+      'Sports': '⚽',
+      'Toys': '🧸',
+      'Automotive': '🚗',
+      'Books': '📚'
+    };
+    
+    return categoryEmojis[this.product.category] || '📦';
   }
 }

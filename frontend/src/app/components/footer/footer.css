@@ -1,6 +1,6 @@
 .footer {
   background-color: #F5E8D6;
-  padding: 2rem;
+  padding: 3rem 2rem; /* Increased padding */
   text-align: center;
   color: #1E3A8A;
   margin-top: 2rem;
@@ -9,17 +9,24 @@
 
 .footer-content {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between; /* Better alignment */
   align-items: flex-start;
   flex-wrap: wrap;
+  gap: 2rem; /* Added gap for spacing */
   max-width: 1200px;
   margin: 0 auto;
 }
 
 .footer-section {
-  flex: 1;
+  flex: 1 1 220px; /* Allow sections to grow and shrink */
   min-width: 200px;
-  margin: 1rem 0;
+  margin: 0; /* Removed margin */
+  text-align: left;
+}
+
+.feedback-section {
+  flex: 2 1 400px; /* Allow feedback to take more space */
+  max-width: 480px; /* Set a max-width for the feedback section */
 }
 
 .footer-section h4 {
@@ -30,30 +37,39 @@
 .social-links a {
   color: #1E3A8A;
   text-decoration: none;
-  margin: 0 0.5rem;
+  margin: 0; /* Removed margin */
   display: block;
+  padding: 0.25rem 0; /* Added padding */
 }
 
 .social-links a:hover {
   color: #163172;
+  text-decoration: underline;
 }
 
 .footer-logo {
   font-size: 2rem;
   margin: 1rem 0;
+  flex-basis: 100%; /* Make logo take full width on its own "line" */
+  text-align: center;
 }
 
-.feedback-section .feedback-container {
-  max-width: 300px;
-  margin: 0 auto;
+.footer-logo span {
+  display: inline-block;
 }
 
-@media (max-width: 768px) {
+/* Removed the rule that was making the form too small */
+
+@media (max-width: 992px) {
   .footer-content {
     flex-direction: column;
-    gap: 2rem;
+    align-items: center; /* Center items on mobile */
+    text-align: center;
+    gap: 2.5rem;
   }
-  .feedback-section .feedback-container {
-    max-width: 100%;
+  .footer-section, .feedback-section {
+    text-align: center;
+    width: 100%;
+    max-width: 450px; /* Give it a reasonable max-width on mobile */
   }
 }

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +11,7 @@ export class FeedbackService {
   private apiUrl = 'http://localhost:8080/qurba/api/feedback';
   private adminApiUrl = 'http://localhost:8080/qurba/api/admin/feedback';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
   submitFeedback(userId: number, feedback: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/${userId}`, feedback);
@@ -42,5 +44,43 @@ export class FeedbackService {
 
   respondToFeedback(feedbackId: number, response: string): Observable<any> {
     return this.http.post(`${this.adminApiUrl}/${feedbackId}/respond`, { response });
+  }
+
+  clearWishlist(): Observable<void> {
+    const userId = this.authService.getUserId();
+    if (!userId) return throwError(() => new Error('User not logged in'));
+    return this.http.delete<void>(`${this.apiUrl}/${userId}/clear`);
+  }
+
+  moveAllToCart(): Observable<void> {
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      return throwError(() => new Error('User not logged in'));
+    }
+    return this.http.post<void>(`${this.apiUrl}/${userId}/move-to-cart`, {});
+  }
+
+  isInWishlist(productId: number): Observable<boolean> {
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      return throwError(() => new Error('User not logged in'));
+    }
+    return this.http.get<boolean>(`${this.apiUrl}/${userId}/exists/${productId}`);
+  }
+
+  addToWishlist(productId: number): Observable<void> {
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      return throwError(() => new Error('User not logged in'));
+    }
+    return this.http.post<void>(`${this.apiUrl}/${userId}/add`, { productId });
+  }
+
+  removeFromWishlist(productId: number): Observable<void> {
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      return throwError(() => new Error('User not logged in'));
+    }
+    return this.http.delete<void>(`${this.apiUrl}/${userId}/remove/${productId}`);
   }
 }

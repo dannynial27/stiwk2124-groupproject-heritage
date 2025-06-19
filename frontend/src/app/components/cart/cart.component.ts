@@ -7,6 +7,8 @@ import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
 import { ImageService } from '../../services/image.service';
 import { WishlistService } from '../../services/wishlist.service';
+import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
+import { ProductReviewsComponent } from '../product-reviews/product-reviews.component';
 import { Cart, CartItem } from '../../models/cart.model';
 import { Product } from '../../models/product.model';
 
@@ -44,138 +46,141 @@ import { Product } from '../../models/product.model';
       <!-- Cart Items -->
       <div *ngIf="!loading && cart.items.length > 0" class="cart-content">
         
-        <!-- Bulk Actions -->
-        <div class="bulk-actions" *ngIf="selectedItems.size > 0">
-          <div class="selection-info">
-            <span>{{selectedItems.size}} items selected</span>
-          </div>
-          <div class="bulk-buttons">
-            <button 
-              class="btn btn-outline"
-              (click)="moveSelectedToWishlist()"
-              [disabled]="bulkLoading">
-              💝 Move to Wishlist
-            </button>
-            <button 
-              class="btn btn-danger"
-              (click)="removeSelectedItems()"
-              [disabled]="bulkLoading">
-              🗑️ Remove Selected
-            </button>
-          </div>
-        </div>
-
-        <!-- Select All -->
-        <div class="select-all-section">
-          <label class="checkbox-container">
-            <input 
-              type="checkbox" 
-              [checked]="isAllSelected()"
-              [indeterminate]="isSomeSelected()"
-              (change)="toggleSelectAll()">
-            <span class="checkmark"></span>
-            Select All Items
-          </label>
-        </div>
-
-        <!-- Cart Items List -->
-        <div class="cart-items">
-          <div 
-            *ngFor="let item of cart.items; trackBy: trackByCartItem" 
-            class="cart-item"
-            [class.selected]="selectedItems.has(item.product.productId)">
-            
-            <!-- Item Selection -->
-            <div class="item-selection">
-              <label class="checkbox-container">
-                <input 
-                  type="checkbox" 
-                  [checked]="selectedItems.has(item.product.productId)"
-                  (change)="toggleItemSelection(item.product.productId)">
-                <span class="checkmark"></span>
-              </label>
+        <div class="cart-main-column">
+          <!-- Bulk Actions -->
+          <div class="bulk-actions" *ngIf="selectedItems.size > 0">
+            <div class="selection-info">
+              <span>{{selectedItems.size}} items selected</span>
             </div>
-
-            <!-- Product Image -->
-            <div class="item-image">
-              <img 
-                [src]="getProductImageUrl(item.product)" 
-                [alt]="item.product.name"
-                (error)="onImageError($event)"
-                class="product-image">
-            </div>
-
-            <!-- Product Details -->
-            <div class="item-details">
-              <h3 class="product-name">{{item.product.name}}</h3>
-              <p class="product-description">{{item.product.description}}</p>
-              <div class="product-meta">
-                <span class="category">{{item.product.category}}</span>
-                <span class="stock-status" 
-                      [class.in-stock]="item.product.stockQuantity > 0"
-                      [class.low-stock]="item.product.stockQuantity <= 5 && item.product.stockQuantity > 0"
-                      [class.out-of-stock]="item.product.stockQuantity === 0">
-                  {{getStockStatus(item.product)}}
-                </span>
-              </div>
-            </div>
-
-            <!-- Price -->
-            <div class="item-price">
-              <span class="unit-price">RM {{item.product.price | number:'1.2-2'}}</span>
-              <span class="per-unit">per unit</span>
-            </div>
-
-            <!-- Quantity Controls -->
-            <div class="quantity-controls">
+            <div class="bulk-buttons">
               <button 
-                class="qty-btn"
-                (click)="decreaseQuantity(item)"
-                [disabled]="item.quantity <= 1 || loadingItems.has(item.product.productId)">
-                -
+                class="btn btn-outline"
+                (click)="moveSelectedToWishlist()"
+                [disabled]="bulkLoading">
+                💝 Move to Wishlist
               </button>
+              <button 
+                class="btn btn-danger"
+                (click)="removeSelectedItems()"
+                [disabled]="bulkLoading">
+                🗑️ Remove Selected
+              </button>
+            </div>
+          </div>
+
+          <!-- Select All -->
+          <div class="select-all-section">
+            <label class="checkbox-container">
               <input 
-                type="number" 
-                class="qty-input"
-                [value]="item.quantity"
-                (change)="onQuantityChange(item, $event)"
-                [disabled]="loadingItems.has(item.product.productId)"
-                min="1"
-                [max]="item.product.stockQuantity">
-              <button 
-                class="qty-btn"
-                (click)="increaseQuantity(item)"
-                [disabled]="item.quantity >= item.product.stockQuantity || loadingItems.has(item.product.productId)">
-                +
-              </button>
-            </div>
+                type="checkbox" 
+                [checked]="isAllSelected()"
+                [indeterminate]="isSomeSelected()"
+                (change)="toggleSelectAll()">
+              <span class="checkmark"></span>
+              Select All Items
+            </label>
+          </div>
 
-            <!-- Subtotal -->
-            <div class="item-subtotal">
-              <span class="subtotal-amount">RM {{(item.product.price * item.quantity) | number:'1.2-2'}}</span>
-            </div>
+          <!-- Cart Items List -->
+          <div class="cart-items">
+            <div 
+              *ngFor="let item of cart.items; trackBy: trackByCartItem" 
+              class="cart-item"
+              (click)="toggleItemSelection(item.product.productId)"
+              [class.selected]="selectedItems.has(item.product.productId)">
+              
+              <!-- Item Selection -->
+              <div class="item-selection">
+                <label class="checkbox-container">
+                  <input 
+                    type="checkbox" 
+                    [checked]="selectedItems.has(item.product.productId)"
+                    (change)="toggleItemSelection(item.product.productId)">
+                  <span class="checkmark"></span>
+                </label>
+              </div>
 
-            <!-- Item Actions -->
-            <div class="item-actions">
-              <button 
-                class="action-btn wishlist-btn"
-                (click)="moveToWishlist(item)"
-                [disabled]="loadingItems.has(item.product.productId)"
-                title="Move to Wishlist">
-                💝
-              </button>
-              <button 
-                class="action-btn remove-btn"
-                (click)="removeItem(item)"
-                [disabled]="loadingItems.has(item.product.productId)"
-                title="Remove from Cart">
-                🗑️
-              </button>
-            </div>
+              <!-- Product Image -->
+              <div class="item-image">
+                <img 
+                  [src]="getProductImageUrl(item.product)" 
+                  [alt]="item.product.name"
+                  (error)="onImageError($event)"
+                  class="product-image">
+              </div>
 
-            <!-- Loading Overlay -->
-            <div *ngIf="loadingItems.has(item.product.productId)" class="item-loading">
-              <div class="spinner-small"></div>
+              <!-- Product Details -->
+              <div class="item-details">
+                <h3 class="product-name">{{item.product.name}}</h3>
+                <p class="product-description">{{item.product.description}}</p>
+                <div class="product-meta">
+                  <span class="category">{{item.product.category}}</span>
+                  <span class="stock-status" 
+                        [class.in-stock]="item.product.stockQuantity > 0"
+                        [class.low-stock]="item.product.stockQuantity <= 5 && item.product.stockQuantity > 0"
+                        [class.out-of-stock]="item.product.stockQuantity === 0">
+                    {{getStockStatus(item.product)}}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Price -->
+              <div class="item-price">
+                <span class="unit-price">RM {{item.product.price | number:'1.2-2'}}</span>
+                <span class="per-unit">per unit</span>
+              </div>
+
+              <!-- Quantity Controls -->
+              <div class="quantity-controls">
+                <button 
+                  class="qty-btn"
+                  (click)="decreaseQuantity(item)"
+                  [disabled]="item.quantity <= 1 || loadingItems.has(item.product.productId)">
+                  -
+                </button>
+                <input 
+                  type="number" 
+                  class="qty-input"
+                  [value]="item.quantity"
+                  (change)="onQuantityChange(item, $event)"
+                  [disabled]="loadingItems.has(item.product.productId)"
+                  min="1"
+                  [max]="item.product.stockQuantity">
+                <button 
+                  class="qty-btn"
+                  (click)="increaseQuantity(item)"
+                  [disabled]="item.quantity >= item.product.stockQuantity || loadingItems.has(item.product.productId)">
+                  +
+                </button>
+              </div>
+
+              <!-- Subtotal -->
+              <div class="item-subtotal">
+                <span class="subtotal-amount">RM {{(item.product.price * item.quantity) | number:'1.2-2'}}</span>
+              </div>
+
+              <!-- Item Actions -->
+              <div class="item-actions">
+                <button 
+                  class="action-btn wishlist-btn"
+                  (click)="moveToWishlist(item)"
+                  [disabled]="loadingItems.has(item.product.productId)"
+                  title="Move to Wishlist">
+                  💝
+                </button>
+                <button 
+                  class="action-btn remove-btn"
+                  (click)="removeItem(item)"
+                  [disabled]="loadingItems.has(item.product.productId)"
+                  title="Remove from Cart">
+                  🗑️
+                </button>
+              </div>
+
+              <!-- Loading Overlay -->
+              <div *ngIf="loadingItems.has(item.product.productId)" class="item-loading">
+                <div class="spinner-small"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -195,36 +200,11 @@ import { Product } from '../../models/product.model';
               <span>{{getShippingCost() === 0 ? 'FREE' : 'RM ' + (getShippingCost() | number:'1.2-2')}}</span>
             </div>
             
-            <div class="summary-row discount" *ngIf="getDiscountAmount() > 0">
-              <span>Discount</span>
-              <span>-RM {{getDiscountAmount() | number:'1.2-2'}}</span>
-            </div>
-            
             <hr>
             
             <div class="summary-row total">
               <span>Total</span>
               <span>RM {{calculateTotal() | number:'1.2-2'}}</span>
-            </div>
-
-            <!-- Promo Code -->
-            <div class="promo-section">
-              <div class="promo-input">
-                <input 
-                  type="text" 
-                  placeholder="Enter promo code"
-                  [(ngModel)]="promoCode"
-                  class="promo-code-input">
-                <button 
-                  class="btn btn-outline"
-                  (click)="applyPromoCode()"
-                  [disabled]="!promoCode || promoLoading">
-                  Apply
-                </button>
-              </div>
-              <div *ngIf="promoMessage" class="promo-message" [class.success]="promoSuccess">
-                {{promoMessage}}
-              </div>
             </div>
 
             <!-- Action Buttons -->
@@ -245,14 +225,6 @@ import { Product } from '../../models/product.model';
         </div>
       </div>
 
-      <!-- Recently Viewed -->
-      <div class="recently-viewed" *ngIf="!loading">
-        <h3>Recently Viewed</h3>
-        <div class="recent-products">
-          <!-- This would be populated by a recently viewed service -->
-          <p>Recently viewed products will appear here</p>
-        </div>
-      </div>
     </div>
   `,
   styles: [`
@@ -353,7 +325,6 @@ import { Product } from '../../models/product.model';
       display: flex;
       justify-content: space-between;
       align-items: center;
-      grid-column: 1 / -1;
     }
 
     .bulk-buttons {
@@ -632,37 +603,6 @@ import { Product } from '../../models/product.model';
       margin-top: 15px;
     }
 
-    .promo-section {
-      margin: 20px 0;
-    }
-
-    .promo-input {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .promo-code-input {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-
-    .promo-message {
-      font-size: 14px;
-      padding: 8px;
-      border-radius: 4px;
-      background: #f8d7da;
-      color: #721c24;
-    }
-
-    .promo-message.success {
-      background: #d4edda;
-      color: #155724;
-    }
-
     .checkout-actions {
       display: flex;
       flex-direction: column;
@@ -767,13 +707,6 @@ export class CartComponent implements OnInit, OnDestroy {
   loadingItems = new Set<number>();
   bulkLoading = false;
   
-  // Promo code
-  promoCode = '';
-  promoLoading = false;
-  promoMessage = '';
-  promoSuccess = false;
-  appliedPromo: any = null;
-
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -888,23 +821,31 @@ export class CartComponent implements OnInit, OnDestroy {
   moveToWishlist(item: CartItem): void {
     this.loadingItems.add(item.product.productId);
     
-    // Add to wishlist first, then remove from cart
     this.wishlistService.addToWishlist(item.product.productId).subscribe({
       next: () => {
-        this.cartService.removeFromCart(item.product.productId).subscribe({
-          next: (cart) => {
-            this.cart = cart;
-            this.loadingItems.delete(item.product.productId);
-            this.selectedItems.delete(item.product.productId);
-          },
-          error: (error) => {
-            console.error('Error removing from cart:', error);
-            this.loadingItems.delete(item.product.productId);
-          }
-        });
+        this.removeFromCartAndFinalize(item);
       },
       error: (error) => {
-        console.error('Error adding to wishlist:', error);
+        // If item is already in wishlist (400 error), just remove from cart to complete the "move"
+        if (error.status === 400 && error.error?.error?.includes('already in wishlist')) {
+          this.removeFromCartAndFinalize(item);
+        } else {
+          console.error('Error adding to wishlist:', error);
+          this.loadingItems.delete(item.product.productId);
+        }
+      }
+    });
+  }
+
+  private removeFromCartAndFinalize(item: CartItem): void {
+    this.cartService.removeFromCart(item.product.productId).subscribe({
+      next: (cart) => {
+        this.cart = cart;
+        this.loadingItems.delete(item.product.productId);
+        this.selectedItems.delete(item.product.productId);
+      },
+      error: (cartError) => {
+        console.error('Error removing from cart:', cartError);
         this.loadingItems.delete(item.product.productId);
       }
     });
@@ -995,11 +936,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   getDiscountAmount(): number {
-    if (this.appliedPromo) {
-      const subtotal = this.calculateSubtotal();
-      return subtotal * (this.appliedPromo.discount / 100);
-    }
-    return 0;
+    return 0; // Promo code system removed
   }
 
   calculateTotal(): number {
@@ -1023,36 +960,6 @@ export class CartComponent implements OnInit, OnDestroy {
 
   trackByCartItem(index: number, item: CartItem): number {
     return item.product.productId;
-  }
-
-  // Promo code
-  applyPromoCode(): void {
-    if (!this.promoCode.trim()) return;
-    
-    this.promoLoading = true;
-    this.promoMessage = '';
-    
-    // Simulate promo code validation
-    setTimeout(() => {
-      const validCodes = {
-        'WELCOME10': { discount: 10, message: '10% discount applied!' },
-        'SAVE20': { discount: 20, message: '20% discount applied!' },
-        'FREESHIP': { discount: 0, message: 'Free shipping applied!', freeShipping: true }
-      };
-      
-      const promo = validCodes[this.promoCode.toUpperCase() as keyof typeof validCodes];
-      
-      if (promo) {
-        this.appliedPromo = promo;
-        this.promoMessage = promo.message;
-        this.promoSuccess = true;
-      } else {
-        this.promoMessage = 'Invalid promo code';
-        this.promoSuccess = false;
-      }
-      
-      this.promoLoading = false;
-    }, 1000);
   }
 
   // Navigation

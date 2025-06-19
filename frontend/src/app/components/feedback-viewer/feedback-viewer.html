@@ -1,12 +1,65 @@
 <div class="feedback-viewer-container">
-  <h2>Admin Feedback Dashboard</h2>
-  <div *ngIf="feedbacks.length === 0" class="no-feedback">No feedbacks available.</div>
-  <div class="feedback-list" *ngIf="feedbacks.length > 0">
-    <div class="feedback-item" *ngFor="let feedback of feedbacks">
-      <h3>{{ feedback.name }}</h3>
-      <p><strong>Email:</strong> {{ feedback.email }}</p>
-      <p><strong>Message:</strong> {{ feedback.message }}</p>
+  <header class="viewer-header">
+    <h1>Feedback Dashboard</h1>
+    <p>Manage and respond to customer feedback</p>
+  </header>
+
+  <div class="filter-bar">
+    <button (click)="applyFilter('ALL')" [class.active]="currentFilter === 'ALL'">All</button>
+    <button (click)="applyFilter('PENDING')" [class.active]="currentFilter === 'PENDING'">Pending</button>
+    <button (click)="applyFilter('READ')" [class.active]="currentFilter === 'READ'">Read</button>
+    <button (click)="applyFilter('RESPONDED')" [class.active]="currentFilter === 'RESPONDED'">Responded</button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">Loading feedback...</div>
+  <div *ngIf="error" class="error-state">{{ error }}</div>
+
+  <div *ngIf="!isLoading && !error">
+    <div *ngIf="filteredFeedbacks.length === 0" class="no-feedback">
+      No feedback matching the current filter.
+    </div>
+
+    <div class="feedback-list" *ngIf="filteredFeedbacks.length > 0">
+      <div class="feedback-item" *ngFor="let feedback of filteredFeedbacks" [class.selected]="selectedFeedback === feedback">
+        <div class="feedback-main">
+          <div class="feedback-header">
+            <div class="user-info">
+              <strong>{{ feedback.user.username }}</strong> ({{ feedback.user.email }})
+            </div>
+            <div class="status" [ngClass]="getStatusClass(feedback.status)">{{ feedback.status }}</div>
+          </div>
+          <div class="feedback-content">
+            <h4>{{ feedback.subject }}</h4>
+            <p>{{ feedback.content }}</p>
+          </div>
+          <div class="feedback-footer">
+            <small>Submitted on: {{ formatDate(feedback.createdAt) }}</small>
+            <div class="feedback-actions">
+              <button *ngIf="feedback.status === 'PENDING'" (click)="markAsRead(feedback)" class="btn btn-sm btn-read">Mark as Read</button>
+              <button (click)="selectForResponse(feedback)" class="btn btn-sm btn-respond">Respond</button>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="feedback.adminResponse" class="admin-response">
+          <strong>Your Response:</strong>
+          <p>{{ feedback.adminResponse }}</p>
+          <small>Responded on: {{ formatDate(feedback.respondedAt) }}</small>
+        </div>
+
+        <div *ngIf="selectedFeedback === feedback" class="response-form">
+          <h5>Respond to {{ feedback.user.username }}</h5>
+          <textarea [(ngModel)]="adminResponse" rows="4" placeholder="Type your response here..."></textarea>
+          <div class="response-actions">
+            <button (click)="submitResponse()" class="btn btn-primary" [disabled]="isResponding || !adminResponse.trim()">
+              <span *ngIf="!isResponding">Send Response</span>
+              <span *ngIf="isResponding">Sending...</span>
+            </button>
+            <button (click)="cancelResponse()" class="btn btn-secondary">Cancel</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <app-footer></app-footer>
 </div>
+<app-footer></app-footer>

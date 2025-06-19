@@ -1,18 +1,30 @@
 <div class="feedback-form-container">
-  <form (ngSubmit)="submitFeedback()" class="feedback-form">
-    <div>
-      <label for="name">Name:</label>
-      <input type="text" id="name" [(ngModel)]="feedback.name" name="name" required>
+  <div class="feedback-header">
+    <h3>Share Your Thoughts</h3>
+    <p>We'd love to hear from you!</p>
+  </div>
+  <form *ngIf="isAuthenticated" (ngSubmit)="submitFeedback()" #feedbackForm="ngForm" class="feedback-form">
+    <div class="form-group">
+      <label for="subject" class="form-label">Subject</label>
+      <input type="text" id="subject" [(ngModel)]="feedback.subject" name="subject" required placeholder="e.g., Product Quality Issue" class="form-control">
     </div>
-    <div>
-      <label for="email">Email:</label>
-      <input type="email" id="email" [(ngModel)]="feedback.email" name="email" required>
+    <div class="form-group">
+      <label for="content" class="form-label">Your Message</label>
+      <textarea id="content" [(ngModel)]="feedback.content" name="content" required rows="5" placeholder="Please provide details here..." class="form-control"></textarea>
     </div>
-    <div>
-      <label for="message">Message:</label>
-      <textarea id="message" [(ngModel)]="feedback.message" name="message" required></textarea>
+    <button type="submit" class="submit-btn" [disabled]="feedbackForm.invalid || isLoading">
+      <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      <span *ngIf="!isLoading">Send Feedback</span>
+      <span *ngIf="isLoading">Submitting...</span>
+    </button>
+    <div *ngIf="successMessage" class="feedback-message success">
+      {{ successMessage }}
     </div>
-    <button type="submit">Submit</button>
-    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+    <div *ngIf="errorMessage" class="feedback-message error">
+      {{ errorMessage }}
+    </div>
   </form>
+  <div *ngIf="!isAuthenticated" class="login-prompt">
+    <p>Your feedback is valuable. Please <a routerLink="/login">log in</a> to share your thoughts.</p>
+  </div>
 </div>

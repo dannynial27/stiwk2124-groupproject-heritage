@@ -1,0 +1,41 @@
+<div class="my-feedback-container">
+  <header class="feedback-header">
+    <h1>My Feedback History</h1>
+    <p>Here you can find all the feedback you've submitted and any responses from our team.</p>
+  </header>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <app-loading-spinner message="Loading your feedback..."></app-loading-spinner>
+  </div>
+  <div *ngIf="error" class="error-state">{{ error }}</div>
+
+  <div *ngIf="!isLoading && !error">
+    <div *ngIf="feedbacks.length === 0" class="no-feedback">
+      <h3>No Feedback Yet</h3>
+      <p>You haven't submitted any feedback. We'd love to hear your thoughts!</p>
+      <a routerLink="/#footer" class="btn btn-primary">Submit Feedback</a>
+    </div>
+
+    <div class="feedback-list" *ngIf="feedbacks.length > 0">
+      <div class="feedback-item" *ngFor="let feedback of feedbacks">
+        <div class="item-header">
+          <h4 class="subject">{{ feedback.subject }}</h4>
+          <div class="status" [ngClass]="getStatusClass(feedback.status)">{{ feedback.status }}</div>
+        </div>
+        <p class="content">{{ feedback.content }}</p>
+        <div class="item-footer">
+          <small class="date">Submitted: {{ formatDate(feedback.createdAt) }}</small>
+          <button (click)="deleteFeedback(feedback.feedbackId)" class="btn btn-danger btn-sm">Delete</button>
+        </div>
+        
+        <div *ngIf="feedback.adminResponse" class="admin-response">
+          <div class="response-header">
+            <h5 class="response-title">Response from AmeenQurba</h5>
+            <small class="date">Responded: {{ formatDate(feedback.respondedAt) }}</small>
+          </div>
+          <p class="response-content">{{ feedback.adminResponse }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

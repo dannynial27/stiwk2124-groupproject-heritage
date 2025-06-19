@@ -1,0 +1,119 @@
+.my-feedback-container {
+  max-width: 900px;
+  margin: 80px auto 40px;
+  padding: 2rem;
+  min-height: 80vh;
+}
+
+.feedback-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.feedback-header h1 {
+  color: #1E3A8A;
+  font-weight: 700;
+}
+
+.feedback-header p {
+  color: #555;
+  font-size: 1.1rem;
+}
+
+.feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.feedback-item {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.subject {
+  margin: 0;
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.content {
+  color: #555;
+  line-height: 1.6;
+  white-space: pre-wrap; /* Preserve line breaks */
+}
+
+.item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.status-pending { background-color: #fff3cd; color: #856404; }
+.status-read { background-color: #cce5ff; color: #004085; }
+.status-responded { background-color: #d4edda; color: #155724; }
+
+.admin-response {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #1E3A8A;
+}
+
+.response-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.response-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1E3A8A;
+}
+
+.response-content {
+  color: #333;
+  line-height: 1.6;
+}
+
+.loading-state, .error-state, .no-feedback {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #666;
+}
+
+.no-feedback h3 {
+  margin-bottom: 1rem;
+}
+
+.no-feedback .btn {
+  margin-top: 1.5rem;
+}

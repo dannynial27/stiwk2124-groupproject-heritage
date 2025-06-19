@@ -290,7 +290,10 @@ export class BulkCartActionsComponent {
         quantity: 1
       }));
 
-      await this.cartService.bulkAddToCart(cartItems).toPromise();
+      const addToCartPromises = cartItems.map(item =>
+        this.cartService.addToCart(item.productId, item.quantity).toPromise()
+      );
+      await Promise.all(addToCartPromises);
       this.bulkActionCompleted.emit(`Added ${this.selectedProducts.length} items to cart`);
     } catch (error) {
       console.error('Error adding to cart:', error);

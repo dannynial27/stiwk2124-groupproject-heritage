@@ -95,6 +95,7 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
         <app-product-card
           *ngFor="let product of paginatedProducts"
           [product]="product"
+          [isAuthenticated]="isAuthenticated"
           [isInWishlist]="wishlistProductIds.has(product.productId)"
           [cartLoading]="cartLoadingIds.has(product.productId)"
           [wishlistLoading]="wishlistLoadingIds.has(product.productId)"
@@ -330,6 +331,7 @@ export class ProductListComponent implements OnInit {
   wishlistLoadingIds = new Set<number>();
 
   loading = false;
+  isAuthenticated = false;
   searchQuery = '';
   selectedCategory = '';
   sortOrder = '';
@@ -350,8 +352,11 @@ export class ProductListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.isAuthenticated = this.authService.isAuthenticated();
     this.loadProducts();
-    this.loadWishlist();
+    if (this.isAuthenticated) {
+      this.loadWishlist();
+    }
   }
 
   loadProducts(): void {
@@ -376,20 +381,21 @@ export class ProductListComponent implements OnInit {
 
   loadWishlist() {
     const userId = this.authService.getUserId();
-    if (userId) {
-      this.wishlistService.getWishlist(userId).subscribe({
-        next: (wishlist) => {
-          this.wishlistProductIds = new Set(
-            // Add proper type annotation for item
-            wishlist.items.map((item: any) => item.product.productId)
-          );
-        },
-        error: (error) => {
-          console.error('Error loading wishlist:', error);
-          this.wishlistProductIds = new Set();
-        }
-      });
+    if (!userId) {
+      return; // Don't proceed if not authenticated
     }
+    this.wishlistService.getWishlist(userId).subscribe({
+      next: (wishlist) => {
+        this.wishlistProductIds = new Set(
+          // Add proper type annotation for item
+          wishlist.items.map((item: any) => item.product.productId)
+        );
+      },
+      error: (error) => {
+        console.error('Error loading wishlist:', error);
+        this.wishlistProductIds = new Set();
+      }
+    });
   }
 
   onSearchChange() {
@@ -482,6 +488,7 @@ export class ProductListComponent implements OnInit {
   }
 
   onAddToCart(product: Product) {
+    if (!this.isAuthenticated) return;
     const productId = this.safeProductId(product);
     this.cartLoadingIds.add(productId);
     
@@ -498,6 +505,7 @@ export class ProductListComponent implements OnInit {
   }
 
   onToggleWishlist(product: Product) {
+    if (!this.isAuthenticated) return;
     const productId = this.safeProductId(product);
     this.wishlistLoadingIds.add(productId);
     
