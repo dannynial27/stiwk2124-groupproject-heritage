@@ -4,12 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { FeedbackService } from '../../services/feedback.service';
 import { AuthService } from '../../services/auth.service';
-import { FooterComponent } from '../footer/footer';
 
 @Component({
   selector: 'app-feedback-viewer',
   standalone: true,
-  imports: [CommonModule, RouterModule, FooterComponent, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './feedback-viewer.html',
   styleUrls: ['./feedback-viewer.css']
 })

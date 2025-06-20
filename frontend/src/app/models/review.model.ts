@@ -1,6 +1,5 @@
 export interface Review {
   reviewId: number;
-  userId: number;
   productId: number;
   rating: number;
   title?: string;
@@ -11,7 +10,10 @@ export interface Review {
   userFoundHelpful?: boolean;
   createdAt: string;
   updatedAt: string;
-  userName?: string; // For display purposes
+  user: {
+    userId: number; // The user ID is correctly nested here.
+    username: string;
+  };
 }
 
 export interface ReviewRequest {
@@ -34,4 +36,4 @@ export interface ReviewFilter {
   rating?: number;
   sortBy?: 'newest' | 'oldest' | 'highest' | 'lowest' | 'helpful';
   verified?: boolean;
-} 
+}

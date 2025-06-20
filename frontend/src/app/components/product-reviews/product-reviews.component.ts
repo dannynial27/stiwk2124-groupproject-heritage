@@ -1,7 +1,8 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReviewService } from '../../services/review.service';
+import { AuthService } from '../../services/auth.service';
 import { Review, ReviewRequest, ReviewSummary } from '../../models/review.model';
 import { StarRatingComponent } from '../shared/star-rating/star-rating.component';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
@@ -69,10 +70,21 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
       </div>
 
       <!-- Add Review Form -->
-      <div class="add-review-section" *ngIf="canAddReview && !userHasReviewed">
-        <h4>Write a Review</h4>
-        
-        <form (ngSubmit)="onSubmitReview()" #reviewForm="ngForm" class="review-form">
+      <div #reviewFormSection class="add-review-section" *ngIf="canAddReview && !userHasReviewed">
+        <!-- Collapsed State -->
+        <div *ngIf="!isReviewFormExpanded" class="collapsed-form">
+          <input 
+            type="text" 
+            class="form-control" 
+            placeholder="Write a review..." 
+            readonly
+            (click)="expandForm()">
+        </div>
+
+        <!-- Expanded State -->
+        <div *ngIf="isReviewFormExpanded" class="expanded-form">
+          <h4>Write a Review</h4>
+          <form (ngSubmit)="onSubmitReview()" #reviewForm="ngForm" class="review-form">
           <div class="rating-input">
             <label>Your Rating *</label>
             <app-star-rating 
@@ -133,10 +145,11 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
             </button>
           </div>
         </form>
+        </div>
       </div>
 
       <!-- User's Existing Review -->
-      <div class="user-review" *ngIf="userReview">
+      <div class="user-review" *ngIf="userReview && !isReviewFormExpanded">
         <h4>Your Review</h4>
         <div class="review-item user-review-item">
           <div class="review-header">
@@ -164,7 +177,7 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
         <div class="review-item" *ngFor="let review of paginatedReviews; trackBy: trackByReviewId">
           <div class="review-header">
             <div class="reviewer-info">
-              <span class="reviewer-name">{{review.userName || 'Anonymous'}}</span>
+              <span class="reviewer-name">{{review.user.username || 'Anonymous'}}</span>
               <span class="verified-badge" *ngIf="review.verified">✓ Verified Purchase</span>
             </div>
             <div class="review-meta">
@@ -682,6 +695,7 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
 export class ProductReviewsComponent implements OnInit, OnChanges {
   @Input() productId!: number;
   @Input() canAddReview: boolean = false;
+  @ViewChild('reviewFormSection') reviewFormSection!: ElementRef;
 
   reviews: Review[] = [];
   filteredReviews: Review[] = [];
@@ -700,6 +714,7 @@ export class ProductReviewsComponent implements OnInit, OnChanges {
   totalPages = 1;
 
   userHasReviewed = false;
+  isReviewFormExpanded = false;
   
   newReview: any = {
     productId: 0,
@@ -709,7 +724,10 @@ export class ProductReviewsComponent implements OnInit, OnChanges {
     recommend: false
   };
 
-  constructor(private reviewService: ReviewService) {}
+  constructor(
+    private reviewService: ReviewService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
     if (this.productId) {
@@ -753,14 +771,14 @@ export class ProductReviewsComponent implements OnInit, OnChanges {
   }
 
   checkUserReview() {
-    // Check if current user has already reviewed this product
-    this.userReview = this.reviews.find(review => review.userId === this.getCurrentUserId()) || null;
+    const currentUserId = this.getCurrentUserId();
+    // Use the correct path to the nested userId property
+    this.userReview = this.reviews.find(review => review.user && review.user.userId === currentUserId) || null;
     this.userHasReviewed = !!this.userReview;
   }
 
-  getCurrentUserId(): number {
-    // This should get the current user ID from authentication service
-    return 1; // Placeholder
+  getCurrentUserId(): number | null {
+    return this.authService.getUserId();
   }
 
   onSubmitReview() {
@@ -769,13 +787,19 @@ export class ProductReviewsComponent implements OnInit, OnChanges {
     }
     
     this.reviewLoading = true;
-    this.newReview.productId = this.productId;
     
-    this.reviewService.addReview(this.newReview).subscribe({
+    const reviewPayload: ReviewRequest = {
+      productId: this.productId,
+      rating: this.newReview.rating,
+      comment: this.newReview.comment,
+    };
+    
+    this.reviewService.addReview(reviewPayload).subscribe({
       next: (review) => {
         this.reviews.unshift(review);
         this.userReview = review;
         this.userHasReviewed = true;
+        this.isReviewFormExpanded = false; // Collapse the form
         this.filterReviews();
         this.loadReviewSummary();
         this.resetReviewForm();
@@ -800,12 +824,19 @@ export class ProductReviewsComponent implements OnInit, OnChanges {
 
   cancelReview() {
     this.resetReviewForm();
+    this.isReviewFormExpanded = false;
+    // Re-check original state in case user was editing
+    if (this.reviews.find(r => r.user && r.user.userId === this.getCurrentUserId())) {
+      this.userHasReviewed = true;
+    }
   }
 
   editUserReview() {
     if (this.userReview) {
-      this.newReview = { ...this.userReview };
-      this.userHasReviewed = false; // Show form
+      this.newReview = { ...this.userReview, productId: this.productId };
+      this.userHasReviewed = false; // Hide the static review display
+      this.isReviewFormExpanded = true; // Show the form
+      this.scrollToReviewForm();
     }
   }
 
@@ -906,8 +937,14 @@ export class ProductReviewsComponent implements OnInit, OnChanges {
     });
   }
 
+  expandForm() {
+    this.isReviewFormExpanded = true;
+    setTimeout(() => this.scrollToReviewForm(), 0);
+  }
+
   scrollToReviewForm() {
-    // In real implementation, scroll to review form
-    console.log('Scroll to review form');
+    if (this.reviewFormSection) {
+      this.reviewFormSection.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
 }
