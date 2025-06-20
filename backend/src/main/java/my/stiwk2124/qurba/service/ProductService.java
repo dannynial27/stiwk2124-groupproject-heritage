@@ -23,7 +23,7 @@ public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
-    
+
     @Autowired
     private ImageService imageService;
 
@@ -36,25 +36,24 @@ public class ProductService {
         try {
             logger.info("Adding new product: {}", product.getName());
 
-
             // Ensure numeric fields are properly set
             if (product.getPrice() == null) {
                 product.setPrice(BigDecimal.ZERO);
             }
-            
+
             if (product.getStockQuantity() == null) {
                 product.setStockQuantity(0);
             }
-            
+
             // Validate required fields
             if (product.getName() == null || product.getName().trim().isEmpty()) {
                 throw new IllegalArgumentException("Product name cannot be empty");
             }
-            
+
             if (product.getCategory() == null || product.getCategory().trim().isEmpty()) {
                 throw new IllegalArgumentException("Product category cannot be empty");
             }
-            
+
             // Ensure image path uses .png extension
             if (product.getImagePath() != null && !product.getImagePath().isEmpty()) {
                 String imagePath = product.getImagePath();
@@ -64,8 +63,8 @@ public class ProductService {
                     product.setImagePath(imagePath);
                 }
             }
-            
-        return productRepository.save(product);
+
+            return productRepository.save(product);
         } catch (Exception e) {
             logger.error("Error adding product: {}", e.getMessage(), e);
             throw e;
@@ -75,23 +74,23 @@ public class ProductService {
     public Product updateProduct(Long id, Product productDetails) {
         try {
             logger.info("Updating product with ID: {}", id);
-            
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-            
+
+            Product product = productRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+
             // Check if category has changed
             boolean categoryChanged = !product.getCategory().equals(productDetails.getCategory());
             String oldCategory = product.getCategory();
             String oldName = product.getName();
             String oldImagePath = product.getImagePath();
-            
+
             // Update product details
-        product.setName(productDetails.getName());
-        product.setDescription(productDetails.getDescription());
+            product.setName(productDetails.getName());
+            product.setDescription(productDetails.getDescription());
             product.setPrice(productDetails.getPrice() != null ? productDetails.getPrice() : BigDecimal.ZERO);
-        product.setCategory(productDetails.getCategory());
+            product.setCategory(productDetails.getCategory());
             product.setStockQuantity(productDetails.getStockQuantity() != null ? productDetails.getStockQuantity() : 0);
-            
+
             // Handle image path updates
             if (productDetails.getImagePath() != null && !productDetails.getImagePath().isEmpty()) {
                 String imagePath = productDetails.getImagePath();
@@ -100,18 +99,18 @@ public class ProductService {
                     imagePath = imagePath.replaceAll("\\.[^.]+$", ".png");
                     logger.info("Corrected image path to use .png extension: {}", imagePath);
                 }
-                
+
                 // If category changed, update the image path to reflect the new category
                 if (categoryChanged) {
                     logger.info("Category changed from {} to {}. Updating image path.", oldCategory, product.getCategory());
-                    
+
                     // Extract filename from path
                     String filename = extractFilenameFromPath(imagePath);
-                    
+
                     // Create new path with the updated category
                     String newImagePath = "assets/QurbaProductPhoto/" + product.getCategory() + "/" + filename;
                     logger.info("Updating image path from {} to {}", imagePath, newImagePath);
-                    
+
                     // Try to move the actual file
                     try {
                         // Move the image file to the new category folder
@@ -125,24 +124,24 @@ public class ProductService {
                         logger.error("Error moving image file: {}", e.getMessage(), e);
                         // Continue with product update even if image move fails
                     }
-                    
+
                     // Update the image path in the database regardless of whether the file move succeeded
                     imagePath = newImagePath;
                 }
-                
+
                 logger.info("Setting image path to: {}", imagePath);
                 product.setImagePath(imagePath);
             } else {
                 logger.info("No new image path provided, checking if we need to update existing path: {}", product.getImagePath());
-                
+
                 // If category changed but no new image path is provided, we still need to update the path
                 if (categoryChanged && oldImagePath != null && !oldImagePath.isEmpty()) {
                     String filename = extractFilenameFromPath(oldImagePath);
-                    
+
                     // Create new path with the updated category
                     String newImagePath = "assets/QurbaProductPhoto/" + product.getCategory() + "/" + filename;
                     logger.info("Updating image path from {} to {}", oldImagePath, newImagePath);
-                    
+
                     try {
                         // Move the image file to the new category folder
                         boolean moved = moveImageFile(oldCategory, product.getCategory(), filename);
@@ -154,13 +153,13 @@ public class ProductService {
                     } catch (Exception e) {
                         logger.error("Error moving image file: {}", e.getMessage(), e);
                     }
-                    
+
                     // Update the image path in the database regardless of whether the file move succeeded
                     product.setImagePath(newImagePath);
                 }
             }
-            
-        return productRepository.save(product);
+
+            return productRepository.save(product);
         } catch (Exception e) {
             logger.error("Error updating product: {}", e.getMessage(), e);
             throw e;
@@ -170,10 +169,10 @@ public class ProductService {
     public void deleteProduct(Long id) {
         try {
             logger.info("Deleting product with ID: {}", id);
-            
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-            
+
+            Product product = productRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+
             // Delete associated image if it exists
             try {
                 if (product.getCategory() != null && product.getName() != null) {
@@ -184,8 +183,8 @@ public class ProductService {
                 // Just log the error but continue with product deletion
                 logger.warn("Failed to delete product image: {}", e.getMessage());
             }
-            
-        productRepository.delete(product);
+
+            productRepository.delete(product);
         } catch (Exception e) {
             logger.error("Error deleting product: {}", e.getMessage(), e);
             throw e;
@@ -195,35 +194,35 @@ public class ProductService {
     // Helper method to extract filename from path
     private String extractFilenameFromPath(String path) {
         if (path == null) return null;
-        
+
         int lastSlashIndex = path.lastIndexOf('/');
         if (lastSlashIndex >= 0 && lastSlashIndex < path.length() - 1) {
             return path.substring(lastSlashIndex + 1);
         }
         return path; // Return the original path if no slash is found
     }
-    
+
     // Helper method to move image file between category folders
     private boolean moveImageFile(String oldCategory, String newCategory, String filename) {
         try {
             // Use ImageService to get normalized category names
             oldCategory = imageService.normalizeCategory(oldCategory);
             newCategory = imageService.normalizeCategory(newCategory);
-            
+
             // Get paths to the image files
             Path sourcePath = imageService.getProductImagePath(oldCategory, filename);
             Path targetPath = imageService.getProductImagePath(newCategory, filename);
-            
+
             // Check if source file exists
             File sourceFile = sourcePath.toFile();
             if (!sourceFile.exists()) {
                 logger.warn("Source image file does not exist: {}", sourcePath);
                 return false;
             }
-            
+
             // Ensure target directory exists
             Files.createDirectories(targetPath.getParent());
-            
+
             // Move the file
             Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
             logger.info("Moved image file from {} to {}", sourcePath, targetPath);
@@ -261,7 +260,7 @@ public class ProductService {
     public Optional<Product> getProductById(Long id) {
         return productRepository.findById(id);
     }
-    
+
     public List<Product> findProducts(String category, String query, String sortOrder) {
         return productRepository.findProducts(category, query, sortOrder);
     }
