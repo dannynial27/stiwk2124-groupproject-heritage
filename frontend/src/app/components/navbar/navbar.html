@@ -12,6 +12,8 @@
         <ng-container *ngIf="!role || (role.toLowerCase() !== 'admin')">
           <a routerLink="/home" class="nav-link">Home</a>
           <a routerLink="/products" class="nav-link">Products</a>
+          <a routerLink="/my-feedback" *ngIf="isAuthenticated" class="nav-link">My Feedback</a>
+          <a routerLink="/feedback" *ngIf="isAuthenticated" class="nav-link">Submit Feedback</a>
           <a *ngIf="isAuthenticated" routerLink="/wishlist" class="nav-link wishlist-link">
             <i class="bi bi-heart"></i>
             <span class="badge" *ngIf="wishlistCount > 0">{{wishlistCount}}</span>
@@ -24,16 +26,27 @@
             <i class="bi bi-box-seam"></i>
             <span class="badge" *ngIf="orderCount > 0">{{orderCount}}</span>
           </a>
-          <a routerLink="/my-feedback" *ngIf="isAuthenticated" class="nav-link">My Feedback</a>
-          <a routerLink="/feedback" *ngIf="isAuthenticated" class="nav-link">Submit Feedback</a>
         </ng-container>
         
         <!-- Admin Links -->
         <ng-container *ngIf="role && role.toLowerCase() === 'admin'">
             <a routerLink="/admin-dashboard" class="nav-link">Dashboard</a>
-            <a routerLink="/admin/products" class="nav-link">Manage Products</a>
-            <a routerLink="/add-product" class="nav-link">Add Product</a>
-            <a routerLink="/view-categories" class="nav-link">Manage Categories</a>
+            <div class="nav-dropdown">
+              <button class="nav-link dropdown-toggle" (click)="toggleDropdown($event)">
+                <i class="bi bi-box-seam"></i> Manage Products <i class="bi bi-chevron-down"></i>
+              </button>
+              <div class="dropdown-menu">
+                <a routerLink="/admin/products" class="dropdown-item">
+                  <i class="bi bi-card-list"></i> All Products
+                </a>
+                <a routerLink="/view-categories" class="dropdown-item">
+                  <i class="bi bi-tags"></i> Manage by Categories
+                </a>
+                <a routerLink="/add-product" class="dropdown-item">
+                  <i class="bi bi-plus-circle"></i> Add Product
+                </a>
+              </div>
+            </div>
             <a routerLink="/admin-orders" class="nav-link">Manage Orders</a>
             <a routerLink="/admin-feedback" class="nav-link">View Feedback</a>
         </ng-container>
