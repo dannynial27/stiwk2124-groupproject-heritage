@@ -2,6 +2,7 @@ import { Product } from './product.model';
 import { User } from './user.model';
 
 export interface OrderItem {
+  unitPrice: number;
   product: Product;
   quantity: number;
   price: number;
@@ -19,6 +20,8 @@ export interface Order {
   shippingCity: string;
   shippingPostalCode: string;
   paymentMethod: string;
+  detailsLoaded?: boolean;
+  isLoadingDetails?: boolean;
 }
 
 export interface ShippingInfo {

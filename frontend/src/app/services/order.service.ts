@@ -24,13 +24,11 @@ export class OrderService {
 
   // Customer endpoints
   checkout(userId: number, shippingInfo: ShippingInfo): Observable<Order> {
-    return this.http.post<Order>(`${this.apiUrl}/checkout/${userId}`, shippingInfo)
-      .pipe(
-        tap(() => {
-          // After checkout, increment the order count
-          this.updateOrderCount(this.orderCountSubject.value + 1);
-        })
-      );
+    return this.http.post<Order>(`${this.apiUrl}/checkout/${userId}`, shippingInfo);
+  }
+
+  getOrderById(orderId: number): Observable<Order> {
+    return this.http.get<Order>(`${this.apiUrl}/orders/${orderId}/summary`);
   }
 
   /**

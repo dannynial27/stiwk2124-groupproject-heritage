@@ -2,8 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrderService } from '../../services/order.service';
+import { ImageService } from '../../services/image.service';
 import { Order } from '../../models/order.model';
 import { Observable } from 'rxjs';
+import { Product } from '../../models/product.model';
+import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-admin-orders',
@@ -17,11 +20,15 @@ export class AdminOrdersComponent implements OnInit {
   isLoading = true;
   sortColumn: string = 'orderDate';
   sortDirection: 'asc' | 'desc' = 'desc';
+  expandedOrderId: number | null = null;
   
   statuses: string[] = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
   private originalOrders: Order[] = [];
 
-  constructor(private orderService: OrderService) { }
+  constructor(
+    private orderService: OrderService,
+    public imageService: ImageService
+  ) { }
 
   ngOnInit(): void {
     this.orderService.getAllOrders().subscribe(orders => {
@@ -37,6 +44,34 @@ export class AdminOrdersComponent implements OnInit {
     this.orders = this.sortOrdersArray(filteredOrders);
   }
   
+  toggleOrderDetails(orderId: number): void {
+    const order = this.orders.find(o => o.orderId === orderId);
+
+    if (this.expandedOrderId === orderId) {
+      this.expandedOrderId = null; // Collapse if already expanded
+    } else {
+      this.expandedOrderId = orderId; // Expand
+      if (order && !order.detailsLoaded) { // Check if details need fetching
+        order.isLoadingDetails = true;
+        this.orderService.getOrderById(orderId).subscribe({
+          next: (detailedOrder) => {
+            // Merge details into the existing order object
+            const index = this.orders.findIndex(o => o.orderId === orderId);
+            if (index !== -1) {
+              this.orders[index] = { ...this.orders[index], ...detailedOrder, detailsLoaded: true, isLoadingDetails: false };
+            }
+          },
+          error: (err) => {
+            console.error(`Failed to load details for order #${orderId}`, err);
+            if (order) {
+              order.isLoadingDetails = false;
+            }
+          }
+        });
+      }
+    }
+  }
+
   sortBy(column: string): void {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';

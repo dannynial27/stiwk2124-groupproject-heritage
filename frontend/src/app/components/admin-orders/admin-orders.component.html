@@ -15,6 +15,7 @@
       <table class="table table-striped table-hover">
         <thead>
         <tr>
+          <th style="width: 40px;"></th>
           <th (click)="sortBy('orderId')">
             Order ID <i class="bi sort-icon" [ngClass]="{'bi-arrow-down': sortColumn === 'orderId' && sortDirection === 'desc', 'bi-arrow-up': sortColumn === 'orderId' && sortDirection === 'asc'}"></i>
           </th>
@@ -34,19 +35,77 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let order of orders">
-          <td>{{ order.orderId }}</td>
-          <td>{{ order.user?.userId }}</td>
-          <td>{{ order.orderDate | date:'short' }}</td>
-          <td>{{ order.totalAmount | currency:'MYR' }}</td>
-          <td><span class="badge" [ngClass]="{'bg-warning': order.status === 'PENDING', 'bg-info': order.status === 'CONFIRMED', 'bg-primary': order.status === 'SHIPPED', 'bg-success': order.status === 'DELIVERED', 'bg-danger': order.status === 'CANCELLED'}">{{ order.status | titlecase }}</span></td>
-          <td>
-            <select class="form-select form-select-sm" (change)="updateStatus(order, $event)">
-              <option [selected]="true" disabled>Change Status</option>
-              <option *ngFor="let status of statuses" [value]="status">{{ status | titlecase }}</option>
-            </select>
-          </td>
-        </tr>
+        <ng-container *ngFor="let order of orders">
+          <tr (click)="toggleOrderDetails(order.orderId)" class="order-row">
+            <td>
+              <i class="bi toggle-icon" [ngClass]="{'bi-chevron-right': expandedOrderId !== order.orderId, 'bi-chevron-down': expandedOrderId === order.orderId}"></i>
+            </td>
+            <td>{{ order.orderId }}</td>
+            <td>{{ order.user?.username }} (ID: {{ order.user?.userId }})</td>
+            <td>{{ order.orderDate | date:'short' }}</td>
+            <td>{{ order.totalAmount | currency:'MYR' }}</td>
+            <td><span class="badge" [ngClass]="{'bg-warning': order.status === 'PENDING', 'bg-info': order.status === 'CONFIRMED', 'bg-primary': order.status === 'SHIPPED', 'bg-success': order.status === 'DELIVERED', 'bg-danger': order.status === 'CANCELLED'}">{{ order.status | titlecase }}</span></td>
+            <td>
+              <select class="form-select form-select-sm" (change)="updateStatus(order, $event)" (click)="$event.stopPropagation()">
+                <option [selected]="true" disabled>Change Status</option>
+                <option *ngFor="let status of statuses" [value]="status">{{ status | titlecase }}</option>
+              </select>
+            </td>
+          </tr>
+          <tr *ngIf="expandedOrderId === order.orderId" class="order-details-row">
+            <td colspan="7">
+              <div class="order-details-content">
+                <div *ngIf="order.isLoadingDetails" class="details-loader">
+                  <div class="spinner-border spinner-border-sm" role="status"></div>
+                  <span>Loading details...</span>
+                </div>
+
+                <div *ngIf="!order.isLoadingDetails && order.detailsLoaded">
+                  <div class="details-grid">
+                    <div class="shipping-details">
+                      <h6>Shipping Information</h6>
+                      <p><strong>To:</strong> {{ order.shippingName }}</p>
+                      <p>{{ order.shippingAddress }}, {{ order.shippingCity }} {{ order.shippingPostalCode }}</p>
+                    </div>
+                    <div class="summary-details">
+                      <h6>Order Summary</h6>
+                      <p><strong>Date:</strong> {{ order.orderDate | date:'medium' }}</p>
+                      <p><strong>Payment:</strong> {{ order.paymentMethod }}</p>
+                    </div>
+                  </div>
+
+                  <h6>Items</h6>
+                  <table class="items-table">
+                    <thead>
+                      <tr>
+                        <th>Product</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-right">Unit Price</th>
+                        <th class="text-right">Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of order.orderItems">
+                        <td>
+                          <div class="product-cell">
+                            <img [src]="imageService.getProductImageUrl(item.product.imagePath)" [alt]="item.product.name" class="item-image">
+                            <div class="item-info">
+                              <div class="item-name">{{ item.product.name }}</div>
+                              <div class="item-meta">ID: {{item.product.productId}}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="text-center">{{ item.quantity }}</td>
+                        <td class="text-right">{{ item.unitPrice | currency:'MYR' }}</td>
+                        <td class="text-right">{{ (item.unitPrice * item.quantity) | currency:'MYR' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
         </tbody>
       </table>
     </div>
