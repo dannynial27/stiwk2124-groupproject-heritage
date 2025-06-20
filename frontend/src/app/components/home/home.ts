@@ -53,6 +53,9 @@ export class HomeComponent implements OnInit {
       avatarPath: "assets/customer/female1.jpg" // Third image
     }
   ];
+  isAuthenticated: boolean = false;
+  username: string | null = null;
+  isCustomer: boolean = false;
 
   constructor(
     private productService: ProductService,
@@ -63,10 +66,24 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadAllProducts();
+    this.isAuthenticated = this.authService.isAuthenticated();
+    this.isCustomer = this.authService.isCustomer();
+    if (this.isAuthenticated) {
+      const userString = localStorage.getItem('user');
+      if (userString) {
+        try {
+          this.username = JSON.parse(userString).username;
+        } catch (e) {
+          console.error('Error parsing user data from localStorage', e);
+          this.username = null;
+        }
+      }
+    }
+    this.loadFeaturedProducts();
+    this.generateCategoryImages();
   }
 
-  loadAllProducts(): void {
+  loadFeaturedProducts(): void {
     this.isLoading = true;
     this.productService.getProducts().subscribe({
       next: (products: Product[]) => {
@@ -193,7 +210,7 @@ export class HomeComponent implements OnInit {
     if (this.allProducts.length > 0) {
       this.selectRandomFeaturedProducts();
     } else {
-      this.loadAllProducts();
+      this.loadFeaturedProducts();
     }
   }
 
@@ -264,10 +281,6 @@ export class HomeComponent implements OnInit {
     }
   }
   
-  loadFeaturedProducts(): void {
-    this.loadAllProducts();
-  }
-
   // Add the rating display helper method
   getStarRating(rating: number): string {
     return '★'.repeat(rating) + '☆'.repeat(5 - rating);
