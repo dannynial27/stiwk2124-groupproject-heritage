@@ -60,13 +60,25 @@ export class LoginPageComponent {
       },
       error: (err: any) => {
         console.error('Login error:', err);
+        let backendMessage = '';
+        if (err.error) {
+          if (typeof err.error === 'string') {
+            backendMessage = err.error;
+          } else if (typeof err.error === 'object' && err.error.message) {
+            backendMessage = err.error.message;
+          }
+        }
 
-        if (err.status === 401) {
+        if (backendMessage) {
+          this.errorMessage = backendMessage;
+        } else if (err.status === 401) {
           this.errorMessage = 'Invalid username or password. Please try again.';
+        } else if (err.status === 404) {
+          this.errorMessage = 'User not registered. Please sign up first.';
         } else if (err.status >= 500) {
           this.errorMessage = 'Oops! Server error. Please try again later.';
         } else {
-          this.errorMessage = 'An unexpected error occurred. Please try again.';
+          this.errorMessage = 'Invalid username or password. Please try again.';
         }
 
         this.isLoading = false;

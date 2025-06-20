@@ -39,7 +39,7 @@ import { catchError } from 'rxjs/operators';
           <h1>My Wishlist</h1>
           <div class="header-actions">
             <button class="btn btn-danger" (click)="clearWishlist()" [disabled]="clearingWishlist || wishlist.items.length === 0">
-              <i class="bi bi-trash"></i> 
+              <i class="bi bi-trash"></i>
               <span *ngIf="!clearingWishlist">Clear All</span>
               <span *ngIf="clearingWishlist">Clearing...</span>
             </button>
@@ -56,15 +56,15 @@ import { catchError } from 'rxjs/operators';
           <div class="action-bar" *ngIf="wishlist.items.length > 0">
             <div class="bulk-actions">
             </div>
-            
+
             <div class="view-toggle">
-              <button 
+              <button
                 class="view-btn"
                 [class.active]="viewMode === 'grid'"
                 (click)="viewMode = 'grid'">
                 Grid
               </button>
-              <button 
+              <button
                 class="view-btn"
                 [class.active]="viewMode === 'list'"
                 (click)="viewMode = 'list'">
@@ -74,12 +74,12 @@ import { catchError } from 'rxjs/operators';
           </div>
 
           <!-- Products Grid/List -->
-          <div 
+          <div
             class="products-container"
             [class.grid-view]="viewMode === 'grid'"
             [class.list-view]="viewMode === 'list'"
             *ngIf="wishlist.items.length > 0">
-            
+
             <div class="wishlist-item" *ngFor="let item of wishlist.items">
               <app-product-card
                 [product]="item.product"
@@ -89,10 +89,10 @@ import { catchError } from 'rxjs/operators';
                 [cartLoading]="cartLoadingIds.has(item.product.productId)"
                 (toggleWishlist)="onRemoveFromWishlist($event)">
               </app-product-card>
-              
+
               <div class="item-actions">
                 <p class="added-date">Added {{formatDate(item.addedAt)}}</p>
-                <button 
+                <button
                   class="btn btn-small btn-primary move-to-cart-btn"
                   (click)="onMoveToCart(item.product)"
                   [disabled]="item.product.stockQuantity === 0 || cartLoadingIds.has(item.product.productId)">
@@ -125,7 +125,7 @@ import { catchError } from 'rxjs/operators';
       </div>
 
       <ng-template #loading>
-        <app-loading-spinner 
+        <app-loading-spinner
           message="Loading wishlist...">
         </app-loading-spinner>
       </ng-template>
@@ -310,7 +310,7 @@ import { catchError } from 'rxjs/operators';
       background-color: #dc3545;
       color: white;
     }
-    
+
     .btn-danger:hover:not(:disabled) {
       background-color: #c82333;
     }
@@ -387,7 +387,7 @@ import { catchError } from 'rxjs/operators';
       display: block;
       margin-bottom: 2px;
     }
-    
+
     .notification-text span {
       font-size: 0.9em;
       color: #666;
@@ -407,7 +407,7 @@ import { catchError } from 'rxjs/operators';
       padding: 5px;
       color: #666;
     }
-    
+
     @keyframes slideIn {
       from {
         transform: translateY(-20px);
@@ -426,7 +426,7 @@ export class WishlistComponent implements OnInit {
   error = false;
   clearingWishlist = false;
   viewMode: 'grid' | 'list' = 'grid';
-  
+
   removingIds = new Set<number>();
   cartLoadingIds = new Set<number>();
 
@@ -471,7 +471,7 @@ export class WishlistComponent implements OnInit {
   onMoveToCart(product: Product) {
     const productId = product.productId;
     this.cartLoadingIds.add(productId);
-    
+
     // 1. Add to cart
     this.cartService.addToCart(productId, 1).subscribe({
       next: () => {
