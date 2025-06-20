@@ -1,21 +1,51 @@
-<div class="container category-admin-container">
-    <h2 class="category-title">Manage Categories</h2>
-    <div class="category-card">
-      <div *ngIf="successMessage" class="form-success-message">{{ successMessage }}</div>
-      <div *ngIf="errorMessage" class="form-error-message">{{ errorMessage }}</div>
-      <ul class="list-group category-list">
-        <li class="list-group-item d-flex justify-content-between align-items-center category-list-item" *ngFor="let category of categories">
-          <span>{{ category }}</span>
-          <button (click)="deleteCategory(category)" class="btn btn-danger btn-sm" [disabled]="loading" title="Delete this category">Delete</button>
-        </li>
-      </ul>
-      <div class="add-category-row mt-4">
-        <input type="text" [(ngModel)]="newCategory" class="form-control add-category-input" placeholder="Enter new category name..." [disabled]="loading">
-        <button (click)="addCategory()" class="btn btn-primary add-category-btn ms-2" [disabled]="!newCategory.trim() || categories.includes(newCategory.trim()) || loading">
-          <span *ngIf="loading" class="spinner"></span>
-          Add
-        </button>
+<div class="container manage-products-container">
+  <h2 class="page-title">Manage Products by Category</h2>
+
+  <!-- Category Filters -->
+  <div class="category-filters" *ngIf="!loading">
+    <button
+      *ngFor="let category of categories"
+      class="filter-btn"
+      [class.active]="category === selectedCategory"
+      (click)="filterByCategory(category)">
+      {{ category }}
+    </button>
+  </div>
+
+  <app-loading-spinner *ngIf="loading" message="Loading products..."></app-loading-spinner>
+
+  <div *ngIf="!loading">
+    <!-- Products Grid -->
+    <div class="products-grid" *ngIf="filteredProducts.length > 0; else noProducts">
+      <div class="admin-product-card" *ngFor="let product of filteredProducts">
+        <div class="card-image">
+          <img [src]="imageService.getProductImageUrl(product.imagePath)" [alt]="product.name" (error)="onImageError($event)">
+        </div>
+        <div class="card-body">
+          <h5 class="product-name">{{ product.name }}</h5>
+          <div class="product-details">
+            <span class="price">RM {{ product.price.toFixed(2) }}</span>
+            <span class="stock" [class.out-of-stock]="product.stockQuantity === 0">
+              Stock: {{ product.stockQuantity }}
+            </span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-edit" (click)="editProduct(product.productId)">Edit</button>
+          <button class="btn btn-delete" (click)="deleteProduct(product)" [disabled]="deletingIds.has(product.productId)">
+            <span *ngIf="!deletingIds.has(product.productId)">Delete</span>
+            <span *ngIf="deletingIds.has(product.productId)">...</span>
+          </button>
+        </div>
       </div>
     </div>
+
+    <!-- Empty State -->
+    <ng-template #noProducts>
+      <div class="empty-state">
+        <h3>No products found in this category.</h3>
+      </div>
+    </ng-template>
   </div>
+</div>
 
