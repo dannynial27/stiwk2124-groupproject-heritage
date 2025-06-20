@@ -14,7 +14,7 @@ export class LoginComponent {
   username: string = '';
   password: string = '';
   errorMessage: string = '';
-isLoading: string|boolean;
+  isLoading: boolean = false;
 
   constructor(private router: Router) {}
 
