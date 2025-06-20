@@ -95,7 +95,7 @@ export class AddProductComponent implements OnInit {
     this.successMessage = '';
     this.isSubmitting = true;
     const productData: Product = {
-      productId: this.productId || 0,
+      productId: this.productId ? this.productId : null,
       ...this.productForm.value
     };
     const request = this.productId

@@ -107,21 +107,29 @@ export class AdminProductsComponent implements OnInit {
   }
 
   onSubmitProduct(): void {
+    // Remove productId for new products BEFORE logging and sending
+    if (!this.editingProduct && 'productId' in this.currentProduct) {
+      delete (this.currentProduct as any).productId;
+    }
     console.log('onSubmitProduct called', this.currentProduct);
     this.loading = true;
     this.errorMessage = null;
     this.successMessage = null;
     const uploadObservable: Observable<string | null | undefined> = this.selectedFile
       ? this.imageService.uploadProductImage(this.selectedFile, this.currentProduct.category, this.currentProduct.name, !!this.editingProduct).pipe(
-        map((response: { imagePath: string }) => response.imagePath)
+        map((response: { imagePath?: string; imageUrl?: string }) => response.imageUrl || response.imagePath)
       )
       : of(this.currentProduct.imagePath);
     uploadObservable.pipe(
       switchMap(imagePath => {
         this.currentProduct.imagePath = imagePath ?? undefined;
+        const productToSend = { ...this.currentProduct };
+        if (!this.editingProduct && 'productId' in productToSend) {
+          delete (productToSend as any).productId;
+        }
         const operation = this.editingProduct
-          ? this.productService.updateProduct(this.editingProduct!.productId, this.currentProduct)
-          : this.productService.addProduct(this.currentProduct);
+          ? this.productService.updateProduct(this.editingProduct!.productId, productToSend)
+          : this.productService.addProduct(productToSend);
         return operation;
       })
     ).subscribe({
@@ -136,7 +144,13 @@ export class AdminProductsComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Error saving product:', err);
-        this.errorMessage = 'Failed to save product. Please check your input.';
+        if (err && err.error && err.error.message) {
+          this.errorMessage = 'Failed to save product: ' + err.error.message;
+        } else if (err && err.message) {
+          this.errorMessage = 'Failed to save product: ' + err.message;
+        } else {
+          this.errorMessage = 'Failed to save product. Please check your input.';
+        }
         this.loading = false;
       }
     });
@@ -153,15 +167,15 @@ export class AdminProductsComponent implements OnInit {
   }
 
   getEmptyProduct(): Product {
+    // Do NOT include productId for new products
     return {
-      productId: 0,
       name: '',
       description: '',
       price: 0,
       category: '',
       stockQuantity: 0,
       imagePath: ''
-    };
+    } as Product;
   }
 
   getImageUrl(imagePath: string | null): string {

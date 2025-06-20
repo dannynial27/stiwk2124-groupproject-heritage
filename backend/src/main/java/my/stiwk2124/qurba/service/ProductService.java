@@ -35,7 +35,8 @@ public class ProductService {
     public Product addProduct(Product product) {
         try {
             logger.info("Adding new product: {}", product.getName());
-            
+
+
             // Ensure numeric fields are properly set
             if (product.getPrice() == null) {
                 product.setPrice(BigDecimal.ZERO);
