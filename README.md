@@ -32,22 +32,28 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 
 ## Abstract (in 300 words)
    1. Background
-      In the rapidly evolving digital landscape, e-commerce has transformed how goods and services are bought and sold globally (Laudon & Traver, 2021). Traditional businesses like Qurba Food Industries, a manufacturer of food and beverage products under the AMEEN brand, are increasingly adopting online platforms to expand market reach and streamline sales processes. These platforms represent not just a technological shift but an opportunity to preserve and promote cultural heritage products while addressing modern market demands (Chauhan et al., 2023).
 
-   2. Problem Statement
+       In the rapidly evolving digital landscape, e-commerce has transformed how goods and services are bought and sold globally (Laudon & Traver, 2021). Traditional businesses like Qurba Food Industries, a manufacturer of food and beverage products under the AMEEN brand, are increasingly adopting online platforms to expand market reach and streamline sales processes. These platforms represent not just a technological shift but an opportunity to preserve and promote cultural heritage products while addressing modern market demands (Chauhan et al., 2023).
+
+   3. Problem Statement
+    
       The growing e-commerce sector faces challenges in developing efficient online platforms to manage product sales, user interactions, and order processing. Issues of scalability, user experience, and consistent transaction flows require careful consideration (Bhat et al., 2016). Despite increasing global appreciation for cultural diversity and authenticity, existing platforms often fail to adequately showcase heritage products, lacking in product diversity, global reach, and ethical considerations (Chauhan et al., 2023; PilotSprint, 2024).
 
-   3. Main objective
-      Our project aims to develop a specialized e-commerce backend using Spring Boot and Java programming language, following the MVC pattern for clear separation of concerns. The platform seeks to create an immersive shopping experience that facilitates transactions while supporting businesses in showcasing their products to a wider audience (Gupta, 2014; Turban et al., 2018).
+   4. Main objective
 
-   4. Methodology
+       Our project aims to develop a specialized e-commerce backend using Spring Boot and Java programming language, following the MVC pattern for clear separation of concerns. The platform seeks to create an immersive shopping experience that facilitates transactions while supporting businesses in showcasing their products to a wider audience (Gupta, 2014; Turban et al., 2018).
+
+   6. Methodology
+    
       We employ a headless commerce architecture using Spring Boot for backend development with RESTful APIs for all core features and MySQL for data storage, while Angular is used for the frontend to enhance the user interface and experience. Security is enforced using JWT-based authentication and role-based access control (Mărcuță, 2025). The system incorporates secure authentication, comprehensive product management, advanced search and filtering capabilities, product review and rating systems, wishlist functionality, contact feedback forms, and streamlined checkout processes, all containerized with Docker for easy deployment (Goele & Chanana, 2012).
 
-   5. Result
-      The implemented platform successfully delivers a robust and fully functional e-commerce backend that supports user registration and authentication for both customers and admins, secure JWT-based access, product catalog management, shopping cart operations, product review and rating capabilities, wishlist management, contact feedback submission, and order processing (Seth & Wadhawan, 2016). The system exposes RESTful APIs for all major features, with role-based access ensuring proper authorization.
+   7. Result
 
-   6. Conclusion
-      By combining comprehensive e-commerce functionality with modern backend practices, our platform provides a secure, maintainable, and scalable foundation that meets the needs of diverse businesses while supporting future enhancements (Raghunath & Panga, 2013). This project demonstrates how technology can be effectively leveraged to build robust e-commerce solutions that address contemporary market challenges (Gunasekaran et al., 2002).
+       The implemented platform successfully delivers a robust and fully functional e-commerce backend that supports user registration and authentication for both customers and admins, secure JWT-based access, product catalog management, shopping cart operations, product review and rating capabilities, wishlist management, contact feedback submission, and order processing (Seth & Wadhawan, 2016). The system exposes RESTful APIs for all major features, with role-based access ensuring proper authorization.
+
+   9. Conclusion
+
+       By combining comprehensive e-commerce functionality with modern backend practices, our platform provides a secure, maintainable, and scalable foundation that meets the needs of diverse businesses while supporting future enhancements (Raghunath & Panga, 2013). This project demonstrates how technology can be effectively leveraged to build robust e-commerce solutions that address contemporary market challenges (Gunasekaran et al., 2002).
 
 ## Link for Docker Image
 [Docker Hub - AmeenQurba- Backend](https://hub.docker.com/r/dannynial27/qurba-backend)
