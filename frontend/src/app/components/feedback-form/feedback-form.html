@@ -1,30 +1,59 @@
-<div class="feedback-form-container">
-  <div class="feedback-header">
-    <h3>Share Your Thoughts</h3>
-    <p>We'd love to hear from you!</p>
+<main class="feedback-container">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+
+      <div class="text-center mb-4">
+        <h2 class="title">Share Your Thoughts</h2>
+        <p class="subtitle">We value your feedback to help us improve.</p>
   </div>
-  <form *ngIf="isAuthenticated" (ngSubmit)="submitFeedback()" #feedbackForm="ngForm" class="feedback-form">
-    <div class="form-group">
+
+      <div class="card shadow-lg">
+        <div class="card-body p-4 p-md-5">
+
+          <form *ngIf="isAuthenticated" (ngSubmit)="submitFeedback()" #feedbackForm="ngForm">
+            <div class="mb-4">
       <label for="subject" class="form-label">Subject</label>
-      <input type="text" id="subject" [(ngModel)]="feedback.subject" name="subject" required placeholder="e.g., Product Quality Issue" class="form-control">
+              <select id="subject" class="form-select"
+                      [(ngModel)]="feedback.subject" name="subject" required
+                      [disabled]="isLoading">
+                <option value="" disabled>Please select a subject...</option>
+                <option *ngFor="let sub of subjectOptions" [value]="sub">{{ sub }}</option>
+              </select>
     </div>
-    <div class="form-group">
+
+            <div class="mb-4">
       <label for="content" class="form-label">Your Message</label>
-      <textarea id="content" [(ngModel)]="feedback.content" name="content" required rows="5" placeholder="Please provide details here..." class="form-control"></textarea>
+              <textarea id="content" class="form-control"
+                        [(ngModel)]="feedback.content" name="content" required
+                        rows="6"
+                        placeholder="Please provide as much detail as possible..."
+                        [disabled]="isLoading"></textarea>
     </div>
-    <button type="submit" class="submit-btn" [disabled]="feedbackForm.invalid || isLoading">
-      <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+
+            <button type="submit" class="btn btn-primary w-100" [disabled]="feedbackForm.invalid || isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
       <span *ngIf="!isLoading">Send Feedback</span>
       <span *ngIf="isLoading">Submitting...</span>
     </button>
+
     <div *ngIf="successMessage" class="feedback-message success">
-      {{ successMessage }}
+              <i class="fas fa-check-circle me-2"></i> {{ successMessage }}
+              <a routerLink="/my-feedback" class="btn btn-outline-primary ms-3">View My Feedback</a>
     </div>
     <div *ngIf="errorMessage" class="feedback-message error">
-      {{ errorMessage }}
+              <i class="fas fa-times-circle me-2"></i> {{ errorMessage }}
     </div>
   </form>
+
   <div *ngIf="!isAuthenticated" class="login-prompt">
-    <p>Your feedback is valuable. Please <a routerLink="/login">log in</a> to share your thoughts.</p>
+             <i class="fas fa-info-circle fa-2x text-muted mb-3"></i>
+            <p>Your feedback is valuable to us.</p>
+            <p class="mb-4">Please <a routerLink="/login" queryParamsHandling="merge">log in</a> to share your thoughts.</p>
+            <a routerLink="/login" queryParamsHandling="merge" class="btn btn-primary">Go to Login</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+</main>

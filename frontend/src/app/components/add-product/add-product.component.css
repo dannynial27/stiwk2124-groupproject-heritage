@@ -1,10 +1,10 @@
 .container {
   max-width: 800px;
-  margin: 40px auto 0 auto;
+  margin: 90px auto;
   background: #fff;
   border-radius: 14px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-  padding: 36px 48px 28px 48px;
+  padding: 48px;
 }
 
 h2 {
@@ -15,7 +15,7 @@ h2 {
 }
 
 form {
-  margin-top: 10px;
+  margin: 10px 0;
 }
 
 .mb-3 {

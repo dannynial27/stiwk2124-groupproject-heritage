@@ -24,6 +24,22 @@ export class WishlistService {
   // Get wishlist - Make userId optional with a default from AuthService
   getWishlist(userId?: number): Observable<Wishlist> {
     const id = userId || this.authService.getUserId() || 0;
+    const role = this.authService.getRole();
+    
+    // Return empty wishlist for admin users without making API call
+    if (role?.toLowerCase() === 'admin') {
+      return new Observable<Wishlist>(observer => {
+        const emptyWishlist: Wishlist = { items: [] };
+        observer.next(emptyWishlist);
+        observer.complete();
+      }).pipe(
+        tap(wishlist => {
+          this.wishlistSubject.next(wishlist);
+          this.updateWishlistCount(wishlist);
+        })
+      );
+    }
+    
     return this.http.get<Wishlist>(`${this.apiUrl}/${id}`, { 
       headers: this.getAuthHeaders() 
     }).pipe(
@@ -146,14 +162,26 @@ export class WishlistService {
 
   private loadInitialData() {
     const userId = this.getCurrentUserId();
-    if (userId) {
+    const role = this.authService.getRole();
+    
+    // Skip loading wishlist data for admin users
+    if (userId && role?.toLowerCase() !== 'admin') {
       this.getWishlist(userId).subscribe({
         next: (wishlist: Wishlist) => {
           this.wishlistSubject.next(wishlist);
           this.updateWishlistCount(wishlist);
         },
-        error: (error: any) => console.error('Error loading initial wishlist:', error)
+        error: (error: any) => {
+          console.error('Error loading initial wishlist:', error);
+          // Reset state on error
+          this.wishlistSubject.next({ items: [] });
+          this.wishlistCountSubject.next(0);
+        }
       });
+    } else {
+      // Initialize with empty wishlist for admin users
+      this.wishlistSubject.next({ items: [] });
+      this.wishlistCountSubject.next(0);
     }
   }
 }

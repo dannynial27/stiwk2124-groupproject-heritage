@@ -1,6 +1,6 @@
 .container {
   max-width: 600px;
-  padding-top: 70px;
+  padding-top: 110px;
 }
 
 .card {
@@ -136,7 +136,7 @@ h2 {
 .manage-products-container {
   max-width: 1200px;
   margin: 48px auto 0 auto;
-  padding: 0 32px;
+  padding: 32px;
 }
 
 .page-title {

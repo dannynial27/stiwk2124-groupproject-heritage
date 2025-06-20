@@ -31,6 +31,22 @@ export class CartService {
 
   // Get cart data from API
   getCart(userId: number): Observable<Cart> {
+    const role = this.authService.getRole();
+    
+    // Return empty cart for admin users without making API call
+    if (role?.toLowerCase() === 'admin') {
+      return new Observable<Cart>(observer => {
+        const emptyCart: Cart = { items: [] };
+        observer.next(emptyCart);
+        observer.complete();
+      }).pipe(
+        tap(cart => {
+          this.cartSubject.next(cart);
+          this.updateCartCount(cart);
+        })
+      );
+    }
+    
     return this.http.get<Cart>(`${this.apiUrl}/${userId}`, { 
       headers: this.getAuthHeaders() 
     }).pipe(
@@ -157,14 +173,26 @@ export class CartService {
 
   private loadInitialCartData() {
     const userId = this.getCurrentUserId();
-    if (userId) {
+    const role = this.authService.getRole();
+    
+    // Skip loading cart data for admin users
+    if (userId && role?.toLowerCase() !== 'admin') {
       this.getCart(userId).subscribe({
         next: (cart: Cart) => {
           this.cartSubject.next(cart);
           this.updateCartCount(cart);
         },
-        error: (error: any) => console.error('Error loading initial cart:', error)
+        error: (error: any) => {
+          console.error('Error loading initial cart:', error);
+          // Reset state on error
+          this.cartSubject.next({ items: [] });
+          this.cartCountSubject.next(0);
+        }
       });
+    } else {
+      // Initialize with empty cart for admin users
+      this.cartSubject.next({ items: [] });
+      this.cartCountSubject.next(0);
     }
   }
 }

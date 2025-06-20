@@ -1,19 +1,19 @@
-<div class="container py-5">
+<main class="login-container">
   <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
+    <div class="col-md-8 col-lg-6 col-xl-5">
       <div class="text-center mb-4">
-        <img src="assets/Logo/logo.png" alt="Ameen Qurba" class="logo mb-3" width="100">
-        <h2 class="fw-bold mb-2">Welcome to Ameen Qurba</h2>
-        <p class="text-muted">Authentic Malaysian Heritage Products</p>
+        <img src="assets/Logo/logo.png" alt="Ameen Qurba" class="logo mb-2">
+        <h2 class="title mb-1">Welcome to Ameen Qurba</h2>
+        <p class="subtitle">Authentic Malaysian Heritage Products</p>
       </div>
       
-      <div class="card shadow">
+      <div class="card shadow-lg">
         <div class="card-body p-4 p-md-5">
-          <h3 class="mb-4 text-center">Sign In</h3>
+          <h3 class="card-title text-center">Sign In</h3>
           
           <form (ngSubmit)="login()" #loginForm="ngForm">
             <!-- Username -->
-            <div class="form-floating mb-4">
+            <div class="form-floating mb-3">
               <input 
                 type="text" 
                 class="form-control" 
@@ -22,7 +22,8 @@
                 [(ngModel)]="username" 
                 name="username" 
                 required
-                [disabled]="isLoading">
+                [disabled]="isLoading"
+                #usernameInput="ngModel">
               <label for="username">Username</label>
             </div>
             
@@ -36,13 +37,15 @@
                 [(ngModel)]="password" 
                 name="password" 
                 required
-                [disabled]="isLoading">
+                [disabled]="isLoading"
+                #passwordInput="ngModel">
               <label for="password">Password</label>
             </div>
             
             <!-- Error Message -->
-            <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
-              {{ errorMessage }}
+            <div *ngIf="errorMessage" class="alert alert-danger d-flex align-items-center" role="alert">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              <div>{{ errorMessage }}</div>
             </div>
             
             <!-- Submit Button -->
@@ -51,13 +54,13 @@
               class="btn btn-primary btn-lg w-100 mb-4"
               [disabled]="loginForm.invalid || isLoading">
               <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-              Sign In
+              <span *ngIf="!isLoading">Sign In</span>
             </button>
             
             <!-- Register Link -->
             <div class="text-center">
               <p class="mb-0">
-                Don't have an account? <a routerLink="/register" class="text-decoration-none fw-medium">Register now</a>
+                Don't have an account? <a routerLink="/register" class="fw-bold">Register Free</a>
               </p>
             </div>
           </form>
@@ -65,4 +68,4 @@
       </div>
     </div>
   </div>
-</div>
+</main>

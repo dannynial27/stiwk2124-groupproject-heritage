@@ -333,12 +333,12 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
       display: flex;
       align-items: center;
       gap: 15px;
-    }
+      }
 
     .notification-content .fa-check-circle {
       color: #28a745;
       font-size: 24px;
-    }
+      }
 
     .notification-text strong {
       display: block;
@@ -354,7 +354,7 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
       display: flex;
       align-items: center;
       gap: 10px;
-    }
+      }
 
     .btn-icon {
       background: transparent;
@@ -427,8 +427,8 @@ export class ProductListComponent implements OnInit {
     this.loading = true;
     this.productService.getProducts().subscribe(data => {
       this.products = data.map(p => ({...p, quantity: 1}));
-      this.applyFilters();
-      this.loading = false;
+        this.applyFilters();
+        this.loading = false;
     });
   }
 
@@ -446,7 +446,7 @@ export class ProductListComponent implements OnInit {
   }
 
   onSearchChange() {
-    clearTimeout(this.searchTimeout);
+      clearTimeout(this.searchTimeout);
     this.searchTimeout = setTimeout(() => {
       this.applyFilters();
     }, 300);
@@ -487,7 +487,7 @@ export class ProductListComponent implements OnInit {
     this.filteredProducts = tempProducts;
     this.updatePagination();
   }
-  
+
   updatePagination() {
     this.totalPages = Math.ceil(this.filteredProducts.length / this.itemsPerPage);
     this.goToPage(1); // Reset to first page after filtering
@@ -509,7 +509,7 @@ export class ProductListComponent implements OnInit {
     this.sortOrder = '';
     this.applyFilters();
   }
-  
+
   private safeProductId(product: Product): number {
     return product ? product.productId : 0;
   }
@@ -541,7 +541,7 @@ export class ProductListComponent implements OnInit {
     }
     const productId = this.safeProductId(product);
     this.wishlistLoadingIds.add(productId);
-
+    
     if (this.wishlistProductIds.has(productId)) {
       // Remove from wishlist
       this.wishlistService.removeFromWishlist(productId).subscribe({

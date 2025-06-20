@@ -1,108 +1,169 @@
-.container {
-  min-height: calc(100vh - 76px);
-  padding-top: 2rem;
-  padding-bottom: 2rem;
+:host {
+  display: block;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 6rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+:host::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+  border-radius: 50%;
+  z-index: 0;
+  animation: float 10s infinite ease-in-out;
+}
+
+:host::after {
+  content: '';
+  position: absolute;
+  bottom: -15%;
+  right: -15%;
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.1), rgba(30, 58, 138, 0));
+  border-radius: 50%;
+  z-index: 0;
+  animation: float 12s infinite ease-in-out reverse;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) translateX(0px); }
+  50% { transform: translateY(-20px) translateX(20px); }
+  100% { transform: translateY(0px) translateX(0px); }
+}
+
+.login-container {
+  position: relative;
+  z-index: 1;
 }
 
 .card {
-  border-radius: 15px;
   border: none;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-}
-
-.logo {
-  width: 100px;
-  height: auto;
-  margin-bottom: 1rem;
-}
-
-h2 {
-  color: #1E3A8A;
-  font-size: 2rem;
-}
-
-h3 {
-  color: #1E3A8A;
-  font-weight: 600;
-}
-
-.form-floating {
-  margin-bottom: 1.5rem;
-}
-
-.form-control {
-  border-radius: 8px;
-  border: 1px solid #ced4da;
-  padding: 1rem 0.75rem;
-  height: calc(3.5rem + 2px);
-  font-size: 1rem;
-}
-
-.form-control:focus {
-  border-color: #1E3A8A;
-  box-shadow: 0 0 0 0.25rem rgba(30, 58, 138, 0.25);
-}
-
-.btn-primary {
-  background-color: #1E3A8A;
-  border-color: #1E3A8A;
-  border-radius: 8px;
-  padding: 0.75rem 0;
-  font-size: 1.1rem;
-  font-weight: 600;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
+/* The hover effect is not suitable for a static form card. */
+/*
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+*/
+
+.logo {
+  max-width: 90px;
+  margin-bottom: 0.5rem;
+}
+
+h2.title {
+  font-weight: 700;
+  color: #1a2a6c;
+  font-size: 1.8rem;
+}
+
+p.subtitle {
+  color: #555;
+  font-size: 1.1rem;
+}
+
+h3.card-title {
+  color: #1a2a6c;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.form-floating > .form-control {
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  height: calc(3.5rem + 2px);
+  padding: 1rem;
+}
+
+.form-floating > .form-control:focus {
+  background-color: rgba(255, 255, 255, 1);
+  border-color: #1a2a6c;
+  box-shadow: 0 0 0 0.25rem rgba(26, 42, 108, 0.2);
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+  transform: translateY(-0.75rem) scale(0.85);
+}
+
+.form-floating > label {
+  color: #6c757d;
+  line-height: 1;
+}
+
+.btn-primary {
+  background: linear-gradient(to right, #1E3A8A, #2b52c4);
+  border: none;
+  border-radius: 10px;
+  padding: 0.85rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 7px 20px rgba(44, 62, 80, 0.3);
+}
+
 .btn-primary:hover:not(:disabled) {
-  background-color: #152c6c;
-  border-color: #152c6c;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 7px 20px rgba(44, 62, 80, 0.3);
 }
 
 .btn-primary:disabled {
-  background-color: #1E3A8A;
-  border-color: #1E3A8A;
-  opacity: 0.65;
-}
-
-.form-floating label {
-  padding: 1rem 0.75rem;
-  color: #6c757d;
+  cursor: not-allowed;
+  background: linear-gradient(to right, #1E3A8A, #2b52c4);
+  opacity: 0.5;
 }
 
 a {
-  color: #1E3A8A;
-  font-weight: 500;
-  transition: color 0.2s ease;
+  color: #1a2a6c;
+  font-weight: 600;
 }
 
 a:hover {
-  color: #152c6c;
-  text-decoration: underline !important;
+  color: #2b52c4;
 }
 
 .alert {
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
+  background-color: rgba(248, 215, 218, 0.8);
+  border-color: rgba(245, 198, 203, 0.8);
+  color: #721c24;
+  border-radius: 10px;
+}
+
+.invalid-feedback {
+  display: block;
+  color: #dc3545;
 }
 
 @media (max-width: 767.98px) {
+  :host {
+    padding: 2rem 0;
+  }
   .card-body {
-    padding: 1.5rem !important;
+    padding: 2rem !important;
   }
-  
-  .logo {
-    width: 80px;
-  }
-  
-  h2 {
-    font-size: 1.75rem;
+  .login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
   }
 }

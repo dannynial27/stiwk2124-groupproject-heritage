@@ -4,6 +4,13 @@
   padding-bottom: 50px;
 }
 
+/* Add more space on mobile view */
+@media (max-width: 992px) {
+  .container {
+    padding-top: 100px;
+  }
+}
+
 .page-header {
   display: flex;
   justify-content: space-between;

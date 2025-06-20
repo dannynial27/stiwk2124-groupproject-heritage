@@ -76,6 +76,17 @@
   width: 100%;
 }
 
+/* Hide text labels and chevron by default (desktop) */
+.nav-link-text, 
+.nav-dropdown .bi-chevron-down {
+  display: none;
+}
+
+/* Show feedback text on all screen sizes */
+.nav-dropdown button span {
+  display: inline-block;
+}
+
 /* Wishlist and Cart Links */
 .wishlist-link, .cart-link {
   position: relative;
@@ -164,6 +175,7 @@
   position: relative;
 }
 
+/* Apply the same hover effect to all nav links including dropdowns */
 .dropdown-toggle {
   background: transparent;
   border: none;
@@ -173,10 +185,29 @@
   cursor: pointer;
   color: #333;
   font-weight: 500;
+  position: relative; /* Added for underline effect */
+  padding: 0.3rem 0; /* Match nav-link padding */
+  transition: color 0.2s ease;
 }
 
 .dropdown-toggle:hover {
   color: #1E3A8A;
+}
+
+/* Add the same underline effect as regular nav links */
+.dropdown-toggle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #1E3A8A;
+  transition: width 0.3s ease;
+}
+
+.dropdown-toggle:hover::after {
+  width: 100%;
 }
 
 .dropdown-menu {
@@ -220,52 +251,51 @@
 /* Mobile Menu Toggle */
 .menu-toggle {
   display: none;
-  background: transparent;
+  background: none;
   border: none;
-  cursor: pointer;
-  width: 40px;
-  height: 40px;
-  position: relative;
-  z-index: 2;
+  z-index: 1001;
+  padding: 10px;
+  cursor: pointer; /* Add cursor pointer */
 }
 
-.menu-icon {
+.burger-icon {
   position: relative;
+  width: 24px;
+  height: 18px;
+}
+
+.burger-icon span {
   display: block;
-  background: #333;
-  width: 24px;
-  height: 2px;
-  transition: all 0.3s ease;
-}
-
-.menu-icon::before,
-.menu-icon::after {
-  content: '';
   position: absolute;
-  background: #333;
-  width: 24px;
-  height: 2px;
-  transition: all 0.3s ease;
+  height: 3px;
+  width: 100%;
+  background: #1E3A8A; /* Change to blue to match brand color */
+  border-radius: 3px;
+  opacity: 1;
+  left: 0;
+  transform: rotate(0deg);
+  transition: .25s ease-in-out;
 }
 
-.menu-icon::before {
-  transform: translateY(-8px);
+.burger-icon span:nth-child(1) { top: 0px; }
+.burger-icon span:nth-child(2) { top: 7px; }
+.burger-icon span:nth-child(3) { top: 14px; }
+
+.menu-toggle.open .burger-icon span:nth-child(1) {
+  top: 7px;
+  transform: rotate(135deg);
+  background-color: #1E3A8A;
 }
 
-.menu-icon::after {
-  transform: translateY(8px);
+.menu-toggle.open .burger-icon span:nth-child(2) {
+  opacity: 0;
+  left: -60px;
 }
 
-.menu-toggle.active .menu-icon {
-  background: transparent;
-}
-
-.menu-toggle.active .menu-icon::before {
-  transform: rotate(45deg);
-}
-
-.menu-toggle.active .menu-icon::after {
-  transform: rotate(-45deg);
+.menu-toggle.open .burger-icon span:nth-child(3) {
+  top: 7px;
+  transform: rotate(-135deg);
+  background-color: #1E3A8A;
 }
 
 /* Bootstrap Icons */
@@ -285,8 +315,9 @@
     padding: 5rem 1.5rem 2rem;
     transition: right 0.3s ease;
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-    z-index: 1;
+    z-index: 1000; /* Ensure it's above other elements */
     gap: 2rem;
+    overflow-y: auto; /* Allow scrolling if menu is tall */
   }
   
   .navbar-nav.open {
@@ -303,16 +334,32 @@
     display: block;
   }
   
-  .auth-buttons {
-    width: 100%;
-    margin-left: 0;
-    justify-content: flex-start;
+  /* Show text labels and chevron on mobile */
+  .nav-link-text,
+  .nav-dropdown .bi-chevron-down {
+    display: inline-block;
   }
   
-  .login-btn, .register-btn {
+  /* Add margin to text labels */
+  .nav-link-text {
+    margin-left: 8px;
+  }
+  
+  /* Fix dropdown toggles on mobile */
+  .nav-dropdown > .nav-link.dropdown-toggle,
+  .dropdown-toggle {
+    display: flex;
+    align-items: center;
     width: 100%;
-    justify-content: center;
-    padding: 0.75rem 1rem;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 0.5rem 0;
+  }
+  
+  /* Remove underline effect on mobile */
+  .dropdown-toggle::after,
+  .nav-link::after {
+    display: none;
   }
   
   .dropdown-menu {
@@ -320,26 +367,21 @@
     box-shadow: none;
     display: none;
     padding-left: 1rem;
+    margin-top: 0;
+    width: 100%;
   }
   
   .nav-dropdown.active .dropdown-menu {
-    display: flex;
-    flex-direction: column;
+    display: block;
   }
   
-  .dropdown-toggle {
-    width: 100%;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-  }
-  
-  .wishlist-link, .cart-link {
+  .wishlist-link, .cart-link, .order-link {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    width: 100%;
   }
   
-  .wishlist-link .badge, .cart-link .badge {
+  .wishlist-link .badge, .cart-link .badge, .order-link .badge {
     position: static;
     margin-left: 0.25rem;
   }
@@ -353,3 +395,33 @@
 .user-navbar {
   background-color: #28a745; /* Green for user */
 }
+
+/* Remove conflicting styles */
+/* Delete these redundant style blocks */
+.nav-dropdown > .dropdown-toggle {
+  text-decoration: none;
+}
+
+.nav-dropdown > .dropdown-toggle:hover {
+  text-decoration: underline;
+}
+
+/* Style for dropdown toggles in the navbar - replace with our new unified style */
+.nav-dropdown > .nav-link.dropdown-toggle {
+  background-color: transparent;
+  border: none;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nav-dropdown > .nav-link.dropdown-toggle:hover {
+  color: #1E3A8A;
+  text-decoration: none;
+}
+
+/* This rule was causing the persistent hover effect and is not needed.
+.nav-dropdown.active > .dropdown-toggle {
+  background-color: rgba(0,0,0,0.1);
+  color: #fff;
+}
+*/

@@ -13,9 +13,20 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./feedback-form.css']
 })
 export class FeedbackFormComponent implements OnInit {
-  feedback = { subject: '', content: '' };
+  feedback = {
+    subject: '',
+    content: ''
+  };
+  subjectOptions: string[] = [
+    'General Inquiry',
+    'Product Quality Issue',
+    'Website Bug or Technical Issue',
+    'Suggestion for Improvement',
+    'Order and Shipping',
+    'Other'
+  ];
   errorMessage = '';
-  successMessage = '';
+  successMessage: string | null = null;
   isAuthenticated = false;
   isLoading = false;
 

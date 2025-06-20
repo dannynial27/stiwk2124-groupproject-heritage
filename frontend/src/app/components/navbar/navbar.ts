@@ -23,6 +23,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   isAuthenticated: boolean = false; // Add this missing property
   
   @ViewChild('authDropdown') authDropdown: ElementRef | undefined;
+  @ViewChild('feedbackDropdown') feedbackDropdown: ElementRef | undefined;
+  @ViewChild('productsDropdown') productsDropdown: ElementRef | undefined;
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -70,28 +72,50 @@ export class NavbarComponent implements OnInit, OnDestroy {
   toggleMobileMenu() {
     this.mobileMenuOpen = !this.mobileMenuOpen;
   }
+
+  closeMobileMenu() {
+    this.mobileMenuOpen = false;
+  }
   
   @HostListener('document:click', ['$event'])
   clickout(event: Event) {
-    if (this.authDropdown?.nativeElement && !this.authDropdown.nativeElement.contains(event.target as Node)) {
-      // Clicked outside the auth dropdown, so close it
-      this.removeActiveFromDropdown();
+    const target = event.target as Node;
+    const authClickedInside = this.authDropdown?.nativeElement.contains(target);
+    const feedbackClickedInside = this.feedbackDropdown?.nativeElement.contains(target);
+    const productsClickedInside = this.productsDropdown?.nativeElement.contains(target);
+
+    if (!authClickedInside && !feedbackClickedInside && !productsClickedInside) {
+      this.closeDropdowns();
     }
   }
 
-  toggleDropdown(event: Event) {
-    const toggleElement = event.currentTarget as HTMLElement;
-    const parentElement = toggleElement.closest('.nav-dropdown');
-    if (parentElement) {
-      parentElement.classList.toggle('active');
-    }
+  toggleDropdown(event: Event, dropdown: 'auth' | 'feedback' | 'products') {
     event.stopPropagation();
+    const authEl = this.authDropdown?.nativeElement;
+    const feedbackEl = this.feedbackDropdown?.nativeElement;
+    const productsEl = this.productsDropdown?.nativeElement;
+
+    if (dropdown === 'auth') {
+      feedbackEl?.classList.remove('active');
+      productsEl?.classList.remove('active');
+      authEl?.classList.toggle('active');
+    } else if (dropdown === 'feedback') {
+      authEl?.classList.remove('active');
+      productsEl?.classList.remove('active');
+      feedbackEl?.classList.toggle('active');
+    } else if (dropdown === 'products') {
+      authEl?.classList.remove('active');
+      feedbackEl?.classList.remove('active');
+      productsEl?.classList.toggle('active');
+    }
   }
 
-  private removeActiveFromDropdown() {
-    if (this.authDropdown?.nativeElement) {
-      this.authDropdown.nativeElement.classList.remove('active');
-    }
+  closeDropdowns() {
+    // Don't close mobile menu when closing dropdowns
+    // this.mobileMenuOpen = false; // Remove this line
+    this.authDropdown?.nativeElement.classList.remove('active');
+    this.feedbackDropdown?.nativeElement.classList.remove('active');
+    this.productsDropdown?.nativeElement.classList.remove('active');
   }
 
   private setupSubscriptions() {
@@ -128,19 +152,26 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   loadWishlistData() {
-    if (this.isAuthenticated) {
+    if (this.isAuthenticated && this.role?.toLowerCase() === 'customer') {
       this.wishlistService.getWishlist().subscribe({
         next: () => console.log('Wishlist loaded successfully in navbar'),
-        error: (err) => console.error('Error loading wishlist in navbar:', err)
+        error: (err) => {
+          console.error('Error loading wishlist in navbar:', err);
+          // Don't show error to user, just handle it gracefully
+          this.wishlistCount = 0;
+        }
       });
     }
   }
 
   loadCartData() {
-    if (this.isAuthenticated) {
+    if (this.isAuthenticated && this.role?.toLowerCase() === 'customer') {
       this.cartService.loadCart().subscribe({
         next: () => console.log('Cart loaded successfully in navbar'),
-        error: (err) => console.error('Error loading cart in navbar:', err)
+        error: (err) => {
+          console.error('Error loading cart in navbar:', err);
+          this.cartCount = 0;
+        }
       });
     }
   }
@@ -151,22 +182,20 @@ export class NavbarComponent implements OnInit, OnDestroy {
       if (userId) {
         this.orderService.getUserOrders(userId).subscribe({
           next: () => console.log('Orders loaded successfully in navbar'),
-          error: (err) => console.error('Error loading orders in navbar:', err)
+          error: (err) => {
+            console.error('Error loading orders in navbar:', err);
+            this.orderCount = 0;
+          }
         });
       }
     }
   }
 
   logout() {
-    localStorage.removeItem('role');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    this.role = null;
-    this.cartCount = 0;
-    this.wishlistCount = 0;
-    this.orderCount = 0;
-    this.isAuthenticated = false; // Update the isAuthenticated state
-    this.router.navigate(['/login']);
-    this.mobileMenuOpen = false;
+    if (confirm('Are you sure you want to logout?')) {
+      this.authService.logout();
+      this.closeDropdowns(); // Ensure dropdowns are closed on logout
+      this.router.navigate(['/login']); // Navigate to login page
+    }
   }
 }

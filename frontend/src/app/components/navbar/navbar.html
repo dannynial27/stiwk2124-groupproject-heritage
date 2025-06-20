@@ -10,72 +10,78 @@
         
         <!-- Customer Links -->
         <ng-container *ngIf="!role || (role.toLowerCase() !== 'admin')">
-          <a routerLink="/home" class="nav-link">Home</a>
-          <a routerLink="/products" class="nav-link">Products</a>
-          <div class="nav-dropdown" *ngIf="isAuthenticated">
-            <button class="nav-link dropdown-toggle" (click)="toggleDropdown($event)">
-              <i class="bi bi-chat-quote"></i> Feedback <i class="bi bi-chevron-down"></i>
+          <a routerLink="/home" class="nav-link" (click)="closeMobileMenu()">Home</a>
+          <a routerLink="/products" class="nav-link" (click)="closeMobileMenu()">Products</a>
+          <div class="nav-dropdown" #feedbackDropdown *ngIf="isAuthenticated">
+            <button class="nav-link dropdown-toggle" (click)="toggleDropdown($event, 'feedback')">
+              <i class="bi bi-chat-quote"></i>
+              <span>Feedback</span>
+              <i class="bi bi-chevron-down ms-1"></i>
             </button>
             <div class="dropdown-menu">
-              <a routerLink="/my-feedback" class="dropdown-item">
+              <a routerLink="/my-feedback" class="dropdown-item" (click)="closeDropdowns(); closeMobileMenu()">
                 <i class="bi bi-journal-text"></i> My Feedback
               </a>
-              <a routerLink="/feedback" class="dropdown-item">
+              <a routerLink="/feedback" class="dropdown-item" (click)="closeDropdowns(); closeMobileMenu()">
                 <i class="bi bi-pencil-square"></i> Submit Feedback
               </a>
             </div>
           </div>
-          <a *ngIf="isAuthenticated" routerLink="/wishlist" class="nav-link wishlist-link">
+          <a *ngIf="isAuthenticated" routerLink="/wishlist" class="nav-link wishlist-link" (click)="closeMobileMenu()">
             <i class="bi bi-heart"></i>
+            <span class="nav-link-text">Wishlist</span>
             <span class="badge" *ngIf="wishlistCount > 0">{{wishlistCount}}</span>
           </a>
-          <a *ngIf="isAuthenticated" routerLink="/cart" class="nav-link cart-link">
+          <a *ngIf="isAuthenticated" routerLink="/cart" class="nav-link cart-link" (click)="closeMobileMenu()">
             <i class="bi bi-cart"></i>
+            <span class="nav-link-text">Cart</span>
             <span class="badge" *ngIf="cartCount > 0">{{cartCount}}</span>
           </a>
-          <a routerLink="/my-orders" *ngIf="isAuthenticated" class="nav-link order-link">
+          <a routerLink="/my-orders" *ngIf="isAuthenticated" class="nav-link order-link" (click)="closeMobileMenu()">
             <i class="bi bi-box-seam"></i>
+            <span class="nav-link-text">My Orders</span>
             <span class="badge" *ngIf="orderCount > 0">{{orderCount}}</span>
           </a>
         </ng-container>
         
         <!-- Admin Links -->
         <ng-container *ngIf="role && role.toLowerCase() === 'admin'">
-            <a routerLink="/admin-dashboard" class="nav-link">Dashboard</a>
-            <div class="nav-dropdown">
-              <button class="nav-link dropdown-toggle" (click)="toggleDropdown($event)">
+            <a routerLink="/admin-dashboard" class="nav-link" (click)="closeMobileMenu()">Dashboard</a>
+            <div class="nav-dropdown" #productsDropdown>
+              <button class="nav-link dropdown-toggle" (click)="toggleDropdown($event, 'products')">
                 <i class="bi bi-box-seam"></i> Manage Products <i class="bi bi-chevron-down"></i>
               </button>
               <div class="dropdown-menu">
-                <a routerLink="/admin/products" class="dropdown-item">
+                <a routerLink="/admin/products" class="dropdown-item" (click)="closeDropdowns(); closeMobileMenu()">
                   <i class="bi bi-card-list"></i> All Products
                 </a>
-                <a routerLink="/view-categories" class="dropdown-item">
+                <a routerLink="/view-categories" class="dropdown-item" (click)="closeDropdowns(); closeMobileMenu()">
                   <i class="bi bi-tags"></i> Manage by Categories
                 </a>
-                <a routerLink="/add-product" class="dropdown-item">
+                <a routerLink="/add-product" class="dropdown-item" (click)="closeDropdowns(); closeMobileMenu()">
                   <i class="bi bi-plus-circle"></i> Add Product
                 </a>
               </div>
             </div>
-            <a routerLink="/admin-orders" class="nav-link">Manage Orders</a>
-            <a routerLink="/admin-feedback" class="nav-link">View Feedback</a>
+            <a routerLink="/admin-orders" class="nav-link" (click)="closeMobileMenu()">Manage Orders</a>
+            <a routerLink="/admin-feedback" class="nav-link" (click)="closeMobileMenu()">View Feedback</a>
         </ng-container>
         
         <!-- Auth Dropdown -->
         <div class="nav-dropdown" #authDropdown>
-          <button class="nav-link dropdown-toggle" (click)="toggleDropdown($event)">
+          <button class="nav-link dropdown-toggle" (click)="toggleDropdown($event, 'auth')">
             <i class="bi bi-person-circle"></i>
+            <span class="nav-link-text">Profile</span>
             <i class="bi bi-chevron-down"></i>
           </button>
           <div class="dropdown-menu">
-            <a *ngIf="!isAuthenticated" routerLink="/login" class="dropdown-item">
-              <i class="bi bi-box-arrow-in-right"></i> Login
+            <a *ngIf="!isAuthenticated" routerLink="/login" class="dropdown-item" (click)="closeDropdowns(); closeMobileMenu()">
+              <i class="bi bi-box-arrow-in-right"></i> Sign In
             </a>
-            <a *ngIf="!isAuthenticated" routerLink="/register" class="dropdown-item">
+            <a *ngIf="!isAuthenticated" routerLink="/register" class="dropdown-item" (click)="closeDropdowns(); closeMobileMenu()">
               <i class="bi bi-person-plus"></i> Register
             </a>
-            <button *ngIf="isAuthenticated" (click)="logout()" class="dropdown-item">
+            <button *ngIf="isAuthenticated" (click)="logout(); closeMobileMenu()" class="dropdown-item">
               <i class="bi bi-box-arrow-right"></i> Logout
             </button>
           </div>
@@ -84,8 +90,12 @@
     </div>
     
     <!-- Mobile menu toggle -->
-    <button class="menu-toggle" (click)="toggleMobileMenu()">
-      <span class="menu-icon"></span>
+    <button class="menu-toggle" (click)="toggleMobileMenu()" [class.open]="mobileMenuOpen">
+      <div class="burger-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
     </button>
   </div>
 </nav>
