@@ -50,8 +50,53 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
       By combining comprehensive e-commerce functionality with modern backend practices, our platform provides a secure, maintainable, and scalable foundation that meets the needs of diverse businesses while supporting future enhancements (Raghunath & Panga, 2013). This project demonstrates how technology can be effectively leveraged to build robust e-commerce solutions that address contemporary market challenges (Gunasekaran et al., 2002).
 
 ## Link for Docker Image
+[Docker Hub - AmeenQurba- Backend](https://hub.docker.com/r/dannynial27/qurba-backend)
 
+[Docker Hub - AmeenQurba- Frontend](https://hub.docker.com/r/dannynial27/qurba-frontend)
 ## Instructions on how to run Docker.
+### Prerequisites
+* Make sure you have Docker Desktop installed and running on your PC.
+
+### Running the Backend
+
+1.  Open the Docker Desktop
+2.  Clone / Download the github repository / Download ```docker-compose.yml``` from repository
+3.  Use the command to pull everything from docker :
+    ```
+    docker pull dannynial27/qurba-backend
+    ```
+5.  Run the Backend services:
+    ```
+    docker-compose up -d
+    ```
+    This command will build (if necessary) and start the Spring Boot application, MySQL database, and phpMyAdmin.
+6.  Access the Backend services:
+    * **Spring Boot Application:**
+    * **phpMyAdmin:** `http://localhost:8082` (Login with `root` and password `root` by default)
+7.  Stop the Backend services:
+    ```
+    docker-compose down
+    ```
+
+### Running the Frontend
+
+1.  Open the Docker Desktop
+2.  Clone / Download the github repository / Download ```docker-compose.yml``` from repository
+3.  Use the command to pull everything from docker :
+    ```
+    docker pull dannynial27/qurba-frontend
+    ```
+5.  Run the Frontend service:
+    ```
+    docker-compose up -d
+    ```
+    This command will build (if necessary) and start your Angular application served by Nginx.
+6.  Search `http://localhost:4200` on your web browser for the frontend.
+    * **Note:** The frontend will attempt to connect to the backend API (`http://localhost:8080/qurba/api/products`). Ensure the backend services are running before accessing the frontend.
+7.  Stop the Frontend service:
+    ```
+    docker-compose down
+    ```
 
 ## List of all the endpoints
 
