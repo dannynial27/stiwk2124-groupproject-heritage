@@ -60,7 +60,6 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
             <option value="oldest">Oldest First</option>
             <option value="highest">Highest Rated</option>
             <option value="lowest">Lowest Rated</option>
-            <option value="helpful">Most Helpful</option>
           </select>
         </div>
 
@@ -180,16 +179,6 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
           <div class="review-footer">
             <div class="review-recommend" *ngIf="review.recommend">
               <span class="recommend-badge">✓ Recommends this product</span>
-            </div>
-            
-            <div class="review-helpful">
-              <span class="helpful-text">Was this helpful?</span>
-              <button 
-                class="helpful-btn"
-                [class.active]="review.userFoundHelpful"
-                (click)="toggleHelpful(review)">
-                👍 {{review.helpfulCount || 0}}
-              </button>
             </div>
           </div>
         </div>
@@ -905,15 +894,6 @@ export class ProductReviewsComponent implements OnInit, OnChanges {
     return this.reviewSummary?.ratingDistribution[rating] || 0;
   }
 
-  toggleHelpful(review: Review) {
-    // Toggle helpful status
-    review.userFoundHelpful = !review.userFoundHelpful;
-    review.helpfulCount = (review.helpfulCount || 0) + (review.userFoundHelpful ? 1 : -1);
-    
-    // In real implementation, make API call to save this
-    console.log(`Review ${review.reviewId} marked as ${review.userFoundHelpful ? 'helpful' : 'not helpful'}`);
-  }
-
   trackByReviewId(index: number, review: Review): number {
     return review.reviewId;
   }
@@ -930,4 +910,4 @@ export class ProductReviewsComponent implements OnInit, OnChanges {
     // In real implementation, scroll to review form
     console.log('Scroll to review form');
   }
-} 
+}

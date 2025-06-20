@@ -12,8 +12,19 @@
         <ng-container *ngIf="!role || (role.toLowerCase() !== 'admin')">
           <a routerLink="/home" class="nav-link">Home</a>
           <a routerLink="/products" class="nav-link">Products</a>
-          <a routerLink="/my-feedback" *ngIf="isAuthenticated" class="nav-link">My Feedback</a>
-          <a routerLink="/feedback" *ngIf="isAuthenticated" class="nav-link">Submit Feedback</a>
+          <div class="nav-dropdown" *ngIf="isAuthenticated">
+            <button class="nav-link dropdown-toggle" (click)="toggleDropdown($event)">
+              <i class="bi bi-chat-quote"></i> Feedback <i class="bi bi-chevron-down"></i>
+            </button>
+            <div class="dropdown-menu">
+              <a routerLink="/my-feedback" class="dropdown-item">
+                <i class="bi bi-journal-text"></i> My Feedback
+              </a>
+              <a routerLink="/feedback" class="dropdown-item">
+                <i class="bi bi-pencil-square"></i> Submit Feedback
+              </a>
+            </div>
+          </div>
           <a *ngIf="isAuthenticated" routerLink="/wishlist" class="nav-link wishlist-link">
             <i class="bi bi-heart"></i>
             <span class="badge" *ngIf="wishlistCount > 0">{{wishlistCount}}</span>

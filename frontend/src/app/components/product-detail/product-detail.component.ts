@@ -591,26 +591,6 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
-  loadProductDetails(productId: number) {
-    this.loading = true;
-    this.error = false;
-    this.newReview.productId = productId;
-
-    this.productService.getProductById(productId).subscribe({
-      next: (product) => {
-        this.product = product;
-        this.loadReviews(productId);
-        this.checkWishlistStatus();
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading product:', error);
-        this.error = true;
-        this.loading = false;
-      }
-    });
-  }
-
   loadReviews(productId: number) {
     this.reviewService.getProductReviews(productId).subscribe({
       next: (reviews) => {
@@ -753,6 +733,7 @@ export class ProductDetailComponent implements OnInit {
     this.productService.getProductById(id).subscribe({
       next: (product) => {
         this.product = product;
+        this.loadReviews(id);
         this.loading = false;
         this.checkWishlistStatus();
       },

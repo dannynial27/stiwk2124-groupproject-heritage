@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Review, ReviewRequest, ReviewSummary } from '../models/review.model';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,10 @@ import { Review, ReviewRequest, ReviewSummary } from '../models/review.model';
 export class ReviewService {
   private apiUrl = 'http://localhost:8080/qurba/api/reviews';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
   // Get reviews for a product
   getProductReviews(productId: number): Observable<Review[]> {
@@ -23,21 +27,37 @@ export class ReviewService {
 
   // Add a review for a product
   addReview(review: ReviewRequest): Observable<Review> {
-    return this.http.post<Review>(this.apiUrl, review);
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+    return this.http.post<Review>(`${this.apiUrl}/${userId}`, review);
   }
 
   // Update a review
   updateReview(reviewId: number, review: ReviewRequest): Observable<Review> {
-    return this.http.put<Review>(`${this.apiUrl}/${reviewId}`, review);
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+    return this.http.put<Review>(`${this.apiUrl}/${userId}/${reviewId}`, review);
   }
 
   // Delete a review
   deleteReview(reviewId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${reviewId}`);
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+    return this.http.delete<void>(`${this.apiUrl}/${userId}/${reviewId}`);
   }
 
   // Get user's reviews
   getUserReviews(): Observable<Review[]> {
-    return this.http.get<Review[]>(`${this.apiUrl}/user`);
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+    return this.http.get<Review[]>(`${this.apiUrl}/${userId}`);
   }
-} 
+}
