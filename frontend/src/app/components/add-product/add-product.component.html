@@ -45,8 +45,25 @@
       </div>
     </div>
     <div class="mb-3">
-      <label for="imagePath" class="form-label">Image URL</label>
-      <input type="text" id="imagePath" formControlName="imagePath" class="form-control" placeholder="Paste image URL or leave blank for default">
+      <label class="form-label">Product Image</label>
+      <div class="image-preview-container mb-2">
+        <div *ngIf="isEditMode && currentImagePath && !imagePreviewUrl" class="image-preview">
+          <img [src]="getImageUrl(currentImagePath)" (error)="onImageError($event)" alt="Current product image" class="preview-thumb">
+          <small>Current Image</small>
+        </div>
+        <div *ngIf="imagePreviewUrl" class="image-preview">
+          <img [src]="imagePreviewUrl" alt="New image preview" class="preview-thumb">
+          <small>New Image Preview</small>
+        </div>
+      </div>
+      <input
+        type="file"
+        (change)="onFileSelected($event)"
+        accept="image/png, image/jpeg, image/gif"
+        class="form-control">
+      <div class="field-hint">
+        Upload a new image to replace the existing one. PNG, JPG, or GIF. Max 2MB.
+      </div>
     </div>
     <button type="submit" class="btn btn-primary w-100" [disabled]="productForm.invalid || isSubmitting">
       <span *ngIf="isSubmitting" class="spinner"></span>

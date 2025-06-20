@@ -117,7 +117,7 @@ export class AdminProductsComponent implements OnInit {
     this.successMessage = null;
     const uploadObservable: Observable<string | null | undefined> = this.selectedFile
       ? this.imageService.uploadProductImage(this.selectedFile, this.currentProduct.category, this.currentProduct.name, !!this.editingProduct).pipe(
-        map((response: { imagePath?: string; imageUrl?: string }) => response.imageUrl || response.imagePath)
+        map((response: { imagePath?: string; imageUrl?: string }) => response.imagePath)
       )
       : of(this.currentProduct.imagePath);
     uploadObservable.pipe(
