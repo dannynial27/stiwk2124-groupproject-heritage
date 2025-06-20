@@ -60,6 +60,7 @@ export class LoginPageComponent {
       },
       error: (err: any) => {
         console.error('Login error:', err);
+<<<<<<< HEAD
         let backendMessage = '';
         if (err.error) {
           if (typeof err.error === 'string') {
@@ -81,6 +82,9 @@ export class LoginPageComponent {
           this.errorMessage = 'Invalid username or password. Please try again.';
         }
 
+=======
+        this.errorMessage = err.message || 'Invalid username or password. Please try again.';
+>>>>>>> 93bb50ccdb62a4eec2019925c5ff531a330f59b0
         this.isLoading = false;
       },
       complete: () => {
@@ -88,7 +92,6 @@ export class LoginPageComponent {
       }
     });
   }
-
 
   initializeUserServices(): void {
     if (this.authService.isAuthenticated()) {
@@ -106,3 +109,4 @@ export class LoginPageComponent {
     }
   }
 }
+
