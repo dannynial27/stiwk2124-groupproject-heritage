@@ -29,29 +29,29 @@ export class LoginPageComponent {
   login(): void {
     // Reset error message
     this.errorMessage = '';
-    
+
     // Validate inputs
     if (!this.username || this.username.trim() === '') {
       this.errorMessage = 'Username is required';
       return;
     }
-    
+
     if (!this.password || this.password.trim() === '') {
       this.errorMessage = 'Password is required';
       return;
     }
-    
+
     this.isLoading = true;
-    
+
     this.authService.login(this.username, this.password).subscribe({
       next: (response) => {
         console.log('Login successful, initializing user data...');
         this.initializeUserServices();
-        
+
         // Navigation based on role
         const role = localStorage.getItem('role');
         console.log(`Redirecting user with role: ${role}`);
-        
+
         if (role === 'ADMIN' || role === 'admin') {
           this.router.navigate(['/admin-dashboard']);
         } else {
@@ -60,7 +60,15 @@ export class LoginPageComponent {
       },
       error: (err: any) => {
         console.error('Login error:', err);
-        this.errorMessage = err.message || 'Invalid username or password. Please try again.';
+
+        if (err.status === 401) {
+          this.errorMessage = 'Invalid username or password. Please try again.';
+        } else if (err.status >= 500) {
+          this.errorMessage = 'Oops! Server error. Please try again later.';
+        } else {
+          this.errorMessage = 'An unexpected error occurred. Please try again.';
+        }
+
         this.isLoading = false;
       },
       complete: () => {
@@ -68,7 +76,8 @@ export class LoginPageComponent {
       }
     });
   }
-  
+
+
   initializeUserServices(): void {
     if (this.authService.isAuthenticated()) {
       console.log('Loading user cart data...');
@@ -76,7 +85,7 @@ export class LoginPageComponent {
         next: (data) => console.log('Cart loaded successfully:', data),
         error: (err) => console.error('Failed to load cart:', err)
       });
-      
+
       console.log('Loading user wishlist data...');
       this.wishlistService.getWishlist().subscribe({
         next: (data) => console.log('Wishlist loaded successfully:', data),
