@@ -739,7 +739,8 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 ## ADMIN
 
 ### Admin Orders Page
-![image](https://github.com/user-attachments/assets/227a2d29-9dbe-4ed5-8d32-bd64736d4f73)
+![image](https://github.com/user-attachments/assets/1cd3bf9c-1993-456b-9563-73493e5a257f)
+
 
 
 
