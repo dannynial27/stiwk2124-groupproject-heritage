@@ -643,17 +643,17 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 ![image](https://github.com/user-attachments/assets/51b920ae-fcef-4dcd-b240-63682add1dc9)
 
 ## CUSTOMER 
-## PRODUCT LIST PAGE
+### PRODUCT LIST PAGE
 ![image](https://github.com/user-attachments/assets/77cd5309-a50d-4c65-8184-29e5af6e8ac1)
 
-## PRODUCT DETAIL PAGE
+### PRODUCT DETAIL PAGE
 ![image](https://github.com/user-attachments/assets/7af5f5b1-33c0-4839-b840-de5ec32b71d8)
 
-## PRODUCT REVIEW AND RATING
+### PRODUCT REVIEW AND RATING
 ![image](https://github.com/user-attachments/assets/c50c758f-4f13-491a-9490-2d7ff5902511)
 ![image](https://github.com/user-attachments/assets/6f879166-19a8-4867-8870-1b72814a6117)
 
-## WISHLIST PAGE
+### WISHLIST PAGE
 ![image](https://github.com/user-attachments/assets/821e151e-8efc-4f89-ab66-3b99cbb15457)
 ![image](https://github.com/user-attachments/assets/1545baba-6a36-4a84-b993-da7c670ec248)
 
