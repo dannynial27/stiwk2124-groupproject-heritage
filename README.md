@@ -23,7 +23,7 @@ https://github.com/STIWK2124-A242/class-activity-stiwk2124/blob/main/NewGroupMem
 | ---------------- | ------- | ------------- | ------------- | ------- | ----------------------------------------------------------------------- |
 | Siti Alya Balqis Binti Abdul Rahmat | Backend Driector | 291345 | 012-6552610 | repo-ranger/repo_rangers  | <img src="https://github.com/user-attachments/assets/fc15804a-7338-439f-bfac-09563a223abe" width="100"/> |
 | Nurfatin Aleysyah Binti Abdul Razly | MEMBER | 296017 | 019-3766461 | blitzers/blitzer  | <img src="https://github.com/user-attachments/assets/a198b7ab-f8ca-49ea-ac8b-308f0edf4891" width="100"/> |
-| Nurul Husna Binti Mohd Badrulisyam | MEMBER | 291878 | 018-4715413 | reallyfun/reallyfun2  | <img src="https://github.com/user-attachments/assets/c72aac99-b1c9-4036-90b0-a401a37cf01d" width="100"/> |
+| Nurul Husna Binti Mohd Badrulisyam | MEMBER | 291878 | 018-4715413 | error404,error404_  | <img src="https://github.com/user-attachments/assets/c72aac99-b1c9-4036-90b0-a401a37cf01d" width="100"/> |
 | Ku Hazwan Bin Ku Izham | MEMBER  | 289889 | 019-8442357 | Syntax/Syntax  | <img src="https://github.com/user-attachments/assets/2e82e08a-6a98-4512-8c98-e3ee919eebbb" width="100"/> |
 
 ## Title of your application (a unique title)
