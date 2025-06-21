@@ -646,7 +646,7 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 ![Screenshot (228)](https://github.com/user-attachments/assets/060ac0ed-7f95-4308-a187-d120e1459287)
 ![Screenshot (229)](https://github.com/user-attachments/assets/79a08199-efe0-4142-b76c-d40fa4f064a1)
 
-### AUTHENTICATION PAGE
+## AUTHENTICATION PAGE
 ![Screenshot 2025-06-21 204921](https://github.com/user-attachments/assets/bcf567ed-19e3-442b-a74b-60e5e8240d87)
 ![Screenshot 2025-06-21 204926](https://github.com/user-attachments/assets/0aa240c1-950b-4ab5-bf07-2374e0805666)
 
