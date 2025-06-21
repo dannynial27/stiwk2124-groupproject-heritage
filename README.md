@@ -731,9 +731,6 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 ![image](https://github.com/user-attachments/assets/1cd3bf9c-1993-456b-9563-73493e5a257f)
 ![WhatsApp Image 2025-06-20 at 22 21 53_1a395629](https://github.com/user-attachments/assets/0d82cfaf-4164-4396-adaf-d559ebbabbcc)
 
-
-
-
 ## References (Not less than 20)
 
 Chauhan, H., Yadav, D., Balaji, T., Kumar, M., & Bhosale, T. (2023). Creating A Distinctive E-Commerce Platform For Cultural Heritage Products: A Visionary Venture. International Journal of Creative Research Thoughts (IJCRT), 11(5), 683-694.
