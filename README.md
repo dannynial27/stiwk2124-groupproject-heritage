@@ -665,7 +665,10 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 ![image](https://github.com/user-attachments/assets/b5906dcc-188e-410e-8797-1c8ffac01b82)
 ![image](https://github.com/user-attachments/assets/90c4d392-7d0c-488d-bcbe-387ca3f270c9)
 ![image](https://github.com/user-attachments/assets/7c1dd3bc-f6af-4293-8cca-dd4e12841f94)
-
+#### Manage product - Manage by Categories
+![image](https://github.com/user-attachments/assets/6395ae74-3f49-4cbb-bd1f-d39d74ceaca8)
+#### Manage product - Add new product
+![image](https://github.com/user-attachments/assets/49451f57-b6cd-4498-a11a-8d53af742afd)
 
 
 
