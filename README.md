@@ -1,4 +1,4 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/co02Vmtr)
+![image](https://github.com/user-attachments/assets/0e2cf142-1b5d-4500-95de-b109d6fcd369)[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/co02Vmtr)
 ## Requirements for Group Project
 [Read the instruction](https://github.com/STIWK2124-A242/class-activity-stiwk2124/blob/main/Group_Project_Guideline.md)
 
@@ -696,8 +696,8 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 ### FEEDBACK FORM (USER)
 #### Feedback Form - Submit Feedback
 ![Screenshot (246)](https://github.com/user-attachments/assets/ae1848e9-704b-46e5-bddd-25dd35b1b7ef)
-![Screenshot (248)](https://github.com/user-attachments/assets/0dd3254d-65a0-452a-a0d4-c477e6698145)
-![Screenshot (249)](https://github.com/user-attachments/assets/0bcc028a-ee2f-4417-9775-8f9839ec76bc)
+![image](https://github.com/user-attachments/assets/e1e52709-ef36-4365-a858-42653822b00d)
+![image](https://github.com/user-attachments/assets/f64df1b5-c1d9-4f4e-b07f-e542c409381e)
 
 #### Feedback Form - My Feedback (History)
 ![Screenshot (250)](https://github.com/user-attachments/assets/ff44d4a0-526d-4b02-b48f-09122f76ba12)
