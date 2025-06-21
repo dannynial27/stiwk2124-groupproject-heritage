@@ -716,6 +716,38 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 #### Manage product - Add new product
 ![image](https://github.com/user-attachments/assets/49451f57-b6cd-4498-a11a-8d53af742afd)
 
+## CUSTOMER
+
+### SHOPPING CART PAGE - VIEW CART ITEMS
+![image](https://github.com/user-attachments/assets/ac9ca8ce-dc68-4f60-be82-e4403166a22e)
+
+### SHOPPING CART PAGE - UPDATE QUANTITY
+![image](https://github.com/user-attachments/assets/55770cf5-9fb8-4ade-9d07-6feee7620435)
+
+### SHOPPING CART PAGE - REMOVE ITEMS
+![image](https://github.com/user-attachments/assets/20c2fe45-4fbb-4496-8964-5ba27afa0309)
+
+### Checkout Page
+![image](https://github.com/user-attachments/assets/f690e5d1-7b08-4884-8abb-462821f6885a)
+
+### Orders Success Page
+![image](https://github.com/user-attachments/assets/65bd92ac-1d53-4cd8-8963-0f1285675888)
+
+### My Orders Page
+![image](https://github.com/user-attachments/assets/3b8082a8-fc67-4d6a-a9d1-3f1ea4929644)
+
+## ADMIN
+
+### Admin Orders Page
+![image](https://github.com/user-attachments/assets/227a2d29-9dbe-4ed5-8d32-bd64736d4f73)
+
+
+
+
+
+
+
+
 
 
 
