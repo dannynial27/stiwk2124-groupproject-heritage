@@ -639,6 +639,43 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 
 ## Result/Output (Screenshot of the output)
 
+### HOME PAGE (BEFORE USER LOGIN)
+![Screenshot (225)](https://github.com/user-attachments/assets/5445dfd3-0dda-41e0-b368-b38b4c97fbb4)
+![Screenshot (226)](https://github.com/user-attachments/assets/88470643-394d-49a3-be21-69c377e767c2)
+![Screenshot (227)](https://github.com/user-attachments/assets/dc3f47de-db7b-461d-878f-200e81fbb254)
+![Screenshot (228)](https://github.com/user-attachments/assets/060ac0ed-7f95-4308-a187-d120e1459287)
+![Screenshot (229)](https://github.com/user-attachments/assets/79a08199-efe0-4142-b76c-d40fa4f064a1)
+
+### HOME PAGE (AFTER USER LOGIN)
+![Screenshot (232)](https://github.com/user-attachments/assets/bd79a94f-9a01-4966-8b61-04835e7315d7)
+![Screenshot (233)](https://github.com/user-attachments/assets/2789be11-3668-443c-9439-4b9bfb53a2ef)
+![Screenshot (234)](https://github.com/user-attachments/assets/9703dded-858b-4b0d-945f-b636db1086ed)
+![Screenshot (236)](https://github.com/user-attachments/assets/b68ac29f-8db1-4672-8c9f-a5161e50d25d)
+![Screenshot (237)](https://github.com/user-attachments/assets/fb4c92bb-8146-4e7c-bb01-7e4e0cce0ff8)
+
+### FEEDBACK FORM (USER)
+#### Feedback Form - Submit Feedback
+![Screenshot (246)](https://github.com/user-attachments/assets/ae1848e9-704b-46e5-bddd-25dd35b1b7ef)
+![Screenshot (248)](https://github.com/user-attachments/assets/0dd3254d-65a0-452a-a0d4-c477e6698145)
+![Screenshot (249)](https://github.com/user-attachments/assets/0bcc028a-ee2f-4417-9775-8f9839ec76bc)
+
+#### Feedback Form - My Feedback (History)
+![Screenshot (250)](https://github.com/user-attachments/assets/ff44d4a0-526d-4b02-b48f-09122f76ba12)
+![Screenshot (247)](https://github.com/user-attachments/assets/3b87e4fe-e910-428c-abbd-00c1d949ce8a)
+
+### FEEDBACK VIEWER (ADMIN)
+![Screenshot (240)](https://github.com/user-attachments/assets/3ec23449-fa5f-4da1-9b8f-cf59a1545050)
+![Screenshot (241)](https://github.com/user-attachments/assets/5d7890f4-6cb3-477e-9655-b67b95604b06)
+![Screenshot (242)](https://github.com/user-attachments/assets/3a9035c4-72dc-453d-b272-c10741308513)
+![Screenshot (243)](https://github.com/user-attachments/assets/e7700c40-d16e-496a-9aa3-041fc82c7bdb)
+![Screenshot (244)](https://github.com/user-attachments/assets/d2ab6cd9-544f-4c56-b04e-54d67e36f95c)
+
+
+
+
+
+
+
 ![image](https://github.com/user-attachments/assets/abbe0912-d9c5-4dee-a75b-908c6dde3604)
 ![image](https://github.com/user-attachments/assets/51b920ae-fcef-4dcd-b240-63682add1dc9)
 
