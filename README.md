@@ -654,8 +654,9 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 ![image](https://github.com/user-attachments/assets/6f879166-19a8-4867-8870-1b72814a6117)
 
 ### WISHLIST PAGE
-![image](https://github.com/user-attachments/assets/821e151e-8efc-4f89-ab66-3b99cbb15457)
-![image](https://github.com/user-attachments/assets/1545baba-6a36-4a84-b993-da7c670ec248)
+![image](https://github.com/user-attachments/assets/e92c7e34-bcab-411a-944c-8b2346420c77)
+![image](https://github.com/user-attachments/assets/8abae512-5a72-4432-8a6f-7356b9bb710d)
+
 
 ## ADMIN
 
