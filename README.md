@@ -646,6 +646,10 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 ![Screenshot (228)](https://github.com/user-attachments/assets/060ac0ed-7f95-4308-a187-d120e1459287)
 ![Screenshot (229)](https://github.com/user-attachments/assets/79a08199-efe0-4142-b76c-d40fa4f064a1)
 
+### AUTHENTICATION PAGE
+![Screenshot 2025-06-21 204921](https://github.com/user-attachments/assets/bcf567ed-19e3-442b-a74b-60e5e8240d87)
+![Screenshot 2025-06-21 204926](https://github.com/user-attachments/assets/0aa240c1-950b-4ab5-bf07-2374e0805666)
+
 ## CUSTOMER
 ### HOME PAGE (AFTER USER LOGIN)
 ![Screenshot (232)](https://github.com/user-attachments/assets/bd79a94f-9a01-4966-8b61-04835e7315d7)
@@ -705,8 +709,6 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 ![Screenshot (242)](https://github.com/user-attachments/assets/3a9035c4-72dc-453d-b272-c10741308513)
 ![Screenshot (243)](https://github.com/user-attachments/assets/e7700c40-d16e-496a-9aa3-041fc82c7bdb)
 ![Screenshot (244)](https://github.com/user-attachments/assets/d2ab6cd9-544f-4c56-b04e-54d67e36f95c)
-![image](https://github.com/user-attachments/assets/abbe0912-d9c5-4dee-a75b-908c6dde3604)
-![image](https://github.com/user-attachments/assets/51b920ae-fcef-4dcd-b240-63682add1dc9)
 
 ## ADMIN
 ### ADMIN PRODUCT PAGE -CRUD
