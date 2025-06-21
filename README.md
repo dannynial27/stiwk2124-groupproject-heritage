@@ -643,8 +643,12 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 ![image](https://github.com/user-attachments/assets/51b920ae-fcef-4dcd-b240-63682add1dc9)
 
 ## CUSTOMER 
+
 ### PRODUCT LIST PAGE
 ![image](https://github.com/user-attachments/assets/77cd5309-a50d-4c65-8184-29e5af6e8ac1)
+![image](https://github.com/user-attachments/assets/bc0fba8f-80f4-4722-9355-fc2d9fe31a08)
+![image](https://github.com/user-attachments/assets/1c4d6fd9-8382-4fb0-85f8-5c23ffbae61c)
+![image](https://github.com/user-attachments/assets/2b4ca741-1a1b-471e-a09d-0708ac3b2b14)
 
 ### PRODUCT DETAIL PAGE
 ![image](https://github.com/user-attachments/assets/7af5f5b1-33c0-4839-b840-de5ec32b71d8)
@@ -659,17 +663,18 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 
 
 ## ADMIN
+
 ### ADMIN PRODUCT PAGE -CRUD
 #### Manage product - All product
 ![image](https://github.com/user-attachments/assets/b3c450e0-c610-4647-9b71-a17afc00c656)
 ![image](https://github.com/user-attachments/assets/b5906dcc-188e-410e-8797-1c8ffac01b82)
 ![image](https://github.com/user-attachments/assets/90c4d392-7d0c-488d-bcbe-387ca3f270c9)
 ![image](https://github.com/user-attachments/assets/7c1dd3bc-f6af-4293-8cca-dd4e12841f94)
+
 #### Manage product - Manage by Categories
 ![image](https://github.com/user-attachments/assets/6395ae74-3f49-4cbb-bd1f-d39d74ceaca8)
 ![image](https://github.com/user-attachments/assets/0b8003bb-cbf8-470f-980c-9f35c32e0169)
 ![image](https://github.com/user-attachments/assets/59444252-8f35-40fa-987a-d9c76fc61e20)
-
 
 #### Manage product - Add new product
 ![image](https://github.com/user-attachments/assets/49451f57-b6cd-4498-a11a-8d53af742afd)
