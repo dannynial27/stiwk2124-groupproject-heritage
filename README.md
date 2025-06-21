@@ -659,6 +659,16 @@ AmeenMarket : Bridging Tradition with Modern E-Commerce
 
 
 ## ADMIN
+### ADMIN PRODUCT PAGE -CRUD
+#### Manage product - All product
+![image](https://github.com/user-attachments/assets/b3c450e0-c610-4647-9b71-a17afc00c656)
+![image](https://github.com/user-attachments/assets/b5906dcc-188e-410e-8797-1c8ffac01b82)
+![image](https://github.com/user-attachments/assets/90c4d392-7d0c-488d-bcbe-387ca3f270c9)
+![image](https://github.com/user-attachments/assets/7c1dd3bc-f6af-4293-8cca-dd4e12841f94)
+
+
+
+
 
 
 
